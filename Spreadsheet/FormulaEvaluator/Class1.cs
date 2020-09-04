@@ -184,7 +184,7 @@ namespace FormulaEvaluator
         }
     }
     /// <summary>
-    /// Extension class for adding the IsOnTop method to the Stack class
+    /// Extension class for adding the IsOnTop method
     /// </summary>
     static class StackExtension
     {
@@ -198,6 +198,7 @@ namespace FormulaEvaluator
         /// <returns></returns>
         public static bool IsOnTop<T>(this Stack<T> s, T c)
         {
+            
             if (s.Count < 1)
                 return false;
             return s.Peek().Equals(c);
