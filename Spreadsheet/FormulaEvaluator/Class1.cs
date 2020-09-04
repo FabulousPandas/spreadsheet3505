@@ -106,6 +106,24 @@ namespace FormulaEvaluator
                     throw new ArgumentException();
             }
         }
+
+        /// <summary>
+        /// Given a values stack and an operators stack it will evaluate the infix expression composed of the two top values and the top operator and push it back into the values stack.
+        /// If the operator is not a valid operator (+-/*) or the expression tries to divide by 0 the function throws an ArgumentException().
+        /// Will also throw an ArgumentException there are not enough values in the values stack.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="operators"></param>
+        /// <returns></returns>
+        static void SimpleEvaluate(Stack<int> values, Stack<char> operators)
+        {
+            if (values.Count < 2)
+                throw new ArgumentException();
+            int val2 = values.Pop();
+            int val1 = values.Pop();
+            values.Push(SimpleEvaluate(val1, val2, operators.Pop()));
+        }
+
         /// <summary>
         /// Helper method for handling the value cases of evaluating infix expressions
         /// </summary>
@@ -139,11 +157,7 @@ namespace FormulaEvaluator
                 case '-':
                     if (operators.IsOnTop<char>('+') || operators.IsOnTop<char>('-'))
                     {
-                        if (values.Count < 2)
-                            throw new ArgumentException();
-                        int val2 = values.Pop();
-                        int val1 = values.Pop();
-                        values.Push(SimpleEvaluate(val1, val2, operators.Pop()));
+                        SimpleEvaluate(values, operators);
                     }
                     operators.Push(op);
                     break;
@@ -155,11 +169,7 @@ namespace FormulaEvaluator
                 case ')':
                     if (operators.IsOnTop<char>('+') || operators.IsOnTop<char>('-'))
                     {
-                        if (values.Count < 2)
-                            throw new ArgumentException();
-                        int val2 = values.Pop();
-                        int val1 = values.Pop();
-                        values.Push(SimpleEvaluate(val1, val2, operators.Pop()));
+                        SimpleEvaluate(values, operators);
                     }
                     if (operators.IsOnTop<char>('('))
                         operators.Pop();
@@ -167,12 +177,7 @@ namespace FormulaEvaluator
                         throw new ArgumentException();
                     if (operators.IsOnTop<char>('*') || operators.IsOnTop<char>('/'))
                     {
-                        if (values.Count < 2)
-                            throw new ArgumentException("");
-
-                        int val2 = values.Pop();
-                        int val1 = values.Pop();
-                        values.Push(SimpleEvaluate(val1, val2, operators.Pop()));
+                        SimpleEvaluate(values, operators);
                     }
                     break;
             }
