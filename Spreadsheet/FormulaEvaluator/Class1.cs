@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace FormulaEvaluator
@@ -44,14 +45,30 @@ namespace FormulaEvaluator
                 }
                 else
                 {
-                    switch(trimmed[0])
-                    {
-                        
-                    }
+                    OperatorCase(trimmed[0], values, operators);
                 }
             }
 
-            return 0;
+            if(operators.Count == 0)
+            {
+                if (values.Count == 1)
+                    return values.Pop();
+                else
+                    throw new ArgumentException();
+            }
+            else
+            {
+                if (operators.IsOnTop<char>('+') || operators.IsOnTop<char>('-'))
+                {
+                    if (values.Count != 2)
+                        throw new ArgumentException();
+                    int val2 = values.Pop();
+                    int val1 = values.Pop();
+                    return SimpleEvaluate(val1, val2, operators.Pop());
+                }
+                else
+                    throw new ArgumentException();
+            }
         }
         /// <summary>
         /// Returns true if a given string is in the valid variable form
@@ -103,12 +120,57 @@ namespace FormulaEvaluator
                 if (values.Count == 0)
                     throw new ArgumentException("");
 
-                int secondValue = values.Pop();
-                char op = operators.Pop();
-                values.Push(SimpleEvaluate(value, secondValue, op));
+                values.Push(SimpleEvaluate(value, values.Pop(), operators.Pop()));
             }
             else
                 values.Push(value);
+        }
+
+        static void OperatorCase(char op, Stack<int> values, Stack<char> operators)
+        {
+            switch (op)
+            {
+                case '+':
+                case '-':
+                    if (operators.IsOnTop<char>('+') || operators.IsOnTop<char>('-'))
+                    {
+                        if (values.Count < 2)
+                            throw new ArgumentException();
+                        int val2 = values.Pop();
+                        int val1 = values.Pop();
+                        values.Push(SimpleEvaluate(val1, val2, operators.Pop()));
+                    }
+                    operators.Push(op);
+                    break;
+                case '*':
+                case '/':
+                case '(':
+                    operators.Push(op);
+                    break;
+                case ')':
+                    if (operators.IsOnTop<char>('+') || operators.IsOnTop<char>('-'))
+                    {
+                        if (values.Count < 2)
+                            throw new ArgumentException();
+                        int val2 = values.Pop();
+                        int val1 = values.Pop();
+                        values.Push(SimpleEvaluate(val1, val2, operators.Pop()));
+                    }
+                    if (operators.IsOnTop<char>('('))
+                        operators.Pop();
+                    else
+                        throw new ArgumentException();
+                    if (operators.IsOnTop<char>('*') || operators.IsOnTop<char>('/'))
+                    {
+                        if (values.Count < 2)
+                            throw new ArgumentException("");
+
+                        int val2 = values.Pop();
+                        int val1 = values.Pop();
+                        values.Push(SimpleEvaluate(val1, val2, operators.Pop()));
+                    }
+                    break;
+            }
         }
     }
     /// <summary>
