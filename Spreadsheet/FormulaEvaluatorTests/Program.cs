@@ -70,7 +70,7 @@ namespace FormulaEvaluatorTests
                 Console.WriteLine("Test " + i++ + ": Passed, exception thrown succesfully");
             }
 
-            //Test 11
+            //Test 12
             try
             {
                 Evaluate("4 / (a1 / 2)", BasicLookup);
@@ -81,7 +81,7 @@ namespace FormulaEvaluatorTests
                 Console.WriteLine("Test " + i++ + ": Passed, exception thrown succesfully");
             }
 
-            //Test 11
+            //Test 13
             try
             {
                 Evaluate("4 / (0 / 2)", BasicLookup);
@@ -92,7 +92,7 @@ namespace FormulaEvaluatorTests
                 Console.WriteLine("Test " + i++ + ": Passed, exception thrown succesfully");
             }
 
-            //Test 12
+            //Test 14
             try
             {
                 Evaluate("4 /", BasicLookup);
@@ -103,7 +103,7 @@ namespace FormulaEvaluatorTests
                 Console.WriteLine("Test " + i++ + ": Passed, exception thrown succesfully");
             }
 
-            //Test 13
+            //Test 15
             try
             {
                 Evaluate("+ 4", BasicLookup);
@@ -114,7 +114,7 @@ namespace FormulaEvaluatorTests
                 Console.WriteLine("Test " + i++ + ": Passed, exception thrown succesfully");
             }
 
-            //Test 14
+            //Test 16
             try
             {
                 Evaluate("2 + 2 + )", BasicLookup);
@@ -125,7 +125,7 @@ namespace FormulaEvaluatorTests
                 Console.WriteLine("Test " + i++ + ": Passed, exception thrown succesfully");
             }
 
-            //Test 15
+            //Test 17
             try
             {
                 Evaluate("-", BasicLookup);
@@ -136,7 +136,7 @@ namespace FormulaEvaluatorTests
                 Console.WriteLine("Test " + i++ + ": Passed, exception thrown succesfully");
             }
 
-            //Test 16
+            //Test 18
             try
             {
                 Evaluate("a", BasicLookup);
@@ -147,7 +147,7 @@ namespace FormulaEvaluatorTests
                 Console.WriteLine("Test " + i++ + ": Passed, exception thrown succesfully");
             }
 
-            //Test 17
+            //Test 19
             try
             {
                 Evaluate("a1 % 6", BasicLookup);
@@ -158,7 +158,7 @@ namespace FormulaEvaluatorTests
                 Console.WriteLine("Test " + i++ + ": Passed, exception thrown succesfully");
             }
 
-            //Test 18
+            //Test 20
             try
             {
                 Evaluate("c1 /()", BasicLookup);
@@ -169,11 +169,17 @@ namespace FormulaEvaluatorTests
                 Console.WriteLine("Test " + i++ + ": Passed, exception thrown succesfully");
             }
 
-            //Test 20
+            //Test 21
             actual = Evaluate("(1)(1) +", BasicLookup);
             expected = 2;
             Console.WriteLine("Test " + i++ + ": " + (actual == expected));
             
+            //Test 22
+            actual = Evaluate("45-19 / (20 + 3) * ((10 + 6) / 3) - (10 + 9) * (25 / 5) - (10 + 10 * (11 - 10))", BasicLookup);
+            expected = 45 - 19 / (20 + 3) * ((10 + 6) / 3) - (10 + 9) * (25 / 5) - (10 + 10 * (11 - 10));
+            Console.WriteLine("Test " + i++ + ": " + (actual == expected));
+            
+
 
             Console.Read();
 
