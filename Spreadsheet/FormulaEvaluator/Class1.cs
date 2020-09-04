@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace FormulaEvaluator
@@ -35,15 +34,15 @@ namespace FormulaEvaluator
 
                 int value;
 
-                if(int.TryParse(trimmed, out value))
+                if(int.TryParse(trimmed, out value)) //case for numbers
                 {
                     ValueCase(value, values, operators);
                 }
-                else if(IsVar(trimmed))
+                else if(IsVar(trimmed)) //case for variables
                 {
                     ValueCase(variableEvaluator(trimmed), values, operators);
                 }
-                else
+                else //case for operators and other invalid symbols/strings
                 {
                     OperatorCase(trimmed[0], values, operators);
                 }
@@ -120,12 +119,18 @@ namespace FormulaEvaluator
                 if (values.Count == 0)
                     throw new ArgumentException("");
 
-                values.Push(SimpleEvaluate(value, values.Pop(), operators.Pop()));
+                values.Push(SimpleEvaluate(values.Pop(), value, operators.Pop()));
             }
             else
                 values.Push(value);
         }
 
+        /// <summary>
+        /// Helper method for handling the operator cases of evaluating infix expressions
+        /// </summary>
+        /// <param name="op"></param>
+        /// <param name="values"></param>
+        /// <param name="operators"></param>
         static void OperatorCase(char op, Stack<int> values, Stack<char> operators)
         {
             switch (op)
