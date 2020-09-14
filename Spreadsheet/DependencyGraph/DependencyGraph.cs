@@ -169,7 +169,18 @@ namespace SpreadsheetUtilities
         /// <param name="t"></param>
         public void RemoveDependency(string s, string t)
         {
+            if (s == null || t == null) //arguments can't be null
+                throw new ArgumentNullException();
 
+            if (dependents.ContainsKey(s))
+            {
+                if(dependents[s].Contains(t))
+                {
+                    dependents[s].Remove(t);
+                    dependees[t].Remove(s);
+                    Size--;
+                }
+            }
         }
 
 
