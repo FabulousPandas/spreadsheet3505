@@ -44,11 +44,19 @@ namespace SpreadsheetUtilities
     /// </summary>
     public class DependencyGraph
     {
+        private Dictionary<string, HashSet<string>> dependents;
+        private Dictionary<string, HashSet<string>> dependees;
+        private int size;
+
+
         /// <summary>
         /// Creates an empty DependencyGraph.
         /// </summary>
         public DependencyGraph()
         {
+            dependents = new Dictionary<string, HashSet<string>>();
+            dependees = new Dictionary<string, HashSet<string>>();
+            Size = 0;
         }
 
 
@@ -57,7 +65,8 @@ namespace SpreadsheetUtilities
         /// </summary>
         public int Size
         {
-            get { return 0; }
+            get { return size; }
+            private set { size = value; }
         }
 
 
@@ -70,7 +79,7 @@ namespace SpreadsheetUtilities
         /// </summary>
         public int this[string s]
         {
-            get { return 0; }
+            get { return dependees[s].Count; }
         }
 
 
@@ -79,7 +88,7 @@ namespace SpreadsheetUtilities
         /// </summary>
         public bool HasDependents(string s)
         {
-            return false;
+            return dependents[s].Count == 0;
         }
 
 
@@ -88,7 +97,7 @@ namespace SpreadsheetUtilities
         /// </summary>
         public bool HasDependees(string s)
         {
-            return false;
+            return dependees[s].Count == 0;
         }
 
 
@@ -121,6 +130,7 @@ namespace SpreadsheetUtilities
         /// <param name="t"> t cannot be evaluated until s is</param>        /// 
         public void AddDependency(string s, string t)
         {
+
         }
 
 
