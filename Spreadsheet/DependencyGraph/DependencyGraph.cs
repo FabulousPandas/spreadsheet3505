@@ -46,8 +46,6 @@ namespace SpreadsheetUtilities
     {
         private Dictionary<string, HashSet<string>> dependents;
         private Dictionary<string, HashSet<string>> dependees;
-        private int size;
-
 
         /// <summary>
         /// Creates an empty DependencyGraph.
@@ -59,14 +57,14 @@ namespace SpreadsheetUtilities
             Size = 0;
         }
 
-
+        private int p_size;
         /// <summary>
         /// The number of ordered pairs in the DependencyGraph.
         /// </summary>
         public int Size
         {
-            get { return size; }
-            private set { size = value; }
+            get { return p_size; }
+            private set { p_size = value; }
         }
 
 
@@ -106,7 +104,7 @@ namespace SpreadsheetUtilities
         /// </summary>
         public IEnumerable<string> GetDependents(string s)
         {
-            return null;
+            return dependents[s];
         }
 
         /// <summary>
@@ -114,7 +112,7 @@ namespace SpreadsheetUtilities
         /// </summary>
         public IEnumerable<string> GetDependees(string s)
         {
-            return null;
+            return dependees[s];
         }
 
 
@@ -130,7 +128,37 @@ namespace SpreadsheetUtilities
         /// <param name="t"> t cannot be evaluated until s is</param>        /// 
         public void AddDependency(string s, string t)
         {
+            if (s == null || t == null) //arguments can't be null
+                throw new ArgumentNullException();
 
+            //Handles Dependents
+            if (dependents.ContainsKey(s)) //if s has already been used as a dependee previously
+            {
+                if(dependents[s].Contains(t)) //if the ordered pair has already been put in the dependency graph, there's no need to add it
+                    return;
+
+                dependents[s].Add(t);
+            }
+            else //if not, creates a new set for the key s, adds t to it, and creates the new key-value pair
+            {
+                HashSet<string> set = new HashSet<string>();
+                set.Add(t);
+                dependents[s] = set;
+            }
+
+            //Handles Dependees
+            if (dependees.ContainsKey(t)) //if t has already been used as a dependent previously
+            {
+                dependees[t].Add(s);
+            }
+            else //if not, creates a new set for the key t, adds s to it, and creates the new key-value pair
+            {
+                HashSet<string> set = new HashSet<string>();
+                set.Add(s);
+                dependees[t] = set;
+            }
+
+            Size++;
         }
 
 
@@ -141,6 +169,7 @@ namespace SpreadsheetUtilities
         /// <param name="t"></param>
         public void RemoveDependency(string s, string t)
         {
+
         }
 
 
