@@ -87,6 +87,8 @@ namespace SpreadsheetUtilities
         /// </summary>
         public bool HasDependents(string s)
         {
+            if (!dependents.ContainsKey(s))
+                return false;
             return dependents[s].Count == 0;
         }
 
@@ -96,6 +98,8 @@ namespace SpreadsheetUtilities
         /// </summary>
         public bool HasDependees(string s)
         {
+            if (!dependees.ContainsKey(s))
+                return false;
             return dependees[s].Count == 0;
         }
 
