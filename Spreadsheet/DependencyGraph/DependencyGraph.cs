@@ -10,6 +10,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 
 namespace SpreadsheetUtilities
@@ -190,6 +191,10 @@ namespace SpreadsheetUtilities
         /// </summary>
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
+            foreach(string r in dependents[s])
+                RemoveDependency(s, r);
+            foreach (string t in newDependents)
+                AddDependency(s, t);
         }
 
 
@@ -199,6 +204,10 @@ namespace SpreadsheetUtilities
         /// </summary>
         public void ReplaceDependees(string s, IEnumerable<string> newDependees)
         {
+            foreach (string r in dependees[s])
+                RemoveDependency(r, s);
+            foreach (string t in newDependees)
+                AddDependency(t, s);
         }
 
     }
