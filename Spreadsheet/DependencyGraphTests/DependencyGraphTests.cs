@@ -12,8 +12,8 @@ namespace DependencyGraphTests
     public class DependencyGraphTests
     {
         /// <summary>
-        ///Empty graph should contain nothing
-        ///</summary>
+        /// Empty graph should contain nothing
+        /// </summary>
         [TestMethod()]
         public void SimpleEmptyTest()
         {
@@ -21,10 +21,9 @@ namespace DependencyGraphTests
             Assert.AreEqual(0, t.Size);
         }
 
-
         /// <summary>
-        ///Empty graph should contain nothing
-        ///</summary>
+        /// Empty graph should contain nothing
+        /// </summary>
         [TestMethod()]
         public void SimpleEmptyRemoveTest()
         {
@@ -35,10 +34,9 @@ namespace DependencyGraphTests
             Assert.AreEqual(0, t.Size);
         }
 
-
         /// <summary>
-        ///Empty graph should contain nothing
-        ///</summary>
+        /// Empty graph should contain nothing
+        /// </summary>
         [TestMethod()]
         public void EmptyEnumeratorTest()
         {
@@ -55,10 +53,9 @@ namespace DependencyGraphTests
             Assert.IsFalse(t.GetDependents("x").GetEnumerator().MoveNext());
         }
 
-
         /// <summary>
-        ///Replace on an empty DG shouldn't fail
-        ///</summary>
+        /// Replace on an empty DG shouldn't fail
+        /// </summary>
         [TestMethod()]
         public void SimpleReplaceTest()
         {
@@ -70,11 +67,9 @@ namespace DependencyGraphTests
             t.ReplaceDependees("y", new HashSet<string>());
         }
 
-
-
-        ///<summary>
-        ///It should be possibe to have more than one DG at a time.
-        ///</summary>
+        /// <summary>
+        /// It should be possibe to have more than one DG at a time.
+        /// </summary>
         [TestMethod()]
         public void StaticTest()
         {
@@ -85,12 +80,9 @@ namespace DependencyGraphTests
             Assert.AreEqual(0, t2.Size);
         }
 
-
-
-
         /// <summary>
-        ///Non-empty graph contains something
-        ///</summary>
+        /// Non-empty graph contains something
+        /// </summary>
         [TestMethod()]
         public void SizeTest()
         {
@@ -102,10 +94,9 @@ namespace DependencyGraphTests
             Assert.AreEqual(4, t.Size);
         }
 
-
         /// <summary>
-        ///Non-empty graph contains something
-        ///</summary>
+        /// Non-empty graph contains something
+        /// </summary>
         [TestMethod()]
         public void EnumeratorTest()
         {
@@ -137,12 +128,9 @@ namespace DependencyGraphTests
             Assert.IsFalse(e.MoveNext());
         }
 
-
-
-
         /// <summary>
-        ///Non-empty graph contains something
-        ///</summary>
+        /// Non-empty graph contains something
+        /// </summary>
         [TestMethod()]
         public void ReplaceThenEnumerate()
         {
@@ -178,11 +166,9 @@ namespace DependencyGraphTests
             Assert.IsFalse(e.MoveNext());
         }
 
-
-
         /// <summary>
-        ///Using lots of data
-        ///</summary>
+        /// Using lots of data
+        /// </summary>
         [TestMethod()]
         public void StressTest()
         {
@@ -256,6 +242,100 @@ namespace DependencyGraphTests
                 Assert.IsTrue(dents[i].SetEquals(new HashSet<string>(t.GetDependents(letters[i]))));
                 Assert.IsTrue(dees[i].SetEquals(new HashSet<string>(t.GetDependees(letters[i]))));
             }
+        }
+
+        /// <summary>
+        /// Tests if null exceptions are thrown in AddDependency, RemoveDependency, ReplaceDependees, and ReplaceDependents
+        /// </summary>
+        [TestMethod()]
+        public void TestNullExceptions()
+        {
+            DependencyGraph t = new DependencyGraph();
+            try
+            {
+                t.AddDependency(null, null);
+                Assert.Fail();
+            }
+            catch(ArgumentNullException)
+            {
+            }
+
+            try
+            {
+                t.RemoveDependency(null, null);
+                Assert.Fail();
+            }
+            catch (ArgumentNullException)
+            {
+            }
+
+            try
+            {
+                t.ReplaceDependees(null, null);
+                Assert.Fail();
+            }
+            catch (ArgumentNullException)
+            {
+            }
+
+            try
+            {
+                t.ReplaceDependents(null, null);
+                Assert.Fail();
+            }
+            catch (ArgumentNullException)
+            {
+            }
+        }
+
+        /// <summary>
+        /// Testing if indexer works properly
+        /// </summary>
+        [TestMethod()]
+        public void TestIndexer()
+        {
+            DependencyGraph t = new DependencyGraph();
+            Assert.AreEqual(0, t["a"]);
+            t.AddDependency("a", "b");
+            Assert.AreEqual(0, t["a"]);
+            Assert.AreEqual(1, t["b"]);
+            t.AddDependency("c", "b");
+            t.AddDependency("a", "c");
+            Assert.AreEqual(2, t["b"]);
+        }
+
+        /// <summary>
+        /// Testing if HasDependents works properly
+        /// </summary>
+        [TestMethod()]
+        public void TestHasDependents()
+        {
+            DependencyGraph t = new DependencyGraph();
+            Assert.IsFalse(t.HasDependents("a"));
+            Assert.IsFalse(t.HasDependents("b"));
+            t.AddDependency("a", "b");
+            Assert.IsTrue(t.HasDependents("a"));
+            Assert.IsFalse(t.HasDependents("b"));
+            t.RemoveDependency("a", "b");
+            Assert.IsFalse(t.HasDependents("a"));
+            Assert.IsFalse(t.HasDependents("b"));
+        }
+
+        /// <summary>
+        /// Testing if HasDependees works properly
+        /// </summary>
+        [TestMethod()]
+        public void TestHasDependees()
+        {
+            DependencyGraph t = new DependencyGraph();
+            Assert.IsFalse(t.HasDependees("a"));
+            Assert.IsFalse(t.HasDependees("b"));
+            t.AddDependency("a", "b");
+            Assert.IsFalse(t.HasDependees("a"));
+            Assert.IsTrue(t.HasDependees("b"));
+            t.RemoveDependency("a", "b");
+            Assert.IsFalse(t.HasDependees("a"));
+            Assert.IsFalse(t.HasDependees("b"));
         }
     }
 }
