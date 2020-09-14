@@ -94,7 +94,7 @@ namespace SpreadsheetUtilities
         {
             if (!dependents.ContainsKey(s))
                 return false;
-            return dependents[s].Count == 0;
+            return dependents[s].Count != 0;
         }
 
 
@@ -105,7 +105,7 @@ namespace SpreadsheetUtilities
         {
             if (!dependees.ContainsKey(s))
                 return false;
-            return dependees[s].Count == 0;
+            return dependees[s].Count != 0;
         }
 
 
@@ -204,6 +204,9 @@ namespace SpreadsheetUtilities
         /// </summary>
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
+            if (s == null || newDependents == null) //arguments can't be null
+                throw new ArgumentNullException();
+
             if (dependents.ContainsKey(s))
             {
                 foreach (string r in GetDependents(s))
@@ -221,6 +224,9 @@ namespace SpreadsheetUtilities
         /// </summary>
         public void ReplaceDependees(string s, IEnumerable<string> newDependees)
         {
+            if (s == null || newDependees == null) //arguments can't be null
+                throw new ArgumentNullException();
+
             if (dependees.ContainsKey(s))
             {
                 foreach (string r in GetDependees(s))
