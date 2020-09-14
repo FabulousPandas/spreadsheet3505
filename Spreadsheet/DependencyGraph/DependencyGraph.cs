@@ -105,6 +105,8 @@ namespace SpreadsheetUtilities
         /// </summary>
         public IEnumerable<string> GetDependents(string s)
         {
+            if (!dependents.ContainsKey(s))
+                return new HashSet<string>();
             return dependents[s];
         }
 
@@ -113,6 +115,8 @@ namespace SpreadsheetUtilities
         /// </summary>
         public IEnumerable<string> GetDependees(string s)
         {
+            if (!dependees.ContainsKey(s))
+                return new HashSet<string>();
             return dependees[s];
         }
 
