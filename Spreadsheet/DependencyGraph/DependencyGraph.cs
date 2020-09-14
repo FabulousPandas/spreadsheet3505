@@ -78,7 +78,12 @@ namespace SpreadsheetUtilities
         /// </summary>
         public int this[string s]
         {
-            get { return dependees[s].Count; }
+            get 
+            {
+                if (!dependees.ContainsKey(s))
+                    return 0;
+                return dependees[s].Count; 
+            }
         }
 
 
@@ -111,7 +116,7 @@ namespace SpreadsheetUtilities
         {
             if (!dependents.ContainsKey(s))
                 return new HashSet<string>();
-            return dependents[s];
+            return new HashSet<string>(dependents[s]);
         }
 
         /// <summary>
@@ -121,7 +126,7 @@ namespace SpreadsheetUtilities
         {
             if (!dependees.ContainsKey(s))
                 return new HashSet<string>();
-            return dependees[s];
+            return new HashSet<string>(dependees[s]);
         }
 
 
@@ -143,7 +148,7 @@ namespace SpreadsheetUtilities
             //Handles Dependents
             if (dependents.ContainsKey(s)) //if s has already been used as a dependee previously
             {
-                if(dependents[s].Contains(t)) //if the ordered pair has already been put in the dependency graph, there's no need to add it
+                if (dependents[s].Contains(t)) //if the ordered pair has already been put in the dependency graph, there's no need to add it
                     return;
 
                 dependents[s].Add(t);
@@ -183,7 +188,7 @@ namespace SpreadsheetUtilities
 
             if (dependents.ContainsKey(s))
             {
-                if(dependents[s].Contains(t))
+                if (dependents[s].Contains(t))
                 {
                     dependents[s].Remove(t);
                     dependees[t].Remove(s);
@@ -199,10 +204,14 @@ namespace SpreadsheetUtilities
         /// </summary>
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
-            foreach(string r in dependents[s])
-                RemoveDependency(s, r);
-            foreach (string t in newDependents)
-                AddDependency(s, t);
+            if (dependents.ContainsKey(s))
+            {
+                foreach (string r in GetDependents(s))
+                    RemoveDependency(s, r);
+                foreach (string t in newDependents)
+                    AddDependency(s, t);
+            }
+
         }
 
 
@@ -212,10 +221,13 @@ namespace SpreadsheetUtilities
         /// </summary>
         public void ReplaceDependees(string s, IEnumerable<string> newDependees)
         {
-            foreach (string r in dependees[s])
-                RemoveDependency(r, s);
-            foreach (string t in newDependees)
-                AddDependency(t, s);
+            if (dependees.ContainsKey(s))
+            {
+                foreach (string r in GetDependees(s))
+                    RemoveDependency(r, s);
+                foreach (string t in newDependees)
+                    AddDependency(t, s);
+            }
         }
 
     }
