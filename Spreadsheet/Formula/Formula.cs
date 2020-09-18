@@ -81,8 +81,35 @@ namespace SpreadsheetUtilities
         /// new Formula("x+y3", N, V) should throw an exception, since V(N("x")) is false
         /// new Formula("2x+y3", N, V) should throw an exception, since "2x+y3" is syntactically incorrect.
         /// </summary>
-        public Formula(String formula, Func<string, string> normalize, Func<string, bool> isValid)
+        public Formula(string formula, Func<string, string> normalize, Func<string, bool> isValid)
         {
+            List<string> tokens = (List<string>) GetTokens(formula);
+            if (tokens.Count == 0)
+                throw new FormulaFormatException("Formula cannot be empty");
+
+            // Patterns for individual tokens
+            string lpPattern = @"\(";
+            string rpPattern = @"\)";
+            string opPattern = @"[\+\-*/]";
+            string varPattern = @"[a-zA-Z_](?: [a-zA-Z_]|\d)*";
+            string doublePattern = @"(?: \d+\.\d* | \d*\.\d+ | \d+ ) (?: [eE][\+-]?\d+)?";
+
+            // Overall pattern
+            string pattern = string.Format("({0}) | ({1}) | ({2}) | ({3}) | ({4})", lpPattern, rpPattern, opPattern, varPattern, doublePattern);
+
+            foreach (string token in tokens)
+            {
+                if (!Regex.IsMatch(token, pattern))
+                    throw new FormulaFormatException("Formula contains invalid characters");
+                if (Regex.IsMatch(token, varPattern))
+                {
+                    string normalized = normalize(token);
+
+                }
+            }    
+
+
+
         }
 
         /// <summary>
@@ -122,7 +149,7 @@ namespace SpreadsheetUtilities
         /// new Formula("x+X*z", N, s => true).GetVariables() should enumerate "X" and "Z".
         /// new Formula("x+X*z").GetVariables() should enumerate "x", "X", and "z".
         /// </summary>
-        public IEnumerable<String> GetVariables()
+        public IEnumerable<string> GetVariables()
         {
             return null;
         }
@@ -174,7 +201,7 @@ namespace SpreadsheetUtilities
         /// </summary>
         public static bool operator ==(Formula f1, Formula f2)
         {
-            return false;
+            return f1.Equals(f2);
         }
 
         /// <summary>
@@ -184,7 +211,7 @@ namespace SpreadsheetUtilities
         /// </summary>
         public static bool operator !=(Formula f1, Formula f2)
         {
-            return false;
+            return !f1.Equals(f2);
         }
 
         /// <summary>
@@ -203,22 +230,22 @@ namespace SpreadsheetUtilities
         /// followed by zero or more letters, digits, or underscores; a double literal; and anything that doesn't
         /// match one of those patterns.  There are no empty tokens, and no token contains white space.
         /// </summary>
-        private static IEnumerable<string> GetTokens(String formula)
+        private static IEnumerable<string> GetTokens(string formula)
         {
             // Patterns for individual tokens
-            String lpPattern = @"\(";
-            String rpPattern = @"\)";
-            String opPattern = @"[\+\-*/]";
-            String varPattern = @"[a-zA-Z_](?: [a-zA-Z_]|\d)*";
-            String doublePattern = @"(?: \d+\.\d* | \d*\.\d+ | \d+ ) (?: [eE][\+-]?\d+)?";
-            String spacePattern = @"\s+";
+            string lpPattern = @"\(";
+            string rpPattern = @"\)";
+            string opPattern = @"[\+\-*/]";
+            string varPattern = @"[a-zA-Z_](?: [a-zA-Z_]|\d)*";
+            string doublePattern = @"(?: \d+\.\d* | \d*\.\d+ | \d+ ) (?: [eE][\+-]?\d+)?";
+            string spacePattern = @"\s+";
 
             // Overall pattern
-            String pattern = String.Format("({0}) | ({1}) | ({2}) | ({3}) | ({4}) | ({5})",
+            string pattern = string.Format("({0}) | ({1}) | ({2}) | ({3}) | ({4}) | ({5})",
                                             lpPattern, rpPattern, opPattern, varPattern, doublePattern, spacePattern);
 
             // Enumerate matching tokens that don't consist solely of white space.
-            foreach (String s in Regex.Split(formula, pattern, RegexOptions.IgnorePatternWhitespace))
+            foreach (string s in Regex.Split(formula, pattern, RegexOptions.IgnorePatternWhitespace))
             {
                 if (!Regex.IsMatch(s, @"^\s*$", RegexOptions.Singleline))
                 {
@@ -237,7 +264,7 @@ namespace SpreadsheetUtilities
         /// <summary>
         /// Constructs a FormulaFormatException containing the explanatory message.
         /// </summary>
-        public FormulaFormatException(String message)
+        public FormulaFormatException(string message)
             : base(message)
         {
         }
@@ -252,7 +279,7 @@ namespace SpreadsheetUtilities
         /// Constructs a FormulaError containing the explanatory reason.
         /// </summary>
         /// <param name="reason"></param>
-        public FormulaError(String reason)
+        public FormulaError(string reason)
             : this()
         {
             Reason = reason;
