@@ -21,6 +21,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace SpreadsheetUtilities
@@ -122,16 +124,18 @@ namespace SpreadsheetUtilities
                         throw new FormulaFormatException("Variable is invalid after normalizing");
                     else
                     {
-                        token = normalize(token);
-                        variables.Add(token);
+                        tokens[i] = normalize(token);
+                        variables.Add(tokens[i]);
                     }
 
-                    if (!isValid(token))
+                    if (!isValid(tokens[i]))
                         throw new FormulaFormatException("Variable does not pass validator");
 
                 }
-                else if(double.TryParse(token, out _))
+                else if(double.TryParse(token, out double value))
                 {
+                    tokens[i] = value.ToString();
+
                     valOrParenthesis = false;
 
                     if (opOrParenthesis)
@@ -400,7 +404,10 @@ namespace SpreadsheetUtilities
         /// </summary>
         public override string ToString()
         {
-            return null;
+            StringBuilder sb = new StringBuilder();
+            foreach (string token in tokens)
+                sb.Append(token);
+            return sb.ToString();
         }
 
         /// <summary>
@@ -455,7 +462,7 @@ namespace SpreadsheetUtilities
         /// </summary>
         public override int GetHashCode()
         {
-            return 0;
+            return this.ToString().GetHashCode();
         }
 
         /// <summary>
