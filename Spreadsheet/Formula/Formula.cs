@@ -87,29 +87,74 @@ namespace SpreadsheetUtilities
             if (tokens.Count == 0)
                 throw new FormulaFormatException("Formula cannot be empty");
 
-            // Patterns for individual tokens
-            string lpPattern = @"\(";
-            string rpPattern = @"\)";
-            string opPattern = @"[\+\-*/]";
-            string varPattern = @"[a-zA-Z_](?: [a-zA-Z_]|\d)*";
-            string doublePattern = @"(?: \d+\.\d* | \d*\.\d+ | \d+ ) (?: [eE][\+-]?\d+)?";
+            string validVarPattern = @"^[a-zA-Z_][a-zA-Z_\d]*$";
+            string operatorPattern = @"[\+\-*/\)\(]";
 
-            // Overall pattern
-            string pattern = string.Format("({0}) | ({1}) | ({2}) | ({3}) | ({4})", lpPattern, rpPattern, opPattern, varPattern, doublePattern);
+            if(!Regex.IsMatch(tokens[0], validVarPattern) && !double.TryParse(tokens[0], out _) && !(tokens[0] == "(")) // starting token rule
+                throw new FormulaFormatException("Beginning of formula is invalid");
+            if (!Regex.IsMatch(tokens[tokens.Count - 1], validVarPattern) && !double.TryParse(tokens[tokens.Count - 1], out _) && !(tokens[0] == ")")) // ending token rule
+                throw new FormulaFormatException("Ending of formula is invalid");
 
-            foreach (string token in tokens)
+            int leftParenthesisCount = 0;
+            int rightParenthesisCount = 0;
+            bool valOrParenthesis = false; // whether a value (number or variable) or a opening parenthesis is needed next for the formula to be syntactically correct
+            bool opOrParenthesis = false; // whether an operator or a closing parenthesis is needed next for the formula to be syntactically correct
+
+            for(int i = 0; i < tokens.Count; i++)
             {
-                if (!Regex.IsMatch(token, pattern))
-                    throw new FormulaFormatException("Formula contains invalid characters");
-                if (Regex.IsMatch(token, varPattern))
-                {
-                    string normalized = normalize(token);
+                string token = tokens[i];
+                if (rightParenthesisCount > leftParenthesisCount)
+                    throw new FormulaFormatException("Unbalanced parentheses");
 
+                if (Regex.IsMatch(token, validVarPattern))
+                {
+                    valOrParenthesis = false;
+
+                    if (opOrParenthesis)
+                        throw new FormulaFormatException("Syntax error");
+
+                    opOrParenthesis = true;
+
+                    tokens[i] = normalize(token);
+                }
+                else if(double.TryParse(token, out _))
+                {
+                    valOrParenthesis = false;
+
+                    if (opOrParenthesis)
+                        throw new FormulaFormatException("Syntax error");
+
+                    opOrParenthesis = true;
+                }
+                else if(Regex.IsMatch(token, operatorPattern))
+                {
+                    if (valOrParenthesis && token != "(")
+                        throw new FormulaFormatException("Syntax error");
+
+                    if(token == "(")
+                    {
+                        if (opOrParenthesis)
+                            throw new FormulaFormatException("Syntax error");
+
+                        leftParenthesisCount++;
+                        valOrParenthesis = true;
+                    }
+                    else if(token == ")")
+                    {
+                        rightParenthesisCount++;
+                        opOrParenthesis = true;
+                    }    
+                    else
+                    {
+                        opOrParenthesis = false;
+                        valOrParenthesis = true;
+                    }
+                }
+                else
+                {
+                    throw new FormulaFormatException("Invalid symbol found in formula");
                 }
             }    
-
-
-
         }
 
         /// <summary>
