@@ -207,13 +207,11 @@ namespace SpreadsheetUtilities
             if (s == null || newDependents == null) //arguments can't be null
                 throw new ArgumentNullException();
 
-            if (dependents.ContainsKey(s))
-            {
-                foreach (string r in GetDependents(s))
-                    RemoveDependency(s, r);
-                foreach (string t in newDependents)
-                    AddDependency(s, t);
-            }
+            foreach (string r in GetDependents(s))
+                RemoveDependency(s, r);
+            foreach (string t in newDependents)
+                AddDependency(s, t);
+            
 
         }
 
@@ -227,13 +225,11 @@ namespace SpreadsheetUtilities
             if (s == null || newDependees == null) //arguments can't be null
                 throw new ArgumentNullException();
 
-            if (dependees.ContainsKey(s))
-            {
-                foreach (string r in GetDependees(s))
-                    RemoveDependency(r, s);
-                foreach (string t in newDependees)
-                    AddDependency(t, s);
-            }
+            foreach (string r in GetDependees(s))
+                RemoveDependency(r, s);
+            foreach (string t in newDependees)
+                AddDependency(t, s);
+            
         }
 
     }
