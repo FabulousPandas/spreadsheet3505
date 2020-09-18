@@ -86,6 +86,8 @@ namespace SpreadsheetUtilities
         public Formula(string formula, Func<string, string> normalize, Func<string, bool> isValid)
         {
             tokens = GetTokens(formula).ToList();
+            variables = new HashSet<string>();
+
             if (tokens.Count == 0)
                 throw new FormulaFormatException("Formula cannot be empty");
 
@@ -282,13 +284,14 @@ namespace SpreadsheetUtilities
         {
             double val2 = values.Pop();
             double val1 = values.Pop();
-            if (typeof(FormulaError).IsInstanceOfType(SimpleEvaluate(val1, val2, operators.Pop())))
+            char op = operators.Pop();
+            if (typeof(FormulaError).IsInstanceOfType(SimpleEvaluate(val1, val2, op)))
             {
                 return false;
             }
             else
             {
-                values.Push((double)SimpleEvaluate(val1, val2, operators.Pop()));
+                values.Push((double)SimpleEvaluate(val1, val2, op));
                 return true;
             }
         }
@@ -304,13 +307,15 @@ namespace SpreadsheetUtilities
         {
             if (operators.IsOnTop<char>('*') || operators.IsOnTop<char>('/'))
             {
-                if (typeof(FormulaError).IsInstanceOfType(SimpleEvaluate(values.Pop(), value, operators.Pop())))
+                double otherValue = values.Pop();
+                char op = operators.Pop();
+                if (typeof(FormulaError).IsInstanceOfType(SimpleEvaluate(otherValue, value, op)))
                 {
                     return false;
                 }
                 else
                 {
-                    values.Push((double)SimpleEvaluate(values.Pop(), value, operators.Pop()));
+                    values.Push((double)SimpleEvaluate(otherValue, value, op));
                     return true;
                 }
             }

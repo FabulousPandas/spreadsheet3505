@@ -39,10 +39,18 @@ namespace FormulaTests
         }
 
         [TestMethod]
-        public void TestSimpleWithVariable()
+        public void TestBiggerEquation()
         {
-            Formula f = new Formula("45 - 19 / (20 + 3) * ((10 + 6) / 3) - (10 + 9) * (25 / 5) - (10 + 10 * (11 - 10))");
-            double expected = 45 - 19 / (20 + 3) * ((10 + 6) / 3) - (10 + 9) * (25 / 5) - (10 + 10 * (11 - 10));
+            Formula f = new Formula("45.0 - 19.0 / (20 + 3.5) * ((10.0 + 6) / 3.1) - (10.543 + 9e0) * (2.54e1 / 5) - (10.2 + 9.8 * (11.4 - 10))");
+            double expected = 45.0 - 19.0 / (20 + 3.5) * ((10.0 + 6) / 3.1) - (10.543 + 9e0) * (2.54e1 / 5) - (10.2 + 9.8 * (11.4 - 10));
+            Assert.AreEqual(expected, (double)f.Evaluate(s => 0), 1e-9);
+        }
+
+        [TestMethod]
+        public void TestBiggerEquation2()
+        {
+            Formula f = new Formula("21.8 - 34e2 / 348 + (23 - (132 * 24)) + (8.45 + 2.3e-1)");
+            double expected = 21.8 - 34e2 / 348 + (23 - (132 * 24)) + (8.45 + 2.3e-1);
             Assert.AreEqual(expected, (double)f.Evaluate(s => 0), 1e-9);
         }
 
@@ -151,6 +159,19 @@ namespace FormulaTests
             Formula f = new Formula("((((1 + 3) - 5) * 3)");
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void TestInvalidVariable()
+        {
+            Formula f = new Formula("1a + 3");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void TestFailValidator()
+        {
+            Formula f = new Formula("a + 3", s => s.ToUpper(), LowercaseValidator);
+        }
 
         private static int SimpleLookup(string var)
         {
