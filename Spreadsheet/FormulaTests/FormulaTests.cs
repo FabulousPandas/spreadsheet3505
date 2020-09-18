@@ -4,6 +4,8 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SpreadsheetUtilities;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FormulaTests
 {
@@ -11,27 +13,48 @@ namespace FormulaTests
     public class FormulaTests
     {
         [TestMethod]
-        public void TestSimpleNoVariables()
+        public void TestSimpleAddNoVariables()
         {
             Formula f = new Formula("1 + 1");
             Assert.AreEqual(2.0, f.Evaluate(s => 0));
         }
         
         [TestMethod]
-        public void TestSimpleNoVariables2()
+        public void TestSimpleAddNoVariables2()
         {
             Formula f = new Formula("6.7 + 2.3");
             Assert.AreEqual(9.0, (double) f.Evaluate(s => 0), 1e-9);
         }
 
         [TestMethod]
-        public void TestOnlyOneToken()
+        public void TestSimpleSubtractNoVariables()
+        {
+            Formula f = new Formula("5 - 3");
+            Assert.AreEqual(2.0, f.Evaluate(s => 0));
+        }
+
+        [TestMethod]
+        public void TestSimpleDivideNoVariables()
+        {
+            Formula f = new Formula("5 / (3 + 2)");
+            Assert.AreEqual(1.0, f.Evaluate(s => 0));
+        }
+
+        [TestMethod]
+        public void TestOnlyOneValue()
         {
             Formula f = new Formula("6.7");
             Assert.AreEqual(6.7, (double)f.Evaluate(s => 0), 1e-9);
         }
 
         [TestMethod]
+        public void TestOnlyOneVariable()
+        {
+            Formula f = new Formula("a1");
+            Assert.AreEqual(5.0, (double) f.Evaluate(SimpleLookup), 1e-9);
+        }
+
+            [TestMethod]
         public void TestManyParentheses()
         {
             Formula f = new Formula("((((((((5.346436))))))))");
@@ -59,6 +82,30 @@ namespace FormulaTests
         {
             Formula f = new Formula("2 / 0");
             Assert.IsInstanceOfType(f.Evaluate(s => 0), typeof(FormulaError));
+            Assert.AreEqual(((FormulaError)f.Evaluate(s => 0)).Reason, "Divide by 0");
+        }
+
+        [TestMethod]
+        public void TestDivideByZero2()
+        {
+            Formula f = new Formula("2 / (0 + 0)");
+            Assert.IsInstanceOfType(f.Evaluate(s => 0), typeof(FormulaError));
+            Assert.AreEqual(((FormulaError)f.Evaluate(s => 0)).Reason, "Divide by 0");
+        }
+
+        [TestMethod]
+        public void TestDivideByZeroVariable()
+        {
+            Formula f = new Formula("2 / a1");
+            Assert.IsInstanceOfType(f.Evaluate(s => 0), typeof(FormulaError));
+            Assert.AreEqual(((FormulaError)f.Evaluate(s => 0)).Reason, "Divide by 0");
+        }
+
+        [TestMethod]
+        public void TestVariableLookupFailed()
+        {
+            Formula f = new Formula("a1 + g3");
+            Assert.IsInstanceOfType(f.Evaluate(SimpleLookup), typeof(FormulaError));
         }
 
         [TestMethod]
@@ -80,6 +127,13 @@ namespace FormulaTests
         public void TestInvalidCharacters()
         {
             Formula f = new Formula("? + 23");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void TestInvalidCharacters2()
+        {
+            Formula f = new Formula("a_23 - 643.2 - 3#4");
         }
 
         [TestMethod]
@@ -140,6 +194,13 @@ namespace FormulaTests
 
         [TestMethod]
         [ExpectedException(typeof(FormulaFormatException))]
+        public void TestConsecutiveParentheses()
+        {
+            Formula f = new Formula("(1 + 3) (3 + 4)");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
         public void TestStartWithOperator()
         {
             Formula f = new Formula("/ 3 + 1.57");
@@ -161,6 +222,13 @@ namespace FormulaTests
 
         [TestMethod]
         [ExpectedException(typeof(FormulaFormatException))]
+        public void TestOperatorAtEnd()
+        {
+            Formula f = new Formula("6 - 4.3 / 23e-1 + ");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
         public void TestInvalidVariable()
         {
             Formula f = new Formula("1a + 3");
@@ -173,24 +241,158 @@ namespace FormulaTests
             Formula f = new Formula("a + 3", s => s.ToUpper(), LowercaseValidator);
         }
 
-        private static int SimpleLookup(string var)
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void TestVariableInvalidAfterNormalizing()
+        {
+            Formula f = new Formula("a + 3", s => "1n", LowercaseValidator);
+        }
+
+        [TestMethod]
+        public void TestGetVariables()
+        {
+            Formula f = new Formula("(f1 + 0.45) - _3 / e2 * (26 - ee_2 / __e_23e)");
+            HashSet<string> variables = new HashSet<string>() {"f1", "_3", "e2", "ee_2", "__e_23e"};
+            foreach(string s in f.GetVariables())
+            {
+                Assert.IsTrue(variables.Contains(s));
+            }
+            
+        }
+
+        [TestMethod]
+        public void TestGetVariablesNoVariables()
+        {
+            Formula f = new Formula("1.0 + 5 / 3 - (2e1 + 0.45134)");
+            Assert.IsTrue(f.GetVariables().Count() == 0);
+        }
+
+        [TestMethod]
+        public void TestToStringNoVariables()
+        {
+            Formula f = new Formula("1.0 + 5 / 3 - (2e1 + 0.45134)");
+            Assert.AreEqual("1+5/3-(20+0.45134)", f.ToString());
+        }
+
+        [TestMethod]
+        public void TestToStringWithVariables()
+        {
+            Formula f = new Formula("4.5e3 + a2 / 6.624 - (e_1e + 0.45134e2)");
+            Assert.AreEqual("4500+a2/6.624-(e_1e+45.134)", f.ToString());
+        }
+
+        [TestMethod]
+        public void TestToStringWithNormalizedVariables()
+        {
+            Formula f = new Formula("1.0 + a2 / 3 - (e_1e + 0.45134)", s => s.ToUpper(), s => true);
+            Assert.AreEqual("1+A2/3-(E_1E+0.45134)", f.ToString());
+        }
+
+        /// Testing equals method (taken from comment on equals method)
+        /// 
+        /// For example, if N is a method that converts all the letters in a string to upper case:
+        /// new Formula("x1+y2", N, s => true).Equals(new Formula("X1  +  Y2")) is true
+        /// new Formula("x1+y2").Equals(new Formula("X1+Y2")) is false
+        /// new Formula("x1+y2").Equals(new Formula("y2+x1")) is false
+        /// new Formula("2.0 + x7").Equals(new Formula("2.000 + x7")) is true
+        [TestMethod]
+        public void TestEquals()
+        {
+            Formula f1 = new Formula("x1+y2", s => s.ToUpper(), s => true);
+            Formula f2 = new Formula("X1  +  Y2");
+            Assert.IsTrue(f1.Equals(f2));
+        }
+
+        [TestMethod]
+        public void TestEquals2()
+        {
+            Formula f1 = new Formula("x1+y2");
+            Formula f2 = new Formula("X1+Y2");
+            Assert.IsFalse(f1.Equals(f2));
+        }
+
+        [TestMethod]
+        public void TestEquals3()
+        {
+            Formula f1 = new Formula("x1+y2");
+            Formula f2 = new Formula("y2+x1");
+            Assert.IsFalse(f1.Equals(f2));
+        }
+
+        [TestMethod]
+        public void TestEquals4()
+        {
+            Formula f1 = new Formula("2.0 + x7");
+            Formula f2 = new Formula("2.000 + x7");
+            Assert.IsTrue(f1.Equals(f2));
+        }
+
+        [TestMethod]
+        public void TestEqualsWrongType()
+        {
+            Formula f1 = new Formula("2.0 + x7");
+            Stack<string> stack = new Stack<string>();
+            Assert.IsFalse(f1.Equals(stack));
+        }
+
+        [TestMethod]
+        public void TestOperatorEquals()
+        {
+            Formula f1 = new Formula("x1+y2", s => s.ToUpper(), s => true);
+            Formula f2 = new Formula("X1  +  Y2");
+            Assert.IsTrue(f1 == f2);
+            Assert.IsFalse(f1 != f2);
+        }
+
+        [TestMethod]
+        public void TestOperatorEquals2()
+        {
+            Formula f1 = new Formula("x1+y2");
+            Formula f2 = new Formula("X1+Y2");
+            Assert.IsFalse(f1 == f2);
+            Assert.IsTrue(f1 != f2);
+        }
+
+        [TestMethod]
+        public void TestOperatorEquals3()
+        {
+            Formula f1 = new Formula("x1+y2");
+            Formula f2 = new Formula("y2+x1");
+            Assert.IsFalse(f1 == f2);
+            Assert.IsTrue(f1 != f2);
+        }
+
+        [TestMethod]
+        public void TestOperatorEquals4()
+        {
+            Formula f1 = new Formula("2.0 + x7");
+            Formula f2 = new Formula("2.000 + x7");
+            Assert.IsTrue(f1 == f2);
+            Assert.IsFalse(f1 != f2);
+        }
+
+        [TestMethod]
+        public void TestGetHashCode()
+        {
+            Formula f1 = new Formula("2.0 + x7");
+            Formula f2 = new Formula("2.000 + x7");
+            Assert.AreEqual(f1.GetHashCode(), f2.GetHashCode());
+        }
+
+
+        /// <summary>
+        /// Simple Lookup Method with only two variables
+        /// </summary>
+        /// <param name="var"></param>
+        /// <returns></returns>
+        private static double SimpleLookup(string var)
         {
             if (var == "a1")
-                return 5;
+                return 5.0;
             else if (var == "b4")
-                return 12;
+                return 12.0;
             else
                 throw new ArgumentException();
-        }
-
-        private string UppercaseNormalizer(string s)
-        {
-            return s.ToUpper();
-        }
-
-        private string LowercaseNormalizer(string s)
-        {
-            return s.ToLower();
         }
 
         private bool LowercaseValidator(string s)
