@@ -21,7 +21,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace SpreadsheetUtilities
@@ -46,6 +45,9 @@ namespace SpreadsheetUtilities
     /// </summary>
     public class Formula
     {
+        private List<string> tokens;
+        private HashSet<string> variables;
+
         /// <summary>
         /// Creates a Formula from a string that consists of an infix expression written as
         /// described in the class comment.  If the expression is syntactically invalid,
@@ -83,16 +85,15 @@ namespace SpreadsheetUtilities
         /// </summary>
         public Formula(string formula, Func<string, string> normalize, Func<string, bool> isValid)
         {
-            List<string> tokens = (List<string>) GetTokens(formula);
+            tokens = GetTokens(formula).ToList();
             if (tokens.Count == 0)
                 throw new FormulaFormatException("Formula cannot be empty");
 
-            string validVarPattern = @"^[a-zA-Z_][a-zA-Z_\d]*$";
             string operatorPattern = @"[\+\-*/\)\(]";
 
-            if(!Regex.IsMatch(tokens[0], validVarPattern) && !double.TryParse(tokens[0], out _) && !(tokens[0] == "(")) // starting token rule
+            if(!IsVar(tokens[0]) && !double.TryParse(tokens[0], out _) && !(tokens[0] == "(")) // starting token rule
                 throw new FormulaFormatException("Beginning of formula is invalid");
-            if (!Regex.IsMatch(tokens[tokens.Count - 1], validVarPattern) && !double.TryParse(tokens[tokens.Count - 1], out _) && !(tokens[0] == ")")) // ending token rule
+            if (!IsVar(tokens[tokens.Count - 1]) && !double.TryParse(tokens[tokens.Count - 1], out _) && !(tokens[tokens.Count-1] == ")")) // ending token rule
                 throw new FormulaFormatException("Ending of formula is invalid");
 
             int leftParenthesisCount = 0;
@@ -106,7 +107,7 @@ namespace SpreadsheetUtilities
                 if (rightParenthesisCount > leftParenthesisCount)
                     throw new FormulaFormatException("Unbalanced parentheses");
 
-                if (Regex.IsMatch(token, validVarPattern))
+                if (IsVar(token))
                 {
                     valOrParenthesis = false;
 
@@ -115,7 +116,17 @@ namespace SpreadsheetUtilities
 
                     opOrParenthesis = true;
 
-                    tokens[i] = normalize(token);
+                    if (!IsVar(token))
+                        throw new FormulaFormatException("Variable is invalid after normalizing");
+                    else
+                    {
+                        token = normalize(token);
+                        variables.Add(token);
+                    }
+
+                    if (!isValid(token))
+                        throw new FormulaFormatException("Variable does not pass validator");
+
                 }
                 else if(double.TryParse(token, out _))
                 {
@@ -154,7 +165,10 @@ namespace SpreadsheetUtilities
                 {
                     throw new FormulaFormatException("Invalid symbol found in formula");
                 }
-            }    
+            }
+
+            if (leftParenthesisCount != rightParenthesisCount)
+                throw new FormulaFormatException("Unbalanced parentheses");
         }
 
         /// <summary>
@@ -180,8 +194,178 @@ namespace SpreadsheetUtilities
         /// </summary>
         public object Evaluate(Func<string, double> lookup)
         {
-            return null;
+            Stack<double> values = new Stack<double>();
+            Stack<char> operators = new Stack<char>();
+
+            foreach (string s in tokens)
+            {
+                if (double.TryParse(s, out double value)) //case for numbers
+                {
+                    if(!ValueCase(value, values, operators))
+                        return new FormulaError("Divide by 0");
+                }
+                else if (IsVar(s)) //case for variables
+                {
+                    try
+                    {
+                        if (!ValueCase(lookup(s), values, operators))
+                            return new FormulaError("Divide by 0");
+                    }
+                    catch(ArgumentException)
+                    {
+                        return new FormulaError("Could not find value for a variable");
+                    }
+                }
+                else //case for operators and other invalid symbols/strings
+                {
+                    if (!OperatorCase(s[0], values, operators))
+                        return new FormulaError("Divide by 0");
+                }
+            }
+
+            if (operators.Count == 0)
+            {
+                return values.Pop();
+            }
+            else
+            {
+                double val2 = values.Pop();
+                double val1 = values.Pop();
+                return SimpleEvaluate(val1, val2, operators.Pop());
+            }
         }
+
+        /// <summary>
+        /// Returns true if a given string is in the valid variable form
+        /// </summary>
+        /// <param name="var"></param>
+        /// <returns></returns>
+        private static bool IsVar(string var)
+        {
+            string pattern = @"^[a-zA-Z_][a-zA-Z_\d]*$";
+            return Regex.IsMatch(var, pattern);
+        }
+
+        /// <summary>
+        /// Given two values and an operator it will evaluate the expression of value1 operator value2.
+        /// If the operator is not a valid operator (+-/*) or the expression tries to divide by 0 the function returns a FormulaError
+        /// </summary>
+        /// <param name="val1">First value</param>
+        /// <param name="val2">Second value</param>
+        /// <param name="op">Operator</param>
+        /// <returns></returns>
+        static object SimpleEvaluate(double val1, double val2, char op)
+        {
+            switch (op)
+            {
+                case '+':
+                    return val1 + val2;
+                case '-':
+                    return val1 - val2;
+                case '*':
+                    return val1 * val2;
+                default:
+                    if (val2 == 0)
+                        return new FormulaError("Divide by 0");
+                    return val1 / val2;
+            }
+        }
+
+        /// <summary>
+        /// Given a values stack and an operators stack it will evaluate the infix expression composed of the two top values and the top operator and push it back into the values stack.
+        /// If the operator is not a valid operator (+-/*) or the expression tries to divide by 0 the function throws an ArgumentException().
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="operators"></param>
+        /// <returns></returns>
+        static bool SimpleEvaluate(Stack<double> values, Stack<char> operators)
+        {
+            double val2 = values.Pop();
+            double val1 = values.Pop();
+            if (typeof(FormulaError).IsInstanceOfType(SimpleEvaluate(val1, val2, operators.Pop())))
+            {
+                return false;
+            }
+            else
+            {
+                values.Push((double)SimpleEvaluate(val1, val2, operators.Pop()));
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Helper method for handling the value cases of evaluating infix expressions
+        /// Returns true if there was no error, returns false otherwise
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="values"></param>
+        /// <param name="operators"></param>
+        static bool ValueCase(double value, Stack<double> values, Stack<char> operators)
+        {
+            if (operators.IsOnTop<char>('*') || operators.IsOnTop<char>('/'))
+            {
+                if (typeof(FormulaError).IsInstanceOfType(SimpleEvaluate(values.Pop(), value, operators.Pop())))
+                {
+                    return false;
+                }
+                else
+                {
+                    values.Push((double)SimpleEvaluate(values.Pop(), value, operators.Pop()));
+                    return true;
+                }
+            }
+            else
+            {
+                values.Push(value);
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Helper method for handling the operator cases of evaluating infix expressions
+        /// Returns true if there was no error, returns false otherwise
+        /// </summary>
+        /// <param name="op"></param>
+        /// <param name="values"></param>
+        /// <param name="operators"></param>
+        static bool OperatorCase(char op, Stack<double> values, Stack<char> operators)
+        {
+            bool noError = true;
+            switch (op)
+            {
+                case '+':
+                case '-':
+                    if (operators.IsOnTop<char>('+') || operators.IsOnTop<char>('-'))
+                    {
+                        noError = SimpleEvaluate(values, operators);
+                    }
+                    operators.Push(op);
+                    return noError;
+                case '*':
+                case '/':
+                case '(':
+                    operators.Push(op);
+                    return true;
+                default:
+                    if (operators.IsOnTop<char>('+') || operators.IsOnTop<char>('-'))
+                    {
+                        noError = SimpleEvaluate(values, operators);
+                    }
+                    if (operators.IsOnTop<char>('('))
+                        operators.Pop();
+
+                    if (!noError)
+                        return false;
+
+                    if (operators.IsOnTop<char>('*') || operators.IsOnTop<char>('/'))
+                    {
+                        noError = SimpleEvaluate(values, operators);
+                    }
+
+                    return noError;
+            }
+        }
+    
 
         /// <summary>
         /// Enumerates the normalized versions of all of the variables that occur in this 
@@ -196,7 +380,7 @@ namespace SpreadsheetUtilities
         /// </summary>
         public IEnumerable<string> GetVariables()
         {
-            return null;
+            return new HashSet<string>(variables);
         }
 
         /// <summary>
@@ -334,6 +518,27 @@ namespace SpreadsheetUtilities
         ///  The reason why this FormulaError was created.
         /// </summary>
         public string Reason { get; private set; }
+    }
+
+    /// <summary>
+    /// Extension class for adding the IsOnTop method
+    /// </summary>
+    static class StackExtension
+    {
+        /// <summary>
+        /// Returns whether or not a given value is on the top of the stack the method is called on.
+        /// Returns false if the stack is empty.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="s"></param>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        public static bool IsOnTop<T>(this Stack<T> s, T c)
+        {
+            if (s.Count < 1)
+                return false;
+            return s.Peek().Equals(c);
+        }
     }
 }
 
