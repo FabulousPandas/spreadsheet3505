@@ -119,12 +119,13 @@ namespace SpreadsheetUtilities
                         throw new FormulaFormatException("Syntax error");
 
                     opOrParenthesis = true;
+                    
+                    tokens[i] = normalize(token);
 
-                    if (!IsVar(token))
+                    if (!IsVar(tokens[i]))
                         throw new FormulaFormatException("Variable is invalid after normalizing");
                     else
                     {
-                        tokens[i] = normalize(token);
                         variables.Add(tokens[i]);
                     }
 
@@ -224,7 +225,7 @@ namespace SpreadsheetUtilities
                 }
                 else //case for operators and other invalid symbols/strings
                 {
-                    if (!OperatorCase(s[0], values, operators))
+                    if(!OperatorCase(s[0], values, operators))
                         return new FormulaError("Divide by 0");
                 }
             }
@@ -346,10 +347,10 @@ namespace SpreadsheetUtilities
                 case '-':
                     if (operators.IsOnTop<char>('+') || operators.IsOnTop<char>('-'))
                     {
-                        noError = SimpleEvaluate(values, operators);
+                        SimpleEvaluate(values, operators);
                     }
                     operators.Push(op);
-                    return noError;
+                    return true;
                 case '*':
                 case '/':
                 case '(':
@@ -358,13 +359,10 @@ namespace SpreadsheetUtilities
                 default:
                     if (operators.IsOnTop<char>('+') || operators.IsOnTop<char>('-'))
                     {
-                        noError = SimpleEvaluate(values, operators);
+                        SimpleEvaluate(values, operators);
                     }
                     if (operators.IsOnTop<char>('('))
                         operators.Pop();
-
-                    if (!noError)
-                        return false;
 
                     if (operators.IsOnTop<char>('*') || operators.IsOnTop<char>('/'))
                     {
@@ -374,7 +372,7 @@ namespace SpreadsheetUtilities
                     return noError;
             }
         }
-    
+
 
         /// <summary>
         /// Enumerates the normalized versions of all of the variables that occur in this 
@@ -432,7 +430,9 @@ namespace SpreadsheetUtilities
         /// </summary>
         public override bool Equals(object obj)
         {
-            return false;
+            if (!typeof(Formula).IsInstanceOfType(obj))
+                return false;
+            return this.ToString().Equals(((Formula) obj).ToString());
         }
 
         /// <summary>
