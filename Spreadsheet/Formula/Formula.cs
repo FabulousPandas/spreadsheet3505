@@ -430,6 +430,8 @@ namespace SpreadsheetUtilities
         /// </summary>
         public override bool Equals(object obj)
         {
+            if (Object.ReferenceEquals(obj, null))
+                return false;
             if (!typeof(Formula).IsInstanceOfType(obj))
                 return false;
             return this.ToString().Equals(((Formula) obj).ToString());
@@ -442,6 +444,10 @@ namespace SpreadsheetUtilities
         /// </summary>
         public static bool operator ==(Formula f1, Formula f2)
         {
+            if (Object.ReferenceEquals(f1, f2))
+                return true;
+            if (Object.ReferenceEquals(f1, null) || Object.ReferenceEquals(f2, null))
+                return false;
             return f1.Equals(f2);
         }
 
@@ -452,7 +458,7 @@ namespace SpreadsheetUtilities
         /// </summary>
         public static bool operator !=(Formula f1, Formula f2)
         {
-            return !f1.Equals(f2);
+            return !(f1 == f2);
         }
 
         /// <summary>
