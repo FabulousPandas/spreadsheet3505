@@ -372,6 +372,41 @@ namespace FormulaTests
         }
 
         [TestMethod]
+        public void TestEqualsNull()
+        {
+            Formula f1 = new Formula("5.6 + 4.4");
+            Formula f2 = null;
+            Assert.IsFalse(f1.Equals(f2));
+        }
+        [TestMethod]
+        public void TestOperatorEqualsNull()
+        {
+            Formula f1 = null;
+            Formula f2 = null;
+            Formula f3 = new Formula("5.6 + 4.4");
+            Assert.IsTrue(f1 == f2);
+            Assert.IsFalse(f1 == f3);
+            Assert.IsTrue(f2 == f1);
+            Assert.IsFalse(f2 == f3);
+            Assert.IsFalse(f3 == f1);
+            Assert.IsFalse(f3 == f2);
+        }
+
+        [TestMethod]
+        public void TestOperatorNotEqualsNull()
+        {
+            Formula f1 = null;
+            Formula f2 = null;
+            Formula f3 = new Formula("5.6 + 4.4");
+            Assert.IsFalse(f1 != f2);
+            Assert.IsTrue(f1 != f3);
+            Assert.IsFalse(f2 != f1);
+            Assert.IsTrue(f2 != f3);
+            Assert.IsTrue(f3 != f1);
+            Assert.IsTrue(f3 != f2);
+        }
+
+        [TestMethod]
         public void TestGetHashCode()
         {
             Formula f1 = new Formula("2.0 + x7");
