@@ -201,19 +201,19 @@ namespace SS
     /// </summary>
     private void Visit(String start, String name, ISet<String> visited, LinkedList<String> changed)
     {
-      visited.Add(name);
-      foreach (String n in GetDirectDependents(name))
+      visited.Add(name); //visits name
+      foreach (String n in GetDirectDependents(name)) //looks at all the dependents for name
       {
-        if (n.Equals(start))
+        if (n.Equals(start)) //if name is equal to start there is a circular dependency, so throw
         {
           throw new CircularException();
         }
-        else if (!visited.Contains(n))
+        else if (!visited.Contains(n)) //otherwise if it hasn't been visited, recursively call visit on n
         {
           Visit(start, n, visited, changed);
         }
       }
-      changed.AddFirst(name);
+      changed.AddFirst(name); //once the end of the recursive calls happens, starts adding name 
     }
 
   }
