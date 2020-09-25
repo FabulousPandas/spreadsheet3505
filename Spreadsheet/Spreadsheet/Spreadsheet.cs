@@ -62,7 +62,7 @@ namespace SS
         /// </summary>
         public override IEnumerable<string> GetNamesOfAllNonemptyCells()
         {
-            throw new NotImplementedException();
+            return cells.Keys;
         }
 
         /// <summary>
