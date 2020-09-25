@@ -49,7 +49,7 @@ namespace SS
                 throw new InvalidNameException();
             if (!cells.ContainsKey(name))
                 return "";
-            return cells[name];
+            return cells[name].Contents;
         }
 
         public override IEnumerable<string> GetNamesOfAllNonemptyCells()
@@ -62,7 +62,7 @@ namespace SS
             if (name == null || !IsVar(name))
                 throw new InvalidNameException();
             Cell cell = new Cell(number);
-            cells.Add(name, cell);
+            cells[name] = cell;
 
             return new List<string>(GetCellsToRecalculate(name));
         }
@@ -77,13 +77,14 @@ namespace SS
 
             if(text == "") //basically a removal
             {
-                cells.Remove(name);
+                if(cells.ContainsKey(name))
+                    cells.Remove(name);
                 graph.ReplaceDependees(name, new List<string>());
             }
             else
             {
                 Cell cell = new Cell(text);
-                cells.Add(name, cell);
+                cells[name] = cell;
             }
 
             return new List<string>(GetCellsToRecalculate(name));
@@ -98,8 +99,8 @@ namespace SS
                 throw new InvalidNameException();
 
             Cell cell = new Cell(formula);
-            cells.Add(name, cell);
-            foreach(string variable in formula.GetVariables())
+            cells[name] = cell;
+            foreach (string variable in formula.GetVariables())
                 graph.AddDependency(variable, name);
 
             List<string> list = new List<string>();
@@ -113,6 +114,7 @@ namespace SS
                 cells.Remove(name);
                 foreach (string variable in formula.GetVariables())
                     graph.RemoveDependency(variable, name);
+                throw new CircularException();
             }
 
             return list;
