@@ -193,6 +193,52 @@ namespace SpreadsheetTests
             Assert.AreEqual(1, s.GetNamesOfAllNonemptyCells().Count());
         }
 
+        [TestMethod]
+        public void AddMultipleDoubles()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents("a1", 2.0);
+            s.SetCellContents("b5", 7.4);
+            s.SetCellContents("__", 12.1);
+            s.SetCellContents("b5", 5.4);
+            Assert.AreEqual(2.0, (double)s.GetCellContents("a1"), 1e-9);
+            Assert.AreEqual(5.4, (double)s.GetCellContents("b5"), 1e-9);
+            Assert.AreEqual(12.1, (double)s.GetCellContents("__"), 1e-9);
+            Assert.AreEqual(3, s.GetNamesOfAllNonemptyCells().Count());
+        }
+
+        [TestMethod]
+        public void AddMultipleStrings()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents("a1", "ajhd");
+            s.SetCellContents("b5", "483 + 3");
+            s.SetCellContents("__", "aeiou8^%$#");
+            s.SetCellContents("b5", "23/6 + 34.3");
+            Assert.AreEqual("ajhd", s.GetCellContents("a1"));
+            Assert.AreEqual("23/6 + 34.3", s.GetCellContents("b5"));
+            Assert.AreEqual("aeiou8^%$#", s.GetCellContents("__"));
+            Assert.AreEqual(3, s.GetNamesOfAllNonemptyCells().Count());
+        }
+
+        [TestMethod]
+        public void AddMultipleFormulas()
+        {
+            Spreadsheet s = new Spreadsheet();
+            Formula a1 = new Formula("1 + b5");
+            Formula b5 = new Formula("6.5 + 3.6");
+            Formula __ = new Formula("2.3 * b5 + a1 - 3.5");
+            Formula newb5 = new Formula("7.2 + 3.2");
+            s.SetCellContents("a1", a1);
+            s.SetCellContents("b5", b5);
+            s.SetCellContents("__", __);
+            s.SetCellContents("b5", newb5);
+            Assert.AreEqual(a1, s.GetCellContents("a1"));
+            Assert.AreEqual(newb5, s.GetCellContents("b5"));
+            Assert.AreEqual(__, s.GetCellContents("__"));
+            Assert.AreEqual(3, s.GetNamesOfAllNonemptyCells().Count());
+        }
+
 
     }
 }
