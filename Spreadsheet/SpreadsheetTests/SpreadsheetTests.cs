@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SpreadsheetUtilities;
 using SS;
 using System;
+using System.Linq;
 
 namespace SpreadsheetTests
 {
@@ -98,7 +99,100 @@ namespace SpreadsheetTests
             s.SetCellContents("a5", f);
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(CircularException))]
+        public void CheckCircularDependency()
+        {
+            Spreadsheet s = new Spreadsheet();
+            Formula f = new Formula("a1 + 3");
+            s.SetCellContents("a1", f);
+        }
+
+        /// -------------------------
+        /// Empty spreadsheet testing
+        /// -------------------------
+
+        [TestMethod]
+        public void TestEmptyGetCellContents()
+        {
+            Spreadsheet s = new Spreadsheet();
+            Assert.AreEqual("", s.GetCellContents("a1"));
+        }
+
+        [TestMethod]
+        public void TestEmptyGetNamesOfAllNonemptyCells()
+        {
+            Spreadsheet s = new Spreadsheet();
+            Assert.AreEqual(0, s.GetNamesOfAllNonemptyCells().Count());
+        }
+
+        /// ---------------------------------------
+        /// Setting and immediately clearing a cell
+        /// ---------------------------------------
+
+        [TestMethod]
+        public void AddAndRemoveDouble()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents("a1", 2.0);
+            s.SetCellContents("a1", "");
+            Assert.AreEqual("", s.GetCellContents("a1"));
+            Assert.AreEqual(0, s.GetNamesOfAllNonemptyCells().Count());
+        }
+
+        [TestMethod]
+        public void AddAndRemoveString()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents("a1", "words");
+            s.SetCellContents("a1", "");
+            Assert.AreEqual("", s.GetCellContents("a1"));
+            Assert.AreEqual(0, s.GetNamesOfAllNonemptyCells().Count());
+        }
+
+        [TestMethod]
+        public void AddAndRemoveFormula()
+        {
+            Spreadsheet s = new Spreadsheet();
+            Formula f = new Formula("6.7 + 93.135");
+            s.SetCellContents("a1", f);
+            s.SetCellContents("a1", "");
+            Assert.AreEqual("", s.GetCellContents("a1"));
+            Assert.AreEqual(0, s.GetNamesOfAllNonemptyCells().Count());
+        }
+
+        /// --------------------
+        /// Checking correctness
+        /// --------------------
         
+        [TestMethod]
+        public void AddOneDouble()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents("a1", 2.0);
+            Assert.AreEqual(2.0, (double) s.GetCellContents("a1"), 1e-9);
+            Assert.AreEqual(1, s.GetNamesOfAllNonemptyCells().Count());
+        }
+
+        [TestMethod]
+        public void AddOneString()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents("_7", "bunch of random letters");
+            Assert.AreEqual("bunch of random letters", s.GetCellContents("_7"));
+            Assert.AreEqual(1, s.GetNamesOfAllNonemptyCells().Count());
+        }
+
+        [TestMethod]
+        public void AddOneFormula()
+        {
+            Spreadsheet s = new Spreadsheet();
+            Formula f = new Formula("5 + 7.8");
+            s.SetCellContents("b_3", f);
+            Assert.AreEqual(f, s.GetCellContents("b_3"));
+            Assert.AreEqual(1, s.GetNamesOfAllNonemptyCells().Count());
+        }
+
 
     }
 }
