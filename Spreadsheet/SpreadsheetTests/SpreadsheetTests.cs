@@ -126,6 +126,15 @@ namespace SpreadsheetTests
             Assert.AreEqual(0, s.GetNamesOfAllNonemptyCells().Count());
         }
 
+        [TestMethod]
+        public void TestSettingCellEmpty()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents("a1", "");
+            Assert.AreEqual("", s.GetCellContents("a1"));
+            Assert.AreEqual(0, s.GetNamesOfAllNonemptyCells().Count());
+        }
+
         /// ---------------------------------------
         /// Setting and immediately clearing a cell
         /// ---------------------------------------
@@ -237,6 +246,26 @@ namespace SpreadsheetTests
             Assert.AreEqual(newb5, s.GetCellContents("b5"));
             Assert.AreEqual(__, s.GetCellContents("__"));
             Assert.AreEqual(3, s.GetNamesOfAllNonemptyCells().Count());
+        }
+
+        /// <summary>
+        /// Making sure that when removing a formula it doesn't create a "phantom" circular dependency
+        /// </summary>
+        [TestMethod]
+        public void AddMultipleFormulas2()
+        {
+            Spreadsheet s = new Spreadsheet();
+            Formula a6 = new Formula("1 + c12");
+            Formula c12 = new Formula("m9 * 2.3");
+            Formula m9 = new Formula("a6 - 3.5");
+            s.SetCellContents("a6", a6);
+            s.SetCellContents("a6", "");
+            s.SetCellContents("c12", c12);
+            s.SetCellContents("m9", m9);
+            Assert.AreEqual("", s.GetCellContents("a6"));
+            Assert.AreEqual(c12, s.GetCellContents("c12"));
+            Assert.AreEqual(m9, s.GetCellContents("m9"));
+            Assert.AreEqual(2, s.GetNamesOfAllNonemptyCells().Count());
         }
 
 
