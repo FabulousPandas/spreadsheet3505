@@ -61,9 +61,10 @@ namespace SS
         {
             if (name == null || !IsVar(name))
                 throw new InvalidNameException();
+            Cell cell = new Cell(number);
+            cells.Add(name, cell);
 
-
-            throw new NotImplementedException();
+            return new List<string>(GetCellsToRecalculate(name));
         }
 
         public override IList<string> SetCellContents(string name, string text)
@@ -74,9 +75,18 @@ namespace SS
             if (name == null || !IsVar(name))
                 throw new InvalidNameException();
 
+            if(text == "") //basically a removal
+            {
+                cells.Remove(name);
+                graph.ReplaceDependees(name, new List<string>());
+            }
+            else
+            {
+                Cell cell = new Cell(text);
+                cells.Add(name, cell);
+            }
 
-
-            throw new NotImplementedException();
+            return new List<string>(GetCellsToRecalculate(name));
         }
 
         public override IList<string> SetCellContents(string name, Formula formula)
@@ -87,9 +97,25 @@ namespace SS
             if (name == null || !IsVar(name))
                 throw new InvalidNameException();
 
+            Cell cell = new Cell(formula);
+            cells.Add(name, cell);
+            foreach(string variable in formula.GetVariables())
+                graph.AddDependency(variable, name);
 
+            List<string> list = new List<string>();
 
-            throw new NotImplementedException();
+            try
+            {
+                list = new List<string> (GetCellsToRecalculate(name));
+            }
+            catch (CircularException)
+            {
+                cells.Remove(name);
+                foreach (string variable in formula.GetVariables())
+                    graph.RemoveDependency(variable, name);
+            }
+
+            return list;
         }
 
         protected override IEnumerable<string> GetDirectDependents(string name)
@@ -106,10 +132,7 @@ namespace SS
             /// Property containing the contents of the cell.
             /// </summary>
             public object Contents
-            {
-                get;
-                set;
-            }
+            { get; private set;}
 
             /// <summary>
             /// Creates a new sell with the contents of contents.
