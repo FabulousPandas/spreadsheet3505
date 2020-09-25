@@ -13,12 +13,13 @@ namespace SS
     public class Spreadsheet : AbstractSpreadsheet
     {
         /// <summary>
-        /// Dictionary representing the mapping of a cell name to a cell
+        /// Dictionary representing the mapping of a cell name to a cell.
+        /// Only represents non-empty cells.
         /// </summary>
         private Dictionary<string, Cell> cells;
         
         /// <summary>
-        /// A DependencyGraph to represent the dependencies between cells
+        /// A DependencyGraph to represent the dependencies between cells.
         /// </summary>
         private DependencyGraph graph;
 
@@ -32,7 +33,7 @@ namespace SS
         }
 
         /// <summary>
-        /// Returns true if a given string is in the valid variable form
+        /// Returns true if a given string is in the valid variable form.
         /// </summary>
         /// <param name="var"></param>
         /// <returns></returns>
@@ -51,8 +52,9 @@ namespace SS
         {
             if (name == null || !IsVar(name))
                 throw new InvalidNameException();
-
-            return null;
+            if (!cells.ContainsKey(name))
+                return "";
+            return cells[name];
         }
 
         /// <summary>
@@ -150,16 +152,16 @@ namespace SS
         /// </summary>
         protected override IEnumerable<string> GetDirectDependents(string name)
         {
-            throw new NotImplementedException();
+            return graph.GetDependents(name);
         }
 
         /// <summary>
-        /// Represents a cell within a spreadsheet
+        /// Represents a cell within a spreadsheet.
         /// </summary>
         private class Cell
         {
             /// <summary>
-            /// Property containing the contents of the cell
+            /// Property containing the contents of the cell.
             /// </summary>
             public object Contents
             {
@@ -168,12 +170,12 @@ namespace SS
             }
 
             /// <summary>
-            /// Creates a new sell with the contents of o
+            /// Creates a new sell with the contents of contents.
             /// </summary>
             /// <param name="o"></param>
-            public Cell(object o)
+            public Cell(object contents)
             {
-                Contents = 0;
+                Contents = contents;
             }
         }
     }
