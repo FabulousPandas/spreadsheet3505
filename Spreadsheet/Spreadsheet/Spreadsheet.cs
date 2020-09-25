@@ -97,9 +97,7 @@ namespace SS
 
             if (name == null || !IsVar(name))
                 throw new InvalidNameException();
-
-            Cell cell = new Cell(formula);
-            cells[name] = cell;
+            
             foreach (string variable in formula.GetVariables())
                 graph.AddDependency(variable, name);
 
@@ -111,11 +109,13 @@ namespace SS
             }
             catch (CircularException)
             {
-                cells.Remove(name);
                 foreach (string variable in formula.GetVariables())
                     graph.RemoveDependency(variable, name);
                 throw new CircularException();
             }
+
+            Cell cell = new Cell(formula);
+            cells[name] = cell;
 
             return list;
         }
