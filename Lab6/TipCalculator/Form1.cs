@@ -35,21 +35,25 @@ namespace TipCalculator
         private void inputBillText_TextChanged(object sender, EventArgs e)
         {
             if (double.TryParse(inputBillText.Text, out _))
+            {
                 computeTipButton.Enabled = true;
+                calculateBill();
+            }
             else
                 computeTipButton.Enabled = false;
 
-            calculateBill();
         }
 
         private void inputPercentText_TextChanged(object sender, EventArgs e)
         {
             if (double.TryParse(inputPercentText.Text, out _))
+            {
                 computeTipButton.Enabled = true;
+                calculateBill();
+            }
             else
                 computeTipButton.Enabled = false;
 
-            calculateBill();
         }
 
         private void calculateBill()
