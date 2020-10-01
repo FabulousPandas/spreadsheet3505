@@ -81,7 +81,11 @@ namespace SS
 
         public override object GetCellValue(string name)
         {
-            throw new NotImplementedException();
+            if (name == null || !IsVar(name))
+                throw new InvalidNameException();
+            if (!cells.ContainsKey(name))
+                return "";
+            return cells[name].Value;
         }
 
         public override IEnumerable<string> GetNamesOfAllNonemptyCells()
