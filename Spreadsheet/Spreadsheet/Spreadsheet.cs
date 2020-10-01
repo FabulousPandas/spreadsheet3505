@@ -63,6 +63,7 @@ namespace SS
                 throw new InvalidNameException();
             Cell cell = new Cell(number);
             cells[name] = cell;
+            graph.ReplaceDependees(name, new List<string>());
 
             return new List<string>(GetCellsToRecalculate(name));
         }
