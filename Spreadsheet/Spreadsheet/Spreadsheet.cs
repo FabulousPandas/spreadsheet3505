@@ -177,6 +177,12 @@ namespace SS
             { get; private set;}
 
             /// <summary>
+            /// Property containing the value of the cell.
+            /// </summary>
+            public object Value
+            { get; private set; }
+
+            /// <summary>
             /// Creates a new sell with the contents of contents.
             /// </summary>
             /// <param name="o"></param>
