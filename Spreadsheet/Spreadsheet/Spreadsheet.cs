@@ -57,7 +57,7 @@ namespace SS
             graph = new DependencyGraph();
         }
 
-        public override bool Changed { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
+        public override bool Changed { get; protected set; }
 
         /// <summary>
         /// Returns true if a given string is in the valid variable form.
