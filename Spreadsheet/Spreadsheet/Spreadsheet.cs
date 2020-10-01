@@ -24,13 +24,40 @@ namespace SS
         private DependencyGraph graph;
 
         /// <summary>
-        /// Creates a new spreadsheet
+        /// Creates a new spreadsheet with no validity conditions and no normalizer with version "default"
         /// </summary>
-        public Spreadsheet()
+        public Spreadsheet() : base(s => true, s => s, "default")
         {
             cells = new Dictionary<string, Cell>();
             graph = new DependencyGraph();
         }
+
+        /// <summary>
+        /// Creates a new spreadsheet with the given validator, normalizer, and version
+        /// </summary>
+        /// <param name="isValid"></param>
+        /// <param name="normalize"></param>
+        /// <param name="version"></param>
+        public Spreadsheet(Func<string, bool> isValid, Func<string, string> normalize, string version) : base(isValid, normalize, version)
+        {
+            cells = new Dictionary<string, Cell>();
+            graph = new DependencyGraph();
+        }
+
+        /// <summary>
+        /// Constructs a spreadsheet from the save file found at the given filePath with the given validator, normalizer, and version
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="isValid"></param>
+        /// <param name="normalize"></param>
+        /// <param name="version"></param>
+        public Spreadsheet(string filePath, Func<string, bool> isValid, Func<string, string> normalize, string version) : base(isValid, normalize, version)
+        {
+            cells = new Dictionary<string, Cell>();
+            graph = new DependencyGraph();
+        }
+
+        public override bool Changed { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
 
         /// <summary>
         /// Returns true if a given string is in the valid variable form.
@@ -52,12 +79,27 @@ namespace SS
             return cells[name].Contents;
         }
 
+        public override object GetCellValue(string name)
+        {
+            throw new NotImplementedException();
+        }
+
         public override IEnumerable<string> GetNamesOfAllNonemptyCells()
         {
             return cells.Keys;
         }
 
-        public override IList<string> SetCellContents(string name, double number)
+        public override string GetSavedVersion(string filename)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Save(string filename)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override IList<string> SetCellContents(string name, double number)
         {
             if (name == null || !IsVar(name))
                 throw new InvalidNameException();
@@ -68,7 +110,7 @@ namespace SS
             return new List<string>(GetCellsToRecalculate(name));
         }
 
-        public override IList<string> SetCellContents(string name, string text)
+        protected override IList<string> SetCellContents(string name, string text)
         {
             if (text == null)
                 throw new ArgumentNullException();
@@ -91,7 +133,7 @@ namespace SS
             return new List<string>(GetCellsToRecalculate(name));
         }
 
-        public override IList<string> SetCellContents(string name, Formula formula)
+        protected override IList<string> SetCellContents(string name, Formula formula)
         {
             if (formula == null)
                 throw new ArgumentNullException();
@@ -119,6 +161,11 @@ namespace SS
             cells[name] = cell;
 
             return list;
+        }
+
+        public override IList<string> SetContentsOfCell(string name, string content)
+        {
+            throw new NotImplementedException();
         }
 
         protected override IEnumerable<string> GetDirectDependents(string name)
