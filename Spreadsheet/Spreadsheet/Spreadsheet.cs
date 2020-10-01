@@ -99,10 +99,19 @@ namespace SS
             throw new NotImplementedException();
         }
 
-        protected override IList<string> SetCellContents(string name, double number)
+        public override IList<string> SetContentsOfCell(string name, string content)
         {
+            if (content == null)
+                throw new ArgumentNullException();
+
             if (name == null || !IsVar(name))
                 throw new InvalidNameException();
+
+            throw new NotImplementedException();
+        }
+
+        protected override IList<string> SetCellContents(string name, double number)
+        {
             Cell cell = new Cell(number);
             cells[name] = cell;
             graph.ReplaceDependees(name, new List<string>());
@@ -112,12 +121,6 @@ namespace SS
 
         protected override IList<string> SetCellContents(string name, string text)
         {
-            if (text == null)
-                throw new ArgumentNullException();
-
-            if (name == null || !IsVar(name))
-                throw new InvalidNameException();
-
             if(text == "") //basically a removal
             {
                 if(cells.ContainsKey(name))
@@ -135,12 +138,6 @@ namespace SS
 
         protected override IList<string> SetCellContents(string name, Formula formula)
         {
-            if (formula == null)
-                throw new ArgumentNullException();
-
-            if (name == null || !IsVar(name))
-                throw new InvalidNameException();
-            
             foreach (string variable in formula.GetVariables())
                 graph.AddDependency(variable, name);
 
@@ -161,11 +158,6 @@ namespace SS
             cells[name] = cell;
 
             return list;
-        }
-
-        public override IList<string> SetContentsOfCell(string name, string content)
-        {
-            throw new NotImplementedException();
         }
 
         protected override IEnumerable<string> GetDirectDependents(string name)
