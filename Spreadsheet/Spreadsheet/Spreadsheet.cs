@@ -110,13 +110,31 @@ namespace SS
 
             if (name == null || !IsVar(name))
                 throw new InvalidNameException();
+            
+            name = Normalize(name);
 
-            throw new NotImplementedException();
+            if (!IsVar(name) || !IsValid(name))
+                throw new InvalidNameException();
+
+
+            if(double.TryParse(content, out double result))
+            {
+                return SetCellContents(name, result);
+            }
+            else if(content[0] == '=')
+            {
+                Formula formula = new Formula(content.Substring(1), Normalize, IsValid);
+                return SetCellContents(name, formula);
+            }
+            else
+            {
+                return SetCellContents(name, content);
+            }
         }
 
         protected override IList<string> SetCellContents(string name, double number)
         {
-            Cell cell = new Cell(number);
+            Cell cell = new Cell(number, number);
             cells[name] = cell;
             graph.ReplaceDependees(name, new List<string>());
 
@@ -133,7 +151,7 @@ namespace SS
             }
             else
             {
-                Cell cell = new Cell(text);
+                Cell cell = new Cell(text, text);
                 cells[name] = cell;
             }
 
@@ -158,10 +176,28 @@ namespace SS
                 throw new CircularException();
             }
 
-            Cell cell = new Cell(formula);
+            Cell cell = new Cell(formula, formula.Evaluate(VariableLookup));
             cells[name] = cell;
 
             return list;
+        }
+
+        /// <summary>
+        /// Returns the value of the cell
+        /// </summary>
+        /// <param name="variable"></param>
+        /// <returns></returns>
+        private double VariableLookup(string variable)
+        {
+            if(cells.ContainsKey(variable))
+            {
+                if (cells[variable].Contents is double)
+                {
+                    return (double) cells[variable].Contents;
+                }
+            }
+
+            throw new ArgumentException();
         }
 
         protected override IEnumerable<string> GetDirectDependents(string name)
@@ -190,9 +226,10 @@ namespace SS
             /// Creates a new sell with the contents of contents.
             /// </summary>
             /// <param name="o"></param>
-            public Cell(object contents)
+            public Cell(object contents, object value)
             {
                 Contents = contents;
+                Value = value;
             }
         }
     }
