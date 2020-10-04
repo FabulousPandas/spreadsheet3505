@@ -3,6 +3,7 @@
 using SpreadsheetUtilities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace SS
@@ -121,24 +122,38 @@ namespace SS
 
             Changed = true;
 
+            List<string> list;
+
             if(double.TryParse(content, out double result))
             {
-                return SetCellContents(name, result);
+                list = new List<string>(SetCellContents(name, result));
+            }
+            else if(content == "")
+            {
+                list = new List<string>(SetCellContents(name, content));
             }
             else if(content[0] == '=')
             {
                 Formula formula = new Formula(content.Substring(1), Normalize, IsValid);
-                return SetCellContents(name, formula);
+                list = new List<string>(SetCellContents(name, formula));
             }
             else
             {
-                return SetCellContents(name, content);
+                list = new List<string>(SetCellContents(name, content));
             }
+            
+            for(int i = 1; i < list.Count; i++) //reevaluates all the items except the first in the list since the value was already evaluated for the current cell
+            {
+                string s = list[i];
+                cells[s].Reevaluate();
+            }
+
+            return list;
         }
 
         protected override IList<string> SetCellContents(string name, double number)
         {
-            Cell cell = new Cell(number, number);
+            Cell cell = new Cell(number, VariableLookup);
             cells[name] = cell;
             graph.ReplaceDependees(name, new List<string>());
 
@@ -155,7 +170,7 @@ namespace SS
             }
             else
             {
-                Cell cell = new Cell(text, text);
+                Cell cell = new Cell(text, VariableLookup);
                 cells[name] = cell;
             }
 
@@ -180,7 +195,8 @@ namespace SS
                 throw new CircularException();
             }
 
-            Cell cell = new Cell(formula, formula.Evaluate(VariableLookup));
+            Cell cell = new Cell(formula, VariableLookup);
+            
             cells[name] = cell;
 
             return list;
@@ -195,9 +211,9 @@ namespace SS
         {
             if(cells.ContainsKey(variable))
             {
-                if (cells[variable].Contents is double)
+                if (cells[variable].Contents is double || cells[variable].Contents is Formula)
                 {
-                    return (double) cells[variable].Contents;
+                    return (double) cells[variable].Value;
                 }
             }
 
@@ -227,13 +243,31 @@ namespace SS
             { get; private set; }
 
             /// <summary>
-            /// Creates a new sell with the contents of contents.
+            /// Holds the lookup delegate for looking up a variable in a formula
+            /// </summary>
+            private Func<string, double> lookUp;
+
+            /// <summary>
+            /// Creates a new cell with the contents of contents and value of the evaluated contents.
             /// </summary>
             /// <param name="o"></param>
-            public Cell(object contents, object value)
+            public Cell(object contents, Func<string, double> lookup)
             {
                 Contents = contents;
-                Value = value;
+                lookUp = lookup;
+                if (contents is double || contents is string)
+                    Value = contents;
+                else
+                    Value = ((Formula)contents).Evaluate(lookup);
+            }
+
+            /// <summary>
+            /// Reevaluates the value of the cell if the contents are a formula
+            /// </summary>
+            public void Reevaluate()
+            {
+                if(Contents is Formula)
+                    Value = ((Formula) Contents).Evaluate(lookUp);
             }
         }
     }
