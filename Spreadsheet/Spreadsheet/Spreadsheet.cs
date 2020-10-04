@@ -30,6 +30,7 @@ namespace SS
         {
             cells = new Dictionary<string, Cell>();
             graph = new DependencyGraph();
+            Changed = false;
         }
 
         /// <summary>
@@ -42,6 +43,7 @@ namespace SS
         {
             cells = new Dictionary<string, Cell>();
             graph = new DependencyGraph();
+            Changed = false;
         }
 
         /// <summary>
@@ -55,6 +57,7 @@ namespace SS
         {
             cells = new Dictionary<string, Cell>();
             graph = new DependencyGraph();
+            Changed = false;
         }
 
         public override bool Changed { get; protected set; }
@@ -116,6 +119,7 @@ namespace SS
             if (!IsVar(name) || !IsValid(name))
                 throw new InvalidNameException();
 
+            Changed = true;
 
             if(double.TryParse(content, out double result))
             {
