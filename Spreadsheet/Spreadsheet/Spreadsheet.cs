@@ -200,11 +200,10 @@ namespace SS
                     writer.WriteEndDocument();
                 }
             }
-            catch(FileNotFoundException)
+            catch (DirectoryNotFoundException)
             {
-                throw new SpreadsheetReadWriteException("File path is invalid");
+                throw new SpreadsheetReadWriteException("Invalid file directory");
             }
-
         }
 
         public override IList<string> SetContentsOfCell(string name, string content)
@@ -310,13 +309,8 @@ namespace SS
         private double VariableLookup(string variable)
         {
             if(cells.ContainsKey(variable))
-            {
                 if (cells[variable].Contents is double || cells[variable].Contents is Formula)
-                {
                     return (double) cells[variable].Value;
-                }
-            }
-
             throw new ArgumentException();
         }
 
