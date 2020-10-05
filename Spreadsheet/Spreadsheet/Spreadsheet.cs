@@ -3,8 +3,10 @@
 using SpreadsheetUtilities;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace SS
 {
@@ -59,6 +61,49 @@ namespace SS
             cells = new Dictionary<string, Cell>();
             graph = new DependencyGraph();
             Changed = false;
+
+            if (filePath == null || filePath == "")
+                throw new SpreadsheetReadWriteException("Invalid file path");
+
+            if (GetSavedVersion(filePath) != version)
+                throw new SpreadsheetReadWriteException("Version mismatch between file version and given version");
+
+            try
+            {
+                using (XmlReader reader = XmlReader.Create(filePath))
+                {
+                    string currentName = "";
+                    while (reader.Read())
+                    {
+                        if(reader.IsStartElement())
+                        {
+                            switch(reader.Name)
+                            {
+                                case "spreadsheet":
+                                    break;
+                                case "cell":
+                                    break;
+                                case "name":
+                                    reader.Read();
+                                    if (!IsVar(reader.Value) || !IsValid(reader.Value))
+                                        throw new SpreadsheetReadWriteException("Invalid variable found in file");
+                                    currentName = reader.Value;
+                                    break;
+                                case "contents":
+                                    reader.Read();
+                                    SetContentsOfCell(currentName, reader.Value);
+                                    break;
+                                default:
+                                    throw new SpreadsheetReadWriteException("Invalid xml element was found in file");
+                            }
+                        }
+                    }
+                }
+            }
+            catch (CircularException)
+            {
+                throw new SpreadsheetReadWriteException("Circular dependency found in save");
+            }
         }
 
         public override bool Changed { get; protected set; }
@@ -99,12 +144,67 @@ namespace SS
 
         public override string GetSavedVersion(string filename)
         {
-            throw new NotImplementedException();
+            try
+            {
+                using(XmlReader reader = XmlReader.Create(filename))
+                {
+                    while(reader.Read())
+                    {
+                        if (reader.Name == "spreadsheet")
+                        {
+                            if (reader.GetAttribute("version") == null)
+                                throw new SpreadsheetReadWriteException("Version not found");
+                            return reader.GetAttribute("version");
+                        }
+                    }
+                }
+            }
+            catch (DirectoryNotFoundException)
+            {
+                throw new SpreadsheetReadWriteException("Invalid file directory");
+            }
+            catch (FileNotFoundException)
+            {
+                throw new SpreadsheetReadWriteException("Could not find file");
+            }
+
+            throw new SpreadsheetReadWriteException("No version found");
         }
 
         public override void Save(string filename)
         {
-            throw new NotImplementedException();
+            XmlWriterSettings settings = new XmlWriterSettings();
+            settings.Indent = true;
+            settings.IndentChars = "  ";
+            try
+            {
+                using (XmlWriter writer = XmlWriter.Create(filename, settings))
+                {
+                    writer.WriteStartDocument();
+
+                    writer.WriteStartElement("spreadsheet");
+                    writer.WriteAttributeString("version", Version);
+
+                    foreach(string cellName in cells.Keys)
+                    {
+                        writer.WriteStartElement("cell");
+
+                        writer.WriteElementString("name", cellName);
+                        writer.WriteElementString("contents", cells[cellName].ToString());
+
+                        writer.WriteEndElement();
+                    }
+
+                    writer.WriteEndElement();
+
+                    writer.WriteEndDocument();
+                }
+            }
+            catch(FileNotFoundException)
+            {
+                throw new SpreadsheetReadWriteException("File path is invalid");
+            }
+
         }
 
         public override IList<string> SetContentsOfCell(string name, string content)
@@ -268,6 +368,20 @@ namespace SS
             {
                 if(Contents is Formula)
                     Value = ((Formula) Contents).Evaluate(lookUp);
+            }
+
+            /// <summary>
+            /// Returns the string representation of the contents of the cell
+            /// </summary>
+            /// <returns></returns>
+            public override string ToString()
+            {
+                if (Contents is double)
+                    return ((double)Contents).ToString();
+                else if (Contents is Formula)
+                    return "=" + ((Formula)Contents).ToString();
+                else
+                    return (string)Contents;
             }
         }
     }
