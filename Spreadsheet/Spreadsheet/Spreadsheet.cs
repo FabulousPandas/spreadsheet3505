@@ -121,6 +121,8 @@ namespace SS
 
         public override object GetCellContents(string name)
         {
+            name = Normalize(name);
+
             if (name == null || !IsVar(name))
                 throw new InvalidNameException();
             if (!cells.ContainsKey(name))
@@ -130,6 +132,8 @@ namespace SS
 
         public override object GetCellValue(string name)
         {
+            name = Normalize(name);
+
             if (name == null || !IsVar(name))
                 throw new InvalidNameException();
             if (!cells.ContainsKey(name))
@@ -166,6 +170,10 @@ namespace SS
             catch (FileNotFoundException)
             {
                 throw new SpreadsheetReadWriteException("Could not find file");
+            }
+            catch (XmlException)
+            {
+                throw new SpreadsheetReadWriteException("Invalid XML file");
             }
 
             throw new SpreadsheetReadWriteException("No version found");
@@ -308,9 +316,14 @@ namespace SS
         /// <returns></returns>
         private double VariableLookup(string variable)
         {
-            if(cells.ContainsKey(variable))
+            if (cells.ContainsKey(variable))
                 if (cells[variable].Contents is double || cells[variable].Contents is Formula)
-                    return (double) cells[variable].Value;
+                {
+                    if (cells[variable].Value is FormulaError)
+                        throw new ArgumentException();
+                    return (double)cells[variable].Value;
+                }
+                    
             throw new ArgumentException();
         }
 
