@@ -185,11 +185,9 @@ namespace SpreadsheetGUI
             RecalculateCells(updateList);
         }
 
-        private void newToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SpreadsheetApplication.getAppContext().RunForm(new SpreadsheetForm());
-        }
-
+        /*
+         * Keeping for reference
+         * 
         /// <summary>
         /// Helper method for creating a save file dialog for saving a spreadsheet file
         /// </summary>
@@ -211,52 +209,7 @@ namespace SpreadsheetGUI
             {
                 MessageBox.Show("Error: " + ex.Message);
             }
-        }
-
-        /// <summary>
-        /// Helper method for creating a dialog for when trying to close the spreadsheet with unsaved changes
-        /// </summary>
-        private void OpenUnsavedChangesDialog()
-        {
-            if (sheet.Changed)
-            {
-                DialogResult result = MessageBox.Show("There are unsaved changes, would you like to save?", "Unsaved Changes", MessageBoxButtons.YesNo);
-                if (result == DialogResult.Yes)
-                {
-                    OpenSaveDialog();
-                }
-            }
-        }
-
-        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            OpenSaveDialog();
-        }
-
-        private void loadToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                using (OpenFileDialog dialog = new OpenFileDialog())
-                {
-                    dialog.Filter = "Spreadsheet File|*.sprd|All files (*.*)|*.*";
-                    dialog.Title = "Open a Spreadsheet File";
-
-                    if (dialog.ShowDialog() == DialogResult.OK)
-                    {
-                        spreadsheetPanel.Clear();
-                        string fileName = dialog.FileName;
-                        sheet = new Spreadsheet(fileName, CellValidator, s => s.ToUpper(), "ps6");
-                        RecalculateCells(new List<string>(sheet.GetNamesOfAllNonemptyCells()));
-                        selectionChanged(spreadsheetPanel);
-                    }
-                }
-            }
-            catch (SpreadsheetReadWriteException ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-        }
+        }*/
 
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -307,7 +260,6 @@ namespace SpreadsheetGUI
 
         private void SpreadsheetForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            OpenUnsavedChangesDialog();
         }
 
         private void helpToolStripMenuItem_Click(object sender, EventArgs e)
@@ -338,14 +290,12 @@ namespace SpreadsheetGUI
 
         private void undoButton_Click(object sender, EventArgs e)
         {
-            SetCell(GetColumn(previousCellName), GetRow(previousCellName), previousCellContents);
-            selectionChanged(spreadsheetPanel);
+            
+        }
 
-            // Swapping between the buttons
-            if(undoButton.Text == "Undo") 
-                undoButton.Text = "Redo";
-            else
-                undoButton.Text = "Undo";
+        private void connectToServerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

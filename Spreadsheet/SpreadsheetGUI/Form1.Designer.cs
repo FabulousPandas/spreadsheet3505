@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.verticleSplitContainer = new System.Windows.Forms.SplitContainer();
+            this.undoButton = new System.Windows.Forms.Button();
             this.cellAddressLabel = new System.Windows.Forms.Label();
             this.cellValueTextBox = new System.Windows.Forms.TextBox();
             this.cellValueLabel = new System.Windows.Forms.Label();
@@ -39,13 +40,10 @@
             this.cellNameTextBox = new System.Windows.Forms.TextBox();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.spreadsheetPanel = new SS.SpreadsheetPanel();
-            this.undoButton = new System.Windows.Forms.Button();
+            this.connectToServerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.verticleSplitContainer)).BeginInit();
             this.verticleSplitContainer.Panel1.SuspendLayout();
             this.verticleSplitContainer.Panel2.SuspendLayout();
@@ -79,6 +77,17 @@
             this.verticleSplitContainer.Size = new System.Drawing.Size(800, 450);
             this.verticleSplitContainer.SplitterDistance = 83;
             this.verticleSplitContainer.TabIndex = 0;
+            // 
+            // undoButton
+            // 
+            this.undoButton.Enabled = false;
+            this.undoButton.Location = new System.Drawing.Point(713, 32);
+            this.undoButton.Name = "undoButton";
+            this.undoButton.Size = new System.Drawing.Size(75, 20);
+            this.undoButton.TabIndex = 6;
+            this.undoButton.Text = "Undo";
+            this.undoButton.UseVisualStyleBackColor = true;
+            this.undoButton.Click += new System.EventHandler(this.undoButton_Click);
             // 
             // cellAddressLabel
             // 
@@ -166,39 +175,16 @@
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.newToolStripMenuItem,
-            this.saveToolStripMenuItem,
-            this.openToolStripMenuItem,
+            this.connectToServerToolStripMenuItem,
             this.closeToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
             // 
-            // newToolStripMenuItem
-            // 
-            this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
-            this.newToolStripMenuItem.Text = "New";
-            this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
-            // 
-            // saveToolStripMenuItem
-            // 
-            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
-            this.saveToolStripMenuItem.Text = "Save";
-            this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
-            // 
-            // openToolStripMenuItem
-            // 
-            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
-            this.openToolStripMenuItem.Text = "Open";
-            this.openToolStripMenuItem.Click += new System.EventHandler(this.loadToolStripMenuItem_Click);
-            // 
             // closeToolStripMenuItem
             // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.closeToolStripMenuItem.Text = "Close";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 
@@ -217,16 +203,12 @@
             this.spreadsheetPanel.Size = new System.Drawing.Size(800, 363);
             this.spreadsheetPanel.TabIndex = 0;
             // 
-            // undoButton
+            // connectToServerToolStripMenuItem
             // 
-            this.undoButton.Enabled = false;
-            this.undoButton.Location = new System.Drawing.Point(713, 32);
-            this.undoButton.Name = "undoButton";
-            this.undoButton.Size = new System.Drawing.Size(75, 20);
-            this.undoButton.TabIndex = 6;
-            this.undoButton.Text = "Undo";
-            this.undoButton.UseVisualStyleBackColor = true;
-            this.undoButton.Click += new System.EventHandler(this.undoButton_Click);
+            this.connectToServerToolStripMenuItem.Name = "connectToServerToolStripMenuItem";
+            this.connectToServerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.connectToServerToolStripMenuItem.Text = "Connect to Server";
+            this.connectToServerToolStripMenuItem.Click += new System.EventHandler(this.connectToServerToolStripMenuItem_Click);
             // 
             // SpreadsheetForm
             // 
@@ -257,9 +239,6 @@
         private SS.SpreadsheetPanel spreadsheetPanel;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem closeToolStripMenuItem;
         private System.Windows.Forms.TextBox cellInputText;
         private System.Windows.Forms.Button setCellButton;
@@ -271,6 +250,7 @@
         private System.Windows.Forms.Label setCellLabel;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.Button undoButton;
+        private System.Windows.Forms.ToolStripMenuItem connectToServerToolStripMenuItem;
     }
 }
 
