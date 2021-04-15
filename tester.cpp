@@ -1,11 +1,13 @@
-#include<iostream>
+#include <iostream>
+#include "tester.h"
+
 
 
 int main()
 {
   //call all tests here
-
-
+  testServerConnect();
+  return 0; //number of tests failed
 }
 
 
@@ -64,4 +66,5 @@ int simultaniousEditTest()
   
   return 0;
 }
+
 
