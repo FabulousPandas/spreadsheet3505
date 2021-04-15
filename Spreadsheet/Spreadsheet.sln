@@ -18,9 +18,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Formula", "Formula\Formula.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormulaTests", "FormulaTests\FormulaTests.csproj", "{3EB33E37-9F21-4FA2-9F43-F0E780AA4E70}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spreadsheet", "Spreadsheet\Spreadsheet.csproj", "{F0B7694C-73AC-441F-BC5F-56C3BE69AD26}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spreadsheet", "Spreadsheet\Spreadsheet.csproj", "{F0B7694C-73AC-441F-BC5F-56C3BE69AD26}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetTests", "SpreadsheetTests\SpreadsheetTests.csproj", "{23D53310-9ED3-4DA3-B74A-C397F00390FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpreadsheetTests", "SpreadsheetTests\SpreadsheetTests.csproj", "{23D53310-9ED3-4DA3-B74A-C397F00390FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetGUI", "SpreadsheetGUI\SpreadsheetGUI.csproj", "{8186875B-B1D8-406E-B334-D52213B7E212}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetPanel", "SpreadsheetPanel\SpreadsheetPanel.csproj", "{C2A99EB0-E146-4121-95F2-30C45B898C93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -60,6 +64,14 @@ Global
 		{23D53310-9ED3-4DA3-B74A-C397F00390FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23D53310-9ED3-4DA3-B74A-C397F00390FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{23D53310-9ED3-4DA3-B74A-C397F00390FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8186875B-B1D8-406E-B334-D52213B7E212}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8186875B-B1D8-406E-B334-D52213B7E212}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8186875B-B1D8-406E-B334-D52213B7E212}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8186875B-B1D8-406E-B334-D52213B7E212}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2A99EB0-E146-4121-95F2-30C45B898C93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2A99EB0-E146-4121-95F2-30C45B898C93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2A99EB0-E146-4121-95F2-30C45B898C93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2A99EB0-E146-4121-95F2-30C45B898C93}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
