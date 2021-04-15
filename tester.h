@@ -5,18 +5,18 @@
 
 #include <iostream>
 
-class tester {
+class tester
+{
 
-private:
-int testServerConnect();
-int testCircularDependency();
-int testSimultaniousEdit();
-int connectToClientTest();
-int basicServerMessage();
-int circularErrorTest();
-int simultaniousEditTest();
-
+public:
+static int testServerConnect();
+static int testCircularDependency();
+static int testSimultaniousEdit();
+static int connectToClientTest();
+static int basicServerMessage();
+static int circularErrorTest();
+static int simultaniousEditTest();
 
 };
-  
+
 #endif

@@ -6,19 +6,19 @@
 int main()
 {
   //call all tests here
-  testServerConnect();
+  tester::testServerConnect();
   return 0; //number of tests failed
 }
 
 
-int testServerConnect()
+int tester::testServerConnect()
 {
   //connect with socket to sever and start handshake
 
   return 0; //return 1 if error
 }
 
-int testCircularDependency()
+int tester::testCircularDependency()
 {
   //connect to server and send a circular dependancy
   //ensure the server sends back the correct error response 
@@ -28,7 +28,7 @@ int testCircularDependency()
 }
 
 
-int testSimultaniousEdit()
+int tester::testSimultaniousEdit()
 {
   //send an edit of the same cell from two sockets to attempt for exception
 
@@ -46,21 +46,21 @@ int connectToClientTest()
   return 0;
 }
 
-int basicServerMessage()
+int tester::basicServerMessage()
 {
   //send a basic edit message from the server
 
   return 0;
 }
 
-int cirucularErrorTest()
+int tester::circularErrorTest()
 {
   //send a error message for a circular dependency to the client
   
   return 0;
 }
 
-int simultaniousEditTest()
+int tester::simultaniousEditTest()
 {
   //send an error for a simultanious edit to the client
   
