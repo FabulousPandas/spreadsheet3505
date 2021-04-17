@@ -40,10 +40,10 @@
             this.cellNameTextBox = new System.Windows.Forms.TextBox();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.connectToServerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.spreadsheetPanel = new SS.SpreadsheetPanel();
-            this.connectToServerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.verticleSplitContainer)).BeginInit();
             this.verticleSplitContainer.Panel1.SuspendLayout();
             this.verticleSplitContainer.Panel2.SuspendLayout();
@@ -181,10 +181,17 @@
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
             // 
+            // connectToServerToolStripMenuItem
+            // 
+            this.connectToServerToolStripMenuItem.Name = "connectToServerToolStripMenuItem";
+            this.connectToServerToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.connectToServerToolStripMenuItem.Text = "Connect to Server";
+            this.connectToServerToolStripMenuItem.Click += new System.EventHandler(this.connectToServerToolStripMenuItem_Click);
+            // 
             // closeToolStripMenuItem
             // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.closeToolStripMenuItem.Text = "Close";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 
@@ -202,13 +209,6 @@
             this.spreadsheetPanel.Name = "spreadsheetPanel";
             this.spreadsheetPanel.Size = new System.Drawing.Size(800, 363);
             this.spreadsheetPanel.TabIndex = 0;
-            // 
-            // connectToServerToolStripMenuItem
-            // 
-            this.connectToServerToolStripMenuItem.Name = "connectToServerToolStripMenuItem";
-            this.connectToServerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.connectToServerToolStripMenuItem.Text = "Connect to Server";
-            this.connectToServerToolStripMenuItem.Click += new System.EventHandler(this.connectToServerToolStripMenuItem_Click);
             // 
             // SpreadsheetForm
             // 

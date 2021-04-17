@@ -21,15 +21,6 @@ namespace SpreadsheetGUI
         /// </summary>
         private Spreadsheet sheet;
 
-        /// <summary>
-        /// For holding the name of the cell that was last changed
-        /// </summary>
-        private string previousCellName;
-        /// <summary>
-        /// For holding the contents of the cell that was last changed
-        /// </summary>
-        private string previousCellContents;
-
         public SpreadsheetForm()
         {
             InitializeComponent();
@@ -102,15 +93,11 @@ namespace SpreadsheetGUI
             {
                 string cellName = GetCellName(col, row);
 
-                //storing previous value in case of undo
-                previousCellName = cellName;
-                previousCellContents = GetCellContents(col, row);
-
                 IList<string> updateList = sheet.SetContentsOfCell(cellName, contents);
                 spreadsheetPanel.SetValue(col, row, GetCellValue(col, row));
                
-                if(!undoButton.Enabled) 
-                    undoButton.Enabled = true;
+                //if(!undoButton.Enabled) 
+                //  undoButton.Enabled = true;
 
                 return updateList;
             }
@@ -155,6 +142,8 @@ namespace SpreadsheetGUI
 
         private void selectionChanged(SpreadsheetPanel ssp)
         {
+            //UpdateCells(); TODO: make it so when you select a different box, changes are reflected on the spreadsheet
+
             spreadsheetPanel.GetSelection(out int col, out int row);
             // Changes the cell address text box
             string cellName = GetCellName(col, row);
@@ -170,6 +159,14 @@ namespace SpreadsheetGUI
 
         private void setCellButton_Click(object sender, EventArgs e)
         {
+            UpdateCells();
+        }
+
+        /*
+         * Helper method for updating all the cells within the spreadsheet.
+         */
+        private void UpdateCells()
+        {
             // Sets the contents of the selected cell when clicked
             spreadsheetPanel.GetSelection(out int col, out int row);
             IList<string> updateList = SetCell(col, row, cellInputText.Text);
@@ -184,7 +181,6 @@ namespace SpreadsheetGUI
             // Recalculates cells that depends on the selected cell
             RecalculateCells(updateList);
         }
-
         /*
          * Keeping for reference
          * 
@@ -221,7 +217,7 @@ namespace SpreadsheetGUI
             switch (e.KeyChar)
             {
                 case (char)Keys.Return:
-                    setCellButton_Click(sender, e);
+                    UpdateCells();
                     e.Handled = true;
                     break;
             }
@@ -233,24 +229,28 @@ namespace SpreadsheetGUI
 
             if (keyData == (Keys.Up))
             {
+                UpdateCells();
                 spreadsheetPanel.SetSelection(col, row - 1);
                 selectionChanged(spreadsheetPanel);
                 return true;
             }
             if (keyData == (Keys.Down))
             {
+                UpdateCells();
                 spreadsheetPanel.SetSelection(col, row + 1);
                 selectionChanged(spreadsheetPanel);
                 return true;
             }
             if (keyData == (Keys.Left))
             {
+                UpdateCells();
                 spreadsheetPanel.SetSelection(col - 1, row);
                 selectionChanged(spreadsheetPanel);
                 return true;
             }
             if (keyData == (Keys.Right))
             {
+                UpdateCells();
                 spreadsheetPanel.SetSelection(col + 1, row);
                 selectionChanged(spreadsheetPanel);
                 return true;
@@ -260,6 +260,7 @@ namespace SpreadsheetGUI
 
         private void SpreadsheetForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            //TODO: maybe add some socket closing bullshit? 
         }
 
         private void helpToolStripMenuItem_Click(object sender, EventArgs e)
@@ -290,12 +291,15 @@ namespace SpreadsheetGUI
 
         private void undoButton_Click(object sender, EventArgs e)
         {
-            
+            //TODO: send a request to the server to undo
         }
 
         private void connectToServerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            ConnectInputDialog input = new ConnectInputDialog();
+            input.Show();
+            //TODO: create a dialog box, prompting the user to enter in the ip address and port of the server, as well as a username 
         }
+
     }
 }
