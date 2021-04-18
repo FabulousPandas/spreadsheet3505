@@ -28,10 +28,10 @@
         private void InitializeComponent()
         {
             this.okButton = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.usernameTextBox = new System.Windows.Forms.Label();
+            this.usernameInputBox = new System.Windows.Forms.TextBox();
+            this.ipAddressTextBox = new System.Windows.Forms.Label();
+            this.ipAddressInputBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // okButton
@@ -45,40 +45,40 @@
             this.okButton.Text = "&OK";
             this.okButton.Click += new System.EventHandler(this.okButton_Click);
             // 
-            // label1
+            // usernameTextBox
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.label1.Location = new System.Drawing.Point(35, 21);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(70, 15);
-            this.label1.TabIndex = 25;
-            this.label1.Text = "UserName:";
-            this.label1.Click += new System.EventHandler(this.label1_Click);
+            this.usernameTextBox.AutoSize = true;
+            this.usernameTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.usernameTextBox.Location = new System.Drawing.Point(35, 21);
+            this.usernameTextBox.Name = "usernameTextBox";
+            this.usernameTextBox.Size = new System.Drawing.Size(68, 15);
+            this.usernameTextBox.TabIndex = 25;
+            this.usernameTextBox.Text = "Username:";
+            this.usernameTextBox.Click += new System.EventHandler(this.label1_Click);
             // 
-            // textBox1
+            // usernameInputBox
             // 
-            this.textBox1.Location = new System.Drawing.Point(111, 21);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(100, 20);
-            this.textBox1.TabIndex = 26;
+            this.usernameInputBox.Location = new System.Drawing.Point(111, 21);
+            this.usernameInputBox.Name = "usernameInputBox";
+            this.usernameInputBox.Size = new System.Drawing.Size(100, 20);
+            this.usernameInputBox.TabIndex = 26;
             // 
-            // label2
+            // ipAddressTextBox
             // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.label2.Location = new System.Drawing.Point(35, 64);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(68, 15);
-            this.label2.TabIndex = 27;
-            this.label2.Text = "IP Address:";
+            this.ipAddressTextBox.AutoSize = true;
+            this.ipAddressTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.ipAddressTextBox.Location = new System.Drawing.Point(35, 64);
+            this.ipAddressTextBox.Name = "ipAddressTextBox";
+            this.ipAddressTextBox.Size = new System.Drawing.Size(68, 15);
+            this.ipAddressTextBox.TabIndex = 27;
+            this.ipAddressTextBox.Text = "IP Address:";
             // 
-            // textBox2
+            // ipAddressInputBox
             // 
-            this.textBox2.Location = new System.Drawing.Point(111, 63);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(100, 20);
-            this.textBox2.TabIndex = 28;
+            this.ipAddressInputBox.Location = new System.Drawing.Point(111, 63);
+            this.ipAddressInputBox.Name = "ipAddressInputBox";
+            this.ipAddressInputBox.Size = new System.Drawing.Size(100, 20);
+            this.ipAddressInputBox.TabIndex = 28;
             // 
             // ConnectInputDialog
             // 
@@ -86,10 +86,10 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(435, 283);
-            this.Controls.Add(this.textBox2);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.ipAddressInputBox);
+            this.Controls.Add(this.ipAddressTextBox);
+            this.Controls.Add(this.usernameInputBox);
+            this.Controls.Add(this.usernameTextBox);
             this.Controls.Add(this.okButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -108,9 +108,9 @@
 
         #endregion
         private System.Windows.Forms.Button okButton;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.Label usernameTextBox;
+        private System.Windows.Forms.TextBox usernameInputBox;
+        private System.Windows.Forms.Label ipAddressTextBox;
+        private System.Windows.Forms.TextBox ipAddressInputBox;
     }
 }
