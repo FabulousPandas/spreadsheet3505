@@ -28,11 +28,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetPanel", "Spreads
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetworkController", "NetworkController\NetworkController.csproj", "{0E755FEA-F6B5-4025-81CB-5F56FA27810F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetController", "SpreadsheetController\SpreadsheetController.csproj", "{D5ECB358-BD0B-4887-B102-824D39BA912A}"
-	ProjectSection(ProjectDependencies) = postProject
-		{F0B7694C-73AC-441F-BC5F-56C3BE69AD26} = {F0B7694C-73AC-441F-BC5F-56C3BE69AD26}
-		{0E755FEA-F6B5-4025-81CB-5F56FA27810F} = {0E755FEA-F6B5-4025-81CB-5F56FA27810F}
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetController", "SpreadsheetController\SpreadsheetController.csproj", "{D00698F0-3D44-49D9-9EDD-F341A6E0FF37}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -84,10 +80,10 @@ Global
 		{0E755FEA-F6B5-4025-81CB-5F56FA27810F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E755FEA-F6B5-4025-81CB-5F56FA27810F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E755FEA-F6B5-4025-81CB-5F56FA27810F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D5ECB358-BD0B-4887-B102-824D39BA912A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D5ECB358-BD0B-4887-B102-824D39BA912A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D5ECB358-BD0B-4887-B102-824D39BA912A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D5ECB358-BD0B-4887-B102-824D39BA912A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D00698F0-3D44-49D9-9EDD-F341A6E0FF37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D00698F0-3D44-49D9-9EDD-F341A6E0FF37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D00698F0-3D44-49D9-9EDD-F341A6E0FF37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D00698F0-3D44-49D9-9EDD-F341A6E0FF37}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

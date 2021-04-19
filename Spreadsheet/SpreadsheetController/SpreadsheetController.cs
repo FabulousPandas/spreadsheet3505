@@ -65,7 +65,7 @@ namespace SS
                 if (p[p.Length - 1] != '\n')
                     break;
 
-              
+
                 state.RemoveData(0, p.Length);
             }
             //UpdateReceived();

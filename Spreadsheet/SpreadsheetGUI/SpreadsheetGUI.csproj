@@ -103,7 +103,7 @@
       <Name>Formula</Name>
     </ProjectReference>
     <ProjectReference Include="..\SpreadsheetController\SpreadsheetController.csproj">
-      <Project>{d5ecb358-bd0b-4887-b102-824d39ba912a}</Project>
+      <Project>{d00698f0-3d44-49d9-9edd-f341a6e0ff37}</Project>
       <Name>SpreadsheetController</Name>
     </ProjectReference>
     <ProjectReference Include="..\SpreadsheetPanel\SpreadsheetPanel.csproj">

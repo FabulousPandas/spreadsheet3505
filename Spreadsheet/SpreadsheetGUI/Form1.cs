@@ -21,7 +21,7 @@ namespace SpreadsheetGUI
         /// </summary>
         private Spreadsheet sheet;
 
-        //private SpreadsheetController controller;
+        private SpreadsheetController controller;
 
         public SpreadsheetForm()
         {
