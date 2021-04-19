@@ -27,23 +27,24 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.okButton = new System.Windows.Forms.Button();
+            this.submitButton = new System.Windows.Forms.Button();
             this.usernameTextBox = new System.Windows.Forms.Label();
             this.usernameInputBox = new System.Windows.Forms.TextBox();
             this.ipAddressTextBox = new System.Windows.Forms.Label();
             this.ipAddressInputBox = new System.Windows.Forms.TextBox();
+            this.cancelButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // okButton
+            // submitButton
             // 
-            this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.okButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.okButton.Location = new System.Drawing.Point(348, 248);
-            this.okButton.Name = "okButton";
-            this.okButton.Size = new System.Drawing.Size(75, 23);
-            this.okButton.TabIndex = 24;
-            this.okButton.Text = "&OK";
-            this.okButton.Click += new System.EventHandler(this.okButton_Click);
+            this.submitButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.submitButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.submitButton.Location = new System.Drawing.Point(259, 248);
+            this.submitButton.Name = "submitButton";
+            this.submitButton.Size = new System.Drawing.Size(75, 23);
+            this.submitButton.TabIndex = 24;
+            this.submitButton.Text = "Submit";
+            this.submitButton.Click += new System.EventHandler(this.okButton_Click);
             // 
             // usernameTextBox
             // 
@@ -54,7 +55,6 @@
             this.usernameTextBox.Size = new System.Drawing.Size(68, 15);
             this.usernameTextBox.TabIndex = 25;
             this.usernameTextBox.Text = "Username:";
-            this.usernameTextBox.Click += new System.EventHandler(this.label1_Click);
             // 
             // usernameInputBox
             // 
@@ -80,17 +80,28 @@
             this.ipAddressInputBox.Size = new System.Drawing.Size(100, 20);
             this.ipAddressInputBox.TabIndex = 28;
             // 
+            // cancelButton
+            // 
+            this.cancelButton.Location = new System.Drawing.Point(348, 248);
+            this.cancelButton.Name = "cancelButton";
+            this.cancelButton.Size = new System.Drawing.Size(75, 23);
+            this.cancelButton.TabIndex = 29;
+            this.cancelButton.Text = "Cancel";
+            this.cancelButton.UseVisualStyleBackColor = true;
+            this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
+            // 
             // ConnectInputDialog
             // 
-            this.AcceptButton = this.okButton;
+            this.AcceptButton = this.submitButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(435, 283);
+            this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.ipAddressInputBox);
             this.Controls.Add(this.ipAddressTextBox);
             this.Controls.Add(this.usernameInputBox);
             this.Controls.Add(this.usernameTextBox);
-            this.Controls.Add(this.okButton);
+            this.Controls.Add(this.submitButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -100,17 +111,17 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Connect to Server";
-            this.Load += new System.EventHandler(this.ConnectInputDialog_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-        private System.Windows.Forms.Button okButton;
+        private System.Windows.Forms.Button submitButton;
         private System.Windows.Forms.Label usernameTextBox;
         private System.Windows.Forms.TextBox usernameInputBox;
         private System.Windows.Forms.Label ipAddressTextBox;
         private System.Windows.Forms.TextBox ipAddressInputBox;
+        private System.Windows.Forms.Button cancelButton;
     }
 }

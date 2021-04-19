@@ -102,6 +102,10 @@
       <Project>{afb9b79c-9621-48e1-86df-25df4b1308f7}</Project>
       <Name>Formula</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SpreadsheetController\SpreadsheetController.csproj">
+      <Project>{d5ecb358-bd0b-4887-b102-824d39ba912a}</Project>
+      <Name>SpreadsheetController</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SpreadsheetPanel\SpreadsheetPanel.csproj">
       <Project>{C2A99EB0-E146-4121-95F2-30C45B898C93}</Project>
       <Name>SpreadsheetPanel</Name>

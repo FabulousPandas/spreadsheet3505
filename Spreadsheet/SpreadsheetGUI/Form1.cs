@@ -21,6 +21,8 @@ namespace SpreadsheetGUI
         /// </summary>
         private Spreadsheet sheet;
 
+        //private SpreadsheetController controller;
+
         public SpreadsheetForm()
         {
             InitializeComponent();
@@ -296,9 +298,24 @@ namespace SpreadsheetGUI
 
         private void connectToServerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ConnectInputDialog input = new ConnectInputDialog();
-            input.Show();
             //TODO: create a dialog box, prompting the user to enter in the ip address and port of the server, as well as a username 
+            string userName = "", ipAddress = "";
+ 
+            ConnectInputDialog input = new ConnectInputDialog();
+            if(input.ShowDialog(this) == DialogResult.OK)
+            {
+                userName = input.UserName;
+                ipAddress = input.IPAddress;
+            }
+            else
+            {
+                MessageBox.Show("No values provided, cancelling connection to server");
+                return;
+            }
+
+
+            MessageBox.Show("Received username: " + userName + " and IP address: " + ipAddress);
+            
         }
 
     }

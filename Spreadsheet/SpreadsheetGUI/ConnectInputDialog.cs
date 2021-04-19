@@ -11,6 +11,9 @@ namespace SpreadsheetGUI
 {
     partial class ConnectInputDialog : Form
     {
+        public string UserName { get; private set; }
+        public string IPAddress { get; private set; }
+
         public ConnectInputDialog()
         {
             InitializeComponent();
@@ -98,6 +101,16 @@ namespace SpreadsheetGUI
 
         private void okButton_Click(object sender, EventArgs e)
         {
+            if(usernameInputBox.Text == "" || ipAddressInputBox.Text == "")
+            {
+                MessageBox.Show("Please fill in both blanks");
+                DialogResult = DialogResult.None;
+                return;
+            }
+            UserName = usernameInputBox.Text;
+            IPAddress = ipAddressInputBox.Text;
+
+            DialogResult = DialogResult.OK;
             Close();
         }
 
@@ -109,6 +122,11 @@ namespace SpreadsheetGUI
         private void label1_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void cancelButton_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }
