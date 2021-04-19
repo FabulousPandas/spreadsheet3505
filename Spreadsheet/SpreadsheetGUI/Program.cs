@@ -1,4 +1,5 @@
 ﻿using System;
+using SS;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -65,7 +66,8 @@ namespace SpreadsheetGUI
             Application.SetCompatibleTextRenderingDefault(false);
 
             SpreadsheetApplication sheetApp = SpreadsheetApplication.getAppContext();
-            sheetApp.RunForm(new SpreadsheetForm());
+            SpreadsheetController controller = new SpreadsheetController();
+            sheetApp.RunForm(new SpreadsheetForm(controller));
             Application.Run(sheetApp);
         }
     }

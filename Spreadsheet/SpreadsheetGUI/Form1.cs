@@ -23,10 +23,10 @@ namespace SpreadsheetGUI
 
         private SpreadsheetController controller;
 
-        public SpreadsheetForm()
+        public SpreadsheetForm(SpreadsheetController controller)
         {
             InitializeComponent();
-
+            this.controller = controller;
             sheet = new Spreadsheet(CellValidator, s => s.ToUpper(), "ps6"); // creates a spreadsheet that normalizes variables to capital letters
             spreadsheetPanel.SelectionChanged += selectionChanged;
             spreadsheetPanel.SetSelection(0, 0);
@@ -315,6 +315,7 @@ namespace SpreadsheetGUI
 
 
             MessageBox.Show("Received username: " + userName + " and IP address: " + ipAddress);
+            controller.Connect(ipAddress, userName);
             
         }
 

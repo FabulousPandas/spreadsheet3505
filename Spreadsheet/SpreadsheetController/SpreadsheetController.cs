@@ -16,9 +16,10 @@ namespace SS
         private SocketState server;
         private string username;
 
-        public void Connect(string addr)
+        public void Connect(string addr, string name)
         {
             Networking.ConnectToServer(OnConnect, addr, 1100);
+            username = name;
         }
 
         private void OnConnect(SocketState state)
@@ -30,8 +31,9 @@ namespace SS
             }
 
             server = state;
+            Networking.Send(server.TheSocket, username);
 
-            Connected();
+            //Connected();
             state.OnNetworkAction = ReceiveData;
             Networking.GetData(state);
         }
