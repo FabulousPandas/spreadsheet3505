@@ -1,17 +1,18 @@
-#pragma once
 /*
 handle connection class header
 
 
 */
+#ifndef HANDLE_CONNECTION_H
+#define	HANDLE_CONNECTION_H
+
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
 #include <string>
 
-#ifndef HANDLE_CONNECTION_H
-#define	HANDLE_CONNECTION_H
+
 
 
 

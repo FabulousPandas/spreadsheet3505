@@ -1,8 +1,10 @@
-#pragma once
 /*
 * Listener Header
 *
 */
+
+#ifndef LISTENER_H
+#define LISTENER_H
 
 #include <boost/asio.hpp>
 #include <vector>
@@ -11,8 +13,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/bind.hpp>
 
-#ifndef LISTENER_H
-#define LISTENER_H
+
 
 class listener
 {
