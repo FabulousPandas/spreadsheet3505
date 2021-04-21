@@ -22,13 +22,7 @@ public:
 
 	listener(boost::asio::io_context& io_context);
 
-
-
-
 private:
-
-
-
 
 	boost::asio::ip::tcp::acceptor acceptor_obj;
 

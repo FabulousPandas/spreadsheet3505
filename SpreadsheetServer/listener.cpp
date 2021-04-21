@@ -8,13 +8,6 @@ Header comment
 
 using namespace boost::asio;
 
-class listener
-{
-
-	io_context& io_context_obj;
-
-	ip::tcp::acceptor acceptor_obj;
-
 
 	listener::listener(io_context& io_context)
 		: io_context_obj(io_context),
@@ -36,4 +29,3 @@ class listener
 
 
 
-};
