@@ -37,34 +37,6 @@ int tester::testSimultaniousEdit()
 }
 
 
-/* Client tests */
 
-int connectToClientTest()
-{
-  //attempt to connect to the client via socket
-
-  return 0;
-}
-
-int tester::basicServerMessage()
-{
-  //send a basic edit message from the server
-
-  return 0;
-}
-
-int tester::circularErrorTest()
-{
-  //send a error message for a circular dependency to the client
-  
-  return 0;
-}
-
-int tester::simultaniousEditTest()
-{
-  //send an error for a simultanious edit to the client
-  
-  return 0;
-}
 
 
