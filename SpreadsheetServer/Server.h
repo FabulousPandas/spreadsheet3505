@@ -2,14 +2,15 @@
 Server class header
 
 */
+#ifndef SERVER_H
+#define SERVER_H
 
 #include <boost/asio.hpp>
 #include <vector>
 #include <string>
 
 
-#ifndef SERVER_H
-#define SERVER_H
+
 
 
 class server
