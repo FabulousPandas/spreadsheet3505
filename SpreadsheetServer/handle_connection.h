@@ -38,8 +38,8 @@ public:
 
 private:
 
-	boost::asio::ip::tcp::socket socket_;
-
+        boost::asio::ip::tcp::socket socket_;
+  
 	std::string message_;
 
 

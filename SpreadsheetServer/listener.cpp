@@ -23,8 +23,9 @@ using namespace boost::asio;
 		handle_connection::pointer new_connection =
 			handle_connection::create(io_context_obj);
 
+		handle_connection* handler = new handle_connection(io_context_obj);
 		acceptor_obj.async_accept(new_connection->socket(),
-			boost::bind(&handle_connection::handle_accept, this, new_connection,
+		        boost::bind(&handle_connection::handle_accept, handler, new_connection,
 				boost::asio::placeholders::error));
 	}
 
