@@ -1,31 +1,39 @@
 /*
-Header comment
+* Listener Header
+*
 */
-#include "server.h"
-#include "listener.h"
-#include "handle_connection.h"
 
+#ifndef LISTENER_H
+#define LISTENER_H
 
-using namespace boost::asio;
-
-
-	listener::listener(io_context& io_context)
-		: io_context_obj(io_context),
-		acceptor_obj(io_context, ip::tcp::endpoint(ip::tcp::v4(), 1100))
-	{
-		start_accept();
-	}
-
-	void listener::start_accept()
-	{
-
-		handle_connection::pointer new_connection =
-			handle_connection::create(io_context_obj);
-
-		acceptor_obj.async_accept(new_connection->socket(),
-			boost::bind(&handle_connection::handle_accept, this, new_connection,
-				boost::asio::placeholders::error));
-	}
+#include <boost/asio.hpp>
+#include <vector>
+#include <string>
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/bind.hpp>
 
 
 
+class listener
+{
+public:
+
+
+	listener(boost::asio::io_context& io_context);
+
+
+private:
+
+
+	boost::asio::ip::tcp::acceptor acceptor_obj;
+
+	boost::asio::io_context& io_context_obj;
+
+
+	void start_accept();
+
+
+
+};
+
+#endif

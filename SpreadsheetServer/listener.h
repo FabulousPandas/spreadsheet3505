@@ -10,7 +10,6 @@
 #include <vector>
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/bind.hpp>
 
 
@@ -22,7 +21,9 @@ public:
 
 	listener(boost::asio::io_context& io_context);
 
+
 private:
+
 
 	boost::asio::ip::tcp::acceptor acceptor_obj;
 
