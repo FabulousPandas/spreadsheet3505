@@ -4,6 +4,7 @@
 
 
 #include <iostream>
+#include <boost/asio.hpp>
 
 class tester
 {
@@ -13,6 +14,9 @@ static int testServerConnect();
 static int testCircularDependency();
 static int testSimultaniousEdit();
 
+private:
+boost::asio::ip::tcp::socket connectToServer(std::string serverip);
+  
 };
 
 #endif
