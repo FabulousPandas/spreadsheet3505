@@ -3,7 +3,6 @@ Header comment
 */
 #include "server.h"
 #include "listener.h"
-#include "handle_connection.h"
 
 
 using namespace boost::asio;
@@ -23,10 +22,20 @@ using namespace boost::asio;
 		handle_connection::pointer new_connection =
 			handle_connection::create(io_context_obj);
 
-		handle_connection* handler = new handle_connection(io_context_obj);
 		acceptor_obj.async_accept(new_connection->socket(),
-		        boost::bind(&handle_connection::handle_accept, handler, new_connection,
+		        boost::bind(&listener::handle_accept, this, new_connection,
 				boost::asio::placeholders::error));
+	}
+
+	void listener::handle_accept(handle_connection::pointer new_connection,
+		const boost::system::error_code& error)
+	{
+		if(!error)
+		{
+			new_connection->start();
+		}
+		start_accept();
+	
 	}
 
 

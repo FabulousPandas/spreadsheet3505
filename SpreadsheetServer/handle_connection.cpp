@@ -25,10 +25,10 @@ boost::asio::ip::tcp::socket& handle_connection::socket()
 	return socket_;
 }
 
-
-void handle_connection::handle_accept(pointer new_connection,
-	const boost::system::error_code& error)
+void handle_connection::start()
 {
 
 }
+
+
 

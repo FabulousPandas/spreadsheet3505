@@ -11,7 +11,7 @@
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/bind.hpp>
-
+#include "handle_connection.h"
 
 
 class listener
@@ -31,6 +31,9 @@ private:
 
 
 	void start_accept();
+
+	void handle_accept(handle_connection::pointer new_connection,
+		const boost::system::error_code& error);
 
 
 

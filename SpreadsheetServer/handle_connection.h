@@ -31,8 +31,6 @@ public:
 
 	void start();
 
-	void handle_accept(pointer new_connection,
-		const boost::system::error_code& error);
 
 
 
