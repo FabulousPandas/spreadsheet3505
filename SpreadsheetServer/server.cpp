@@ -27,11 +27,23 @@ int main()
     }
 
 
-
-
-
     return 0;
 }
+
+    void polling()
+    {
+        bool idle = false;
+        bool loop = true;
+
+
+        while (loop)
+        {
+            for (int i = 0; i< client_list.size(); i++)
+            {
+
+            }
+        }
+    }
 
 
 

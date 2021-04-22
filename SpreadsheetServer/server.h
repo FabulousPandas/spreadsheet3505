@@ -22,14 +22,16 @@ public:
 
 private:
 
+	void polling();
+
+
 
 	std::vector<std::string> client_list = std::vector<std::string>();
 
 	std::vector<std::string> connection_list = std::vector<std::string>();
 
-
-
 };
+
 
 
 
