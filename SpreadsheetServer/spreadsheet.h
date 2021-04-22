@@ -6,7 +6,7 @@
 #define SPREADSHEET_H
 
 #include <queue>
-
+#include <string>
 
 
 class spreadsheet 
@@ -15,7 +15,7 @@ public:
 
 	spreadsheet(std::string name);
 
-	std::queue message_q;
+	std::queue<std::string> message_q;
 
 	std::vector<int> clients;
 

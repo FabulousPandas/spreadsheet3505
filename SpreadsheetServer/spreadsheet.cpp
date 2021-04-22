@@ -4,21 +4,21 @@
 */
 
 
-#include 'spreadsheet'
+#include "spreadsheet.h"
 
 
-spreadsheet(std::string name)
+spreadsheet::spreadsheet(std::string name)
 {
 
 }
 
 
-void add_to_q()
+void spreadsheet::add_to_q()
 {
 
 }
 
-bool save_spreadsheet()
+bool spreadsheet::save_spreadsheet()
 {
-
+	return false;
 }

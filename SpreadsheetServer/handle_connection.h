@@ -10,9 +10,7 @@ handle connection class header
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/asio.hpp>
 #include <string>
-
-
-
+#include <boost/bind.hpp>
 
 
 
@@ -38,13 +36,15 @@ private:
 
         boost::asio::ip::tcp::socket socket_;
   
-	std::string message_;
+	enum { max_length = 512 };
+	char delivered_message[max_length];
+	std::string message_buffer = "";
 
 
 
 
-	void handle_write(const boost::system::error_code& /*error*/,
-		size_t /*bytes_transferred*/);
+	void read_handler(const boost::system::error_code& err,
+		size_t bytes_transferred);
 
 
 

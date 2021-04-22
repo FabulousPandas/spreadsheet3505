@@ -35,7 +35,16 @@ boost::asio::ip::tcp::socket& handle_connection::socket()
  */
 void handle_connection::start()
 {
+	socket_.async_read_some(
+		boost::asio::buffer(delivered_message, max_length),
+		boost::bind(&handle_connection::read_handler,
+			shared_from_this(),
+			boost::asio::placeholders::error,
+			boost::asio::placeholders::bytes_transferred));
+}
 
+void handle_connection::read_handler(const boost::system::error_code& err, size_t bytes_transferred)
+{
 }
 
 
