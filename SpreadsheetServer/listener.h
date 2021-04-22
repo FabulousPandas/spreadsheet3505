@@ -1,6 +1,6 @@
 /*
-* Listener Header
-*
+* Header file for the class which listens for a new client to connect
+* Written by Malik Qader and Dylan Hansen
 */
 
 #ifndef LISTENER_H

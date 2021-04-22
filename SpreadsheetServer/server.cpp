@@ -1,3 +1,6 @@
+/*
+ * The main class for dealing with the server code
+ */ 
 #include "server.h"
 #include <iostream>
 #include <iterator>
