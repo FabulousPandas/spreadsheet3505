@@ -38,7 +38,8 @@ private:
   
 	enum { max_length = 512 };
 	char delivered_message[max_length];
-	std::string message_buffer = "";
+	std::string message_buffer;
+	int con_state;
 
 
 
@@ -46,7 +47,7 @@ private:
 	void read_handler(const boost::system::error_code& err,
 		size_t bytes_transferred);
 
-
+	bool complete_handshake_message();
 
 
 };
