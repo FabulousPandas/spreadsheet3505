@@ -9,13 +9,9 @@ using System.Windows.Forms;
 
 namespace SpreadsheetGUI
 {
-    partial class ConnectInputDialog : Form
+    partial class SpreadsheetSelector : Form
     {
-        public string UserName { get; private set; }
-        public string IPAddress { get; private set; }
-        public int Port { get; private set; }
-
-        public ConnectInputDialog()
+        public SpreadsheetSelector()
         {
             InitializeComponent();
         }
@@ -102,23 +98,15 @@ namespace SpreadsheetGUI
 
         private void okButton_Click(object sender, EventArgs e)
         {
-            if(usernameInputBox.Text == "" || ipAddressInputBox.Text == "")
+            /*
+            if(spreadsheetList|| spreadsheetInputBox.Text == "")
             {
-                MessageBox.Show("Please fill in the user name/ip address boxes");
+                MessageBox.Show("Please fill in both blanks");
                 DialogResult = DialogResult.None;
                 return;
             }
+            */
 
-            if (portInputBox.Text == "")
-                Port = 1100; // if port is left blank, use 1100 as default
-            else
-            {
-                int.TryParse(portInputBox.Text, out int result);
-                Port = result;
-            }
-
-            UserName = usernameInputBox.Text;
-            IPAddress = ipAddressInputBox.Text;
 
             DialogResult = DialogResult.OK;
             Close();

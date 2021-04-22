@@ -9,4 +9,10 @@
     <ProjectReference Include="..\Formula\Formula.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="NetworkController">
+      <HintPath>..\NetworkController.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
