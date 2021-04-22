@@ -10,6 +10,10 @@
 
 using namespace boost::asio;
 
+std::vector<std::string> client_list;
+
+std::vector<std::string> connection_list;
+
 int main()
 {
 
