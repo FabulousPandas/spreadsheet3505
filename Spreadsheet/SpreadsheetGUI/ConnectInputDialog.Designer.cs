@@ -44,7 +44,7 @@
             this.submitButton.Location = new System.Drawing.Point(259, 248);
             this.submitButton.Name = "submitButton";
             this.submitButton.Size = new System.Drawing.Size(75, 23);
-            this.submitButton.TabIndex = 24;
+            this.submitButton.TabIndex = 3;
             this.submitButton.Text = "Submit";
             this.submitButton.Click += new System.EventHandler(this.okButton_Click);
             // 
@@ -63,7 +63,7 @@
             this.usernameInputBox.Location = new System.Drawing.Point(301, 21);
             this.usernameInputBox.Name = "usernameInputBox";
             this.usernameInputBox.Size = new System.Drawing.Size(100, 20);
-            this.usernameInputBox.TabIndex = 26;
+            this.usernameInputBox.TabIndex = 0;
             // 
             // ipAddressTextBox
             // 
@@ -80,14 +80,14 @@
             this.ipAddressInputBox.Location = new System.Drawing.Point(301, 64);
             this.ipAddressInputBox.Name = "ipAddressInputBox";
             this.ipAddressInputBox.Size = new System.Drawing.Size(100, 20);
-            this.ipAddressInputBox.TabIndex = 28;
+            this.ipAddressInputBox.TabIndex = 1;
             // 
             // cancelButton
             // 
             this.cancelButton.Location = new System.Drawing.Point(348, 248);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
-            this.cancelButton.TabIndex = 29;
+            this.cancelButton.TabIndex = 4;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
             this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
@@ -107,7 +107,7 @@
             this.portInputBox.Location = new System.Drawing.Point(301, 106);
             this.portInputBox.Name = "portInputBox";
             this.portInputBox.Size = new System.Drawing.Size(100, 20);
-            this.portInputBox.TabIndex = 31;
+            this.portInputBox.TabIndex = 2;
             // 
             // ConnectInputDialog
             // 
@@ -132,6 +132,7 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Connect to Server";
+            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ConnectInputDialog_KeyPress);
             this.ResumeLayout(false);
             this.PerformLayout();
 

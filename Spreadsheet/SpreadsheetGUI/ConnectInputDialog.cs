@@ -134,14 +134,17 @@ namespace SpreadsheetGUI
 
         }
 
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void cancelButton_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void ConnectInputDialog_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar.Equals(Keys.Enter))
+            {
+                SaveInput();
+            }
         }
     }
 }
