@@ -14,6 +14,11 @@ namespace SS
         public delegate void ConnectedHandler();
         public event ConnectedHandler Connected;
 
+        public delegate void SpreadsheetsReceivedHandler(List<string> list);
+        public event SpreadsheetsReceivedHandler SpreadsheetReceived;
+
+        private List<string> spreadsheetList;
+
         private Spreadsheet sheet;
         private SocketState server;
         private string username;
@@ -33,14 +38,15 @@ namespace SS
             }
 
             server = state;
-            Networking.Send(server.TheSocket, username);
+            spreadsheetList = new List<string>();
+            Networking.Send(server.TheSocket, username + "\n");
 
             Connected();
-            state.OnNetworkAction = ReceiveData;
+            state.OnNetworkAction = ReceiveSpreadsheetData;
             Networking.GetData(state);
         }
 
-        private void ReceiveData(SocketState state)
+        private void ReceiveSpreadsheetData(SocketState state)
         {
             if (state.ErrorOccured)
             {
@@ -49,16 +55,21 @@ namespace SS
                 return;
             }
 
-            ProcessData(state);
+            ProcessSpreadsheetData(state);
 
             Networking.GetData(state);
         }
 
-        private void ProcessData(SocketState state)
+        private void ProcessSpreadsheetData(SocketState state)
         {
             string totalData = state.GetData();
-            string[] parts = Regex.Split(totalData, @"(?<=[\n])");
 
+            Console.WriteLine(totalData.Substring(totalData.Length - 2));
+            if (totalData.Substring(totalData.Length - 2) != "\n\n")  //checking if we have received all the spreadsheets yet
+                return;
+
+            string[] parts = Regex.Split(totalData, @"(?<=[\n])");
+            
             foreach (string p in parts)
             {
                 // Ignore empty strings added by the regex splitter
@@ -69,12 +80,36 @@ namespace SS
                 if (p[p.Length - 1] != '\n')
                     break;
 
+                spreadsheetList.Add(p);
 
                 state.RemoveData(0, p.Length);
             }
-            //UpdateReceived();
-            //ProcessInputs();
+
+            state.OnNetworkAction = ReceiveEdits;
+            SpreadsheetReceived(spreadsheetList);
         }
+
+        private void ReceiveEdits(SocketState state)
+        {
+            if (state.ErrorOccured)
+            {
+                // inform the view
+                Error(state.ErrorMessage);
+                return;
+            }
+
+            Networking.GetData(state);
+        }
+
+        /*
+         * Sends the given spreadsheet name to the server for the handshake
+         */
+        public void SendSpreadsheet(string sheetName)
+        {
+            Networking.Send(server.TheSocket, sheetName + "\n");
+        }
+
+
 
         /// <summary>
         /// Returns true if s is a valid cell in the spreadsheet, returns false otherwise

@@ -11,9 +11,15 @@ namespace SpreadsheetGUI
 {
     partial class SpreadsheetSelector : Form
     {
-        public SpreadsheetSelector()
+        private List<string> sheets;
+
+        public string Spreadsheet { get; private set; }
+
+        public SpreadsheetSelector(List<string> spreadsheets)
         {
             InitializeComponent();
+            sheets = new List<string>(spreadsheets);
+            spreadsheetList.Items.AddRange(sheets.ToArray());
         }
 
         #region Assembly Attribute Accessors
@@ -98,33 +104,27 @@ namespace SpreadsheetGUI
 
         private void okButton_Click(object sender, EventArgs e)
         {
-            /*
-            if(spreadsheetList|| spreadsheetInputBox.Text == "")
+            if(spreadsheetInputBox.Text == "")
             {
-                MessageBox.Show("Please fill in both blanks");
+                MessageBox.Show("Please select a spreadsheet or type a name in the blank");
                 DialogResult = DialogResult.None;
                 return;
             }
-            */
 
+            Spreadsheet = spreadsheetInputBox.Text;
 
             DialogResult = DialogResult.OK;
             Close();
         }
 
-        private void ConnectInputDialog_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void cancelButton_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void spreadsheetList_SelectedValueChanged(object sender, EventArgs e)
+        {
+            spreadsheetInputBox.Text = spreadsheetList.Text;
         }
     }
 }

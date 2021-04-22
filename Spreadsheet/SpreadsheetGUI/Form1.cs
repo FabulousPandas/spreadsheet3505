@@ -29,6 +29,7 @@ namespace SpreadsheetGUI
             this.controller = control;
             controller.Error += ShowError;
             controller.Connected += OnConnect;
+            controller.SpreadsheetReceived += ReceivedSpreadsheets;
 
             //sheet = new Spreadsheet(CellValidator, s => s.ToUpper(), "default"); // creates a spreadsheet that normalizes variables to capital letters
             //spreadsheetPanel.SelectionChanged += selectionChanged;
@@ -196,9 +197,23 @@ namespace SpreadsheetGUI
             
         }
 
-        private void ReceivedSpreadsheets()
+        private void ReceivedSpreadsheets(List<string> sheetList)
         {
-
+            //List<string> test = new List<string>() {"test", "random", "strings" };
+            SpreadsheetSelector input = new SpreadsheetSelector(sheetList);
+            string chosenSpreadsheet = "";
+            MethodInvoker invoker =
+            new MethodInvoker(
+                () => 
+                {
+                    if (input.ShowDialog(this) == DialogResult.OK)
+                    {
+                        chosenSpreadsheet = input.Spreadsheet;
+                    }
+                }
+            );
+            this.Invoke(invoker);
+            controller.SendSpreadsheet(chosenSpreadsheet);
         }
 
     }

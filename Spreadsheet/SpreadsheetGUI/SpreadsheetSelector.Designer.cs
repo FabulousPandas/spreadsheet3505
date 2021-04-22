@@ -52,9 +52,9 @@
             this.spreadsheetLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
             this.spreadsheetLabel.Location = new System.Drawing.Point(12, 176);
             this.spreadsheetLabel.Name = "spreadsheetLabel";
-            this.spreadsheetLabel.Size = new System.Drawing.Size(224, 15);
+            this.spreadsheetLabel.Size = new System.Drawing.Size(198, 15);
             this.spreadsheetLabel.TabIndex = 27;
-            this.spreadsheetLabel.Text = "Enter the name of the new spreadsheet:";
+            this.spreadsheetLabel.Text = "Enter the name of the spreadsheet:";
             // 
             // spreadsheetInputBox
             // 
@@ -66,14 +66,11 @@
             // spreadsheetList
             // 
             this.spreadsheetList.FormattingEnabled = true;
-            this.spreadsheetList.Items.AddRange(new object[] {
-            "test",
-            "test2",
-            "test3"});
             this.spreadsheetList.Location = new System.Drawing.Point(15, 25);
             this.spreadsheetList.Name = "spreadsheetList";
             this.spreadsheetList.Size = new System.Drawing.Size(408, 108);
             this.spreadsheetList.TabIndex = 30;
+            this.spreadsheetList.SelectedValueChanged += new System.EventHandler(this.spreadsheetList_SelectedValueChanged);
             // 
             // selectSpreadsheetLabel
             // 

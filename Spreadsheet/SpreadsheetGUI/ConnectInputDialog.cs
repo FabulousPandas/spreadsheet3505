@@ -102,7 +102,13 @@ namespace SpreadsheetGUI
 
         private void okButton_Click(object sender, EventArgs e)
         {
-            if(usernameInputBox.Text == "" || ipAddressInputBox.Text == "")
+            SaveInput();
+            Close();
+        }
+
+        private void SaveInput()
+        {
+            if (usernameInputBox.Text == "" || ipAddressInputBox.Text == "")
             {
                 MessageBox.Show("Please fill in the user name/ip address boxes");
                 DialogResult = DialogResult.None;
@@ -121,7 +127,6 @@ namespace SpreadsheetGUI
             IPAddress = ipAddressInputBox.Text;
 
             DialogResult = DialogResult.OK;
-            Close();
         }
 
         private void ConnectInputDialog_Load(object sender, EventArgs e)
