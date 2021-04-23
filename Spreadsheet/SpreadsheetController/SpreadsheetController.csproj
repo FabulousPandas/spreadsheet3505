@@ -45,6 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ServerMessage.cs" />
+    <Compile Include="ClientRequest.cs" />
     <Compile Include="SpreadsheetController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
