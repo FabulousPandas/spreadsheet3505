@@ -47,6 +47,12 @@ private:
 	void read_handler(const boost::system::error_code& err,
 		size_t bytes_transferred);
 
+	void write_handler(const boost::system::error_code& err, size_t bytes_transferred);
+
+	void read_message();
+
+	void send_message(std::string message);
+
 	bool complete_handshake_message();
 
 

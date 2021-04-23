@@ -39,13 +39,8 @@ void handle_connection::start()
 {
 	// Sets the state of the connection to the part where it receives the username
 	con_state = 1;
-
-	socket_.async_read_some(
-		boost::asio::buffer(delivered_message, max_length), // Puts the message sent to the server in the delivered_message buffer
-		boost::bind(&handle_connection::read_handler, // Calls read_handler once a message has been reveived by the server
-			shared_from_this(),
-			boost::asio::placeholders::error,
-			boost::asio::placeholders::bytes_transferred));
+	
+	read_message(); // Listens for a client message and calls the read_handler once on has been made
 }
 
 /*
@@ -62,11 +57,18 @@ void handle_connection::read_handler(const boost::system::error_code& err, size_
 				if (complete_handshake_message())
 				{
 					std::cout << "USERNAME IS " << message_buffer << std::endl; //TODO: REMOVE (FOR TESTING ONLY)
+					std::string spreadsheet_list = "sheet1\nmalikkk\nwow\n\n"; //TODO: Make it list the actual saved spreadsheets
+					send_message(spreadsheet_list);
 				}
 				message_buffer = "";
 				break;
 			// Getting filename part of handshake
 			case 2:
+				if (complete_handshake_message())
+				{
+					std::cout << "FILENAME IS " << message_buffer << std::endl; //TODO: REMOVE (FOR TESTING ONLY)
+				}
+				message_buffer = "";
 				break;
 			// Editing the spreadsheet communication
 			case 3:
@@ -76,6 +78,50 @@ void handle_connection::read_handler(const boost::system::error_code& err, size_
 				break;
 		}
 	}
+}
+
+/*
+ * The function that deals with what to do once a message has been sent to the client
+ */
+void handle_connection::write_handler(const boost::system::error_code& err, size_t bytes_transferred)
+{
+	if(!err)
+	{
+		switch(con_state)
+		{
+			// Right after the server has sent the client the list of spreadsheets
+			case 1:
+				con_state = 2;
+				read_message();
+				break;
+			case 2:
+				break;
+			case 3:
+				break;
+			case 4:
+				break;
+		}
+	}
+}
+
+void handle_connection::read_message()
+{
+	socket_.async_read_some(
+		boost::asio::buffer(delivered_message, max_length), // Puts the message sent to the server in the delivered_message buffer
+		boost::bind(&handle_connection::read_handler, // Calls read_handler once a message has been reveived by the server
+			shared_from_this(),
+			boost::asio::placeholders::error,
+			boost::asio::placeholders::bytes_transferred));
+}
+
+void handle_connection::send_message(std::string message)
+{
+	socket_.async_write_some(
+		boost::asio::buffer(message, max_length), // Sends the provided message to the client
+       	 	boost::bind(&handle_connection::write_handler, // Calls write_handler once the message has successfully been sent
+	                  shared_from_this(),
+           		  boost::asio::placeholders::error,
+	                  boost::asio::placeholders::bytes_transferred));
 }
 
 /*
