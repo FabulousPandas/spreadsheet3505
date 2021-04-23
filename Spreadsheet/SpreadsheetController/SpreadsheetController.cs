@@ -17,6 +17,12 @@ namespace SS
         public delegate void SpreadsheetsReceivedHandler(List<string> list);
         public event SpreadsheetsReceivedHandler SpreadsheetReceived;
 
+        public delegate void UpdateReceivedHandler(IList<string> updateList);
+        public event UpdateReceivedHandler UpdateReceived;
+
+        public delegate void SelectionMadeHandler(string cellName);
+        public event SelectionMadeHandler SelectionMade;
+
         private List<string> spreadsheetList;
 
         private Spreadsheet sheet;
@@ -25,8 +31,8 @@ namespace SS
 
         public void Connect(string addr, string name, int port)
         {
-            Networking.ConnectToServer(OnConnect, addr, port);
             username = name;
+            Networking.ConnectToServer(OnConnect, addr, port);
         }
 
         private void OnConnect(SocketState state)
@@ -64,7 +70,6 @@ namespace SS
         {
             string totalData = state.GetData();
 
-            Console.WriteLine(totalData.Substring(totalData.Length - 2));
             if (totalData.Substring(totalData.Length - 2) != "\n\n")  //checking if we have received all the spreadsheets yet
                 return;
 
@@ -85,11 +90,13 @@ namespace SS
                 state.RemoveData(0, p.Length);
             }
 
-            state.OnNetworkAction = ReceiveEdits;
+            // Creates our spreadsheet with our validator, normalizing cell values to capital letters, and with version "default"
+            sheet = new Spreadsheet(CellValidator, s => s.ToUpper(), "default");
+            state.OnNetworkAction = ReceiveUpdates;
             SpreadsheetReceived(spreadsheetList);
         }
 
-        private void ReceiveEdits(SocketState state)
+        private void ReceiveUpdates(SocketState state)
         {
             if (state.ErrorOccured)
             {
@@ -98,7 +105,53 @@ namespace SS
                 return;
             }
 
+            ProcessUpdates(state);
             Networking.GetData(state);
+        }
+
+        private void ProcessUpdates(SocketState state)
+        {
+            string totalData = state.GetData();
+
+            string[] parts = Regex.Split(totalData, @"(?<=[\n])");
+
+            foreach (string p in parts)
+            {
+                // Ignore empty strings added by the regex splitter
+                if (p.Length == 0)
+                    continue;
+                // The regex splitter will include the last string even if it doesn't end with a '\n',
+                // So we need to ignore it if this happens. 
+                if (p[p.Length - 1] != '\n')
+                    break;
+
+                //TODO: process full requests
+                /*
+                 * code outline
+                 * 
+                 * parse json
+                 * 
+                 * if messageType == cellUpdate
+                 *      edits and shit come up here
+                 *      update spreadsheet with the update
+                 *      IList<string> updateList = setCell(col, row, cellContents);
+                 *      UpdateReceived(updateList);
+                 *      
+                 * else if messageType == cellSelected
+                 *      if selector is us -> tell view we selected a cell
+                 *      SelectionMade()
+                 * else if messageType == disconnected
+                 *      view gets disconnected() event to show a disconnect message or something
+                 * else if messageType == requestError
+                 *      view gets error message
+                 *      Error(errorMessage);
+                 * else if messageType == serverError
+                 *      view gets server shutdown message
+                 *      Error(serverShutdownMessage);
+                 */
+
+                state.RemoveData(0, p.Length);
+            }
         }
 
         /*
@@ -109,14 +162,31 @@ namespace SS
             Networking.Send(server.TheSocket, sheetName + "\n");
         }
 
+        public void SelectCell(string cellName)
+        {
+            //TODO: send a select cell request
+            Console.WriteLine("Cell selected: " + cellName);
 
+        }
+
+        public void SendEditRequest(string cellName, string cellContents)
+        {
+            //TODO: send an edit request
+            Console.WriteLine("Edit request of cell: " + cellName + " to contents: " + cellContents);
+        }
+
+        public void SendUndoRequest()
+        {
+            //TODO: send an undo request
+            Console.WriteLine("Undo request sent to server");
+        }
 
         /// <summary>
         /// Returns true if s is a valid cell in the spreadsheet, returns false otherwise
         /// </summary>
         /// <param name="cell"></param>
         /// <returns></returns>
-        private bool CellValidator(string cell)
+        public bool CellValidator(string cell)
         {
             string pattern = @"^[a-zA-Z][1-9][0-9]?$";
             return Regex.IsMatch(cell, pattern);
@@ -126,7 +196,7 @@ namespace SS
         /// Helper method for retrieving the cell name from the given row and column
         /// </summary>
         /// <returns></returns>
-        private string GetCellName(int col, int row)
+        public string GetCellName(int col, int row)
         {
             char letter = (char)('A' + col);
             return "" + letter + (row + 1);
@@ -137,7 +207,7 @@ namespace SS
         /// </summary>
         /// <param name="cellName"></param>
         /// <returns></returns>
-        private int GetColumn(string cellName)
+        public int GetColumn(string cellName)
         {
             return cellName[0] - 'A';
         }
@@ -147,21 +217,9 @@ namespace SS
         /// </summary>
         /// <param name="cellName"></param>
         /// <returns></returns>
-        private int GetRow(string cellName)
+        public int GetRow(string cellName)
         {
             return int.Parse(cellName.Substring(1)) - 1;
-        }
-
-        /// <summary>
-        /// Given a list of cell names, recalculate and set the text of the cells that are in the list
-        /// </summary>
-        /// <param name="list"></param>
-        private void RecalculateCells(IList<string> list)
-        {
-            foreach (string s in list)
-            {
-                //spreadsheetPanel.SetValue(GetColumn(s), GetRow(s), GetCellValue(GetColumn(s), GetRow(s)));
-            }
         }
 
         /// <summary>
@@ -174,20 +232,12 @@ namespace SS
                 string cellName = GetCellName(col, row);
 
                 IList<string> updateList = sheet.SetContentsOfCell(cellName, contents);
-                //spreadsheetPanel.SetValue(col, row, GetCellValue(col, row));
-
-                //if(!undoButton.Enabled) 
-                //  undoButton.Enabled = true;
 
                 return updateList;
             }
-            catch (CircularException)
+            catch (FormulaFormatException)
             {
-                //MessageBox.Show("Cannot create circular dependency");
-            }
-            catch (FormulaFormatException e)
-            {
-                //MessageBox.Show("Invalid Formula: " + e.Message);
+                Error("Invalid formula given");
             }
             return new List<string>();
         }
@@ -196,7 +246,7 @@ namespace SS
         /// Helper method for getting the string representation of a cell's value
         /// </summary>
         /// <returns></returns>
-        private string GetCellValue(int col, int row)
+        public string GetCellValue(int col, int row)
         {
             string cellName = GetCellName(col, row);
             object cellValue = sheet.GetCellValue(cellName);
@@ -211,7 +261,7 @@ namespace SS
         /// Helper method for getting the string representation of a cell's contents
         /// </summary>
         /// <returns></returns>
-        private string GetCellContents(int col, int row)
+        public string GetCellContents(int col, int row)
         {
             string cellName = GetCellName(col, row);
             object cellContents = sheet.GetCellContents(cellName);
@@ -220,23 +270,6 @@ namespace SS
             return cellContents.ToString();
         }
 
-        /*
-        private void selectionChanged(SpreadsheetPanel ssp)
-        {
-            //UpdateCells(); TODO: make it so when you select a different box, changes are reflected on the spreadsheet
-
-            spreadsheetPanel.GetSelection(out int col, out int row);
-            // Changes the cell address text box
-            string cellName = GetCellName(col, row);
-            cellNameTextBox.Text = cellName;
-
-            // Changes the cell value text box
-            string cellValue = GetCellValue(col, row);
-            cellValueTextBox.Text = cellValue;
-
-            // Changes the cell input box to whatever is selected
-            cellInputText.Text = GetCellContents(col, row);
-        }*/
 
         /*
          * Helper method for updating all the cells within the spreadsheet.
