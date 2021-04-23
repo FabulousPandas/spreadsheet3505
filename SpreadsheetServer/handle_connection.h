@@ -1,7 +1,6 @@
 /*
 handle connection class header
 
-
 */
 #ifndef HANDLE_CONNECTION_H
 #define	HANDLE_CONNECTION_H
