@@ -8,10 +8,6 @@ namespace SpreadsheetController
 {
     public class ServerMessage
     {
-        public String cellName;
-        public String contents;
-        public String message;
-        public String selector;
-        public String selectorName;
+
     }
 }

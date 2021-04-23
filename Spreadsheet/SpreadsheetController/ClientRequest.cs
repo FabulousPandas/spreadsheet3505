@@ -8,7 +8,6 @@ namespace SpreadsheetController
 {
     public class ClientRequest
     {
-        public String cellName;
-        public String contents;
+
     }
 }
