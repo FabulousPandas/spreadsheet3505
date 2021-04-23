@@ -9,15 +9,17 @@ using System.Windows.Forms;
 
 namespace SpreadsheetGUI
 {
-    partial class ConnectInputDialog : Form
+    partial class SpreadsheetSelector : Form
     {
-        public string UserName { get; private set; }
-        public string IPAddress { get; private set; }
-        public int Port { get; private set; }
+        private List<string> sheets;
 
-        public ConnectInputDialog()
+        public string Spreadsheet { get; private set; }
+
+        public SpreadsheetSelector(List<string> spreadsheets)
         {
             InitializeComponent();
+            sheets = new List<string>(spreadsheets);
+            spreadsheetList.Items.AddRange(sheets.ToArray());
         }
 
         #region Assembly Attribute Accessors
@@ -102,36 +104,17 @@ namespace SpreadsheetGUI
 
         private void okButton_Click(object sender, EventArgs e)
         {
-            SaveInput();
-            Close();
-        }
-
-        private void SaveInput()
-        {
-            if (usernameInputBox.Text == "" || ipAddressInputBox.Text == "")
+            if(spreadsheetInputBox.Text == "")
             {
-                MessageBox.Show("Please fill in the user name/ip address boxes");
+                MessageBox.Show("Please select a spreadsheet or type a name in the blank");
                 DialogResult = DialogResult.None;
                 return;
             }
 
-            if (portInputBox.Text == "")
-                Port = 1100; // if port is left blank, use 1100 as default
-            else
-            {
-                int.TryParse(portInputBox.Text, out int result);
-                Port = result;
-            }
-
-            UserName = usernameInputBox.Text;
-            IPAddress = ipAddressInputBox.Text;
+            Spreadsheet = spreadsheetInputBox.Text;
 
             DialogResult = DialogResult.OK;
-        }
-
-        private void ConnectInputDialog_Load(object sender, EventArgs e)
-        {
-
+            Close();
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
@@ -139,12 +122,9 @@ namespace SpreadsheetGUI
             Close();
         }
 
-        private void ConnectInputDialog_KeyPress(object sender, KeyPressEventArgs e)
+        private void spreadsheetList_SelectedValueChanged(object sender, EventArgs e)
         {
-            if (e.KeyChar.Equals(Keys.Enter))
-            {
-                SaveInput();
-            }
+            spreadsheetInputBox.Text = spreadsheetList.Text;
         }
     }
 }

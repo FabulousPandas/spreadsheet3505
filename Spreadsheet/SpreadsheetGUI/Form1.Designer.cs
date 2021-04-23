@@ -151,7 +151,6 @@
             this.setCellButton.TabIndex = 0;
             this.setCellButton.Text = "Set Cell";
             this.setCellButton.UseVisualStyleBackColor = true;
-            this.setCellButton.Click += new System.EventHandler(this.setCellButton_Click);
             // 
             // cellNameTextBox
             // 

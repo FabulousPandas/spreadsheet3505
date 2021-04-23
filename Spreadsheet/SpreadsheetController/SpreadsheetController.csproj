@@ -31,6 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NetworkController, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\NetworkController.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -45,9 +49,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NetworkController\NetworkController.csproj">
-      <Project>{0e755fea-f6b5-4025-81cb-5f56fa27810f}</Project>
-      <Name>NetworkController</Name>
+    <ProjectReference Include="..\Formula\Formula.csproj">
+      <Project>{afb9b79c-9621-48e1-86df-25df4b1308f7}</Project>
+      <Name>Formula</Name>
     </ProjectReference>
     <ProjectReference Include="..\Spreadsheet\Spreadsheet.csproj">
       <Project>{f0b7694c-73ac-441f-bc5f-56c3be69ad26}</Project>
