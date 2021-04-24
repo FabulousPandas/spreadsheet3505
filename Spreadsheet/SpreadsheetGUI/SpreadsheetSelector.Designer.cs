@@ -113,6 +113,7 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Select a Spreadsheet";
+            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SpreadsheetSelector_KeyPress);
             this.ResumeLayout(false);
             this.PerformLayout();
 

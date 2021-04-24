@@ -49,63 +49,6 @@ namespace SS
             Changed = false;
         }
 
-        /// <summary>
-        /// Constructs a spreadsheet from the save file found at the given filePath with the given validator, normalizer, and version
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <param name="isValid"></param>
-        /// <param name="normalize"></param>
-        /// <param name="version"></param>
-        public Spreadsheet(string filePath, Func<string, bool> isValid, Func<string, string> normalize, string version) : base(isValid, normalize, version)
-        {
-            cells = new Dictionary<string, Cell>();
-            graph = new DependencyGraph();
-            Changed = false;
-
-            if (filePath == null || filePath == "")
-                throw new SpreadsheetReadWriteException("Invalid file path");
-
-            if (GetSavedVersion(filePath) != version)
-                throw new SpreadsheetReadWriteException("Version mismatch between file version and given version");
-
-            try
-            {
-                using (XmlReader reader = XmlReader.Create(filePath))
-                {
-                    string currentName = "";
-                    while (reader.Read())
-                    {
-                        if(reader.IsStartElement())
-                        {
-                            switch(reader.Name)
-                            {
-                                case "spreadsheet":
-                                    break;
-                                case "cell":
-                                    break;
-                                case "name":
-                                    reader.Read();
-                                    if (!IsVar(reader.Value) || !IsValid(reader.Value))
-                                        throw new SpreadsheetReadWriteException("Invalid variable found in file");
-                                    currentName = reader.Value;
-                                    break;
-                                case "contents":
-                                    reader.Read();
-                                    SetContentsOfCell(currentName, reader.Value);
-                                    break;
-                                default:
-                                    throw new SpreadsheetReadWriteException("Invalid xml element was found in file");
-                            }
-                        }
-                    }
-                }
-            }
-            catch (CircularException)
-            {
-                throw new SpreadsheetReadWriteException("Circular dependency found in save");
-            }
-        }
-
         public override bool Changed { get; protected set; }
 
         /// <summary>

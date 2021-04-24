@@ -16,11 +16,7 @@ namespace SpreadsheetGUI
 {
     public partial class SpreadsheetForm : Form
     {
-        /// <summary>
-        /// Holds the backing spreadsheet object that handles the logic
-        /// </summary>
-        private Spreadsheet sheet;
-
+        // Controller object
         private SpreadsheetController controller;
 
         public SpreadsheetForm(SpreadsheetController control)
@@ -30,39 +26,34 @@ namespace SpreadsheetGUI
             controller.Error += ShowError;
             controller.Connected += OnConnect;
             controller.SpreadsheetReceived += ReceivedSpreadsheets;
+            controller.UpdateReceived += ReceivedUpdate;
+            controller.SelectionMade += SelectedCell;
 
-            //sheet = new Spreadsheet(CellValidator, s => s.ToUpper(), "default"); // creates a spreadsheet that normalizes variables to capital letters
-            //spreadsheetPanel.SelectionChanged += selectionChanged;
-            //spreadsheetPanel.SetSelection(0, 0);
-            //selectionChanged(spreadsheetPanel);
+            spreadsheetPanel.SelectionChanged += selectionChanged;
+            spreadsheetPanel.SetSelection(0, 0);
+
+
         }
-
-        
-        /*
-         * Keeping for reference
-         * 
-        /// <summary>
-        /// Helper method for creating a save file dialog for saving a spreadsheet file
-        /// </summary>
-        private void OpenSaveDialog()
+        private void selectionChanged(SpreadsheetPanel ssp)
         {
-            SaveFileDialog dialog = new SaveFileDialog();
-            dialog.Filter = "Spreadsheet File|*.sprd|All files (*.*)|*.*";
-            dialog.Title = "Save a Spreadsheet File";
-            try
-            {
-                if (dialog.ShowDialog() == DialogResult.OK)
-                {
-                    if (dialog.FilterIndex == 1)
-                        dialog.DefaultExt = "sprd";
-                    sheet.Save(dialog.FileName);
-                }
-            }
-            catch (SpreadsheetReadWriteException ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-        }*/
+            //UpdateCells(); TODO: make it so when you select a different box, changes are reflected on the spreadsheet
+            spreadsheetPanel.GetSelection(out int col, out int row);
+            string cellName = controller.GetCellName(col, row);
+            controller.SelectCell(cellName);
+            /*
+            // Changes the cell address text box
+            string cellName = controller.GetCellName(col, row);
+            cellNameTextBox.Text = cellName;
+
+
+            // Changes the cell value text box
+            string cellValue = controller.GetCellValue(col, row);
+            cellValueTextBox.Text = cellValue;
+
+            // Changes the cell input box to whatever is selected
+            cellInputText.Text = controller.GetCellContents(col, row);
+            */
+        }
 
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -74,7 +65,7 @@ namespace SpreadsheetGUI
             switch (e.KeyChar)
             {
                 case (char)Keys.Return:
-                    //UpdateCells();
+                    controller.SendEditRequest(cellNameTextBox.Text, cellInputTextBox.Text);
                     e.Handled = true;
                     break;
             }
@@ -88,28 +79,28 @@ namespace SpreadsheetGUI
             {
                 //UpdateCells();
                 spreadsheetPanel.SetSelection(col, row - 1);
-                //selectionChanged(spreadsheetPanel);
+                selectionChanged(spreadsheetPanel);
                 return true;
             }
             if (keyData == (Keys.Down))
             {
                 //UpdateCells();
                 spreadsheetPanel.SetSelection(col, row + 1);
-                //selectionChanged(spreadsheetPanel);
+                selectionChanged(spreadsheetPanel);
                 return true;
             }
             if (keyData == (Keys.Left))
             {
                 //UpdateCells();
                 spreadsheetPanel.SetSelection(col - 1, row);
-                //selectionChanged(spreadsheetPanel);
+                selectionChanged(spreadsheetPanel);
                 return true;
             }
             if (keyData == (Keys.Right))
             {
                 //UpdateCells();
                 spreadsheetPanel.SetSelection(col + 1, row);
-                //selectionChanged(spreadsheetPanel);
+                selectionChanged(spreadsheetPanel);
                 return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);
@@ -132,16 +123,14 @@ namespace SpreadsheetGUI
             {
                 case (char)Keys.Return:
                     string cellName = cellNameTextBox.Text.ToUpper();
-                    /*
-                    if (CellValidator(cellName))
+                    if (controller.CellValidator(cellName))
                     {
-                        spreadsheetPanel.SetSelection(GetColumn(cellName), GetRow(cellName));
+                        spreadsheetPanel.SetSelection(controller.GetColumn(cellName), controller.GetRow(cellName));
                         selectionChanged(spreadsheetPanel);
                         e.Handled = true;
                     }
                     else
                         MessageBox.Show("Invalid cell name");
-                    */
                     break;
             }
             
@@ -149,7 +138,7 @@ namespace SpreadsheetGUI
 
         private void undoButton_Click(object sender, EventArgs e)
         {
-            //TODO: send a request to the server to undo
+            controller.SendUndoRequest();
         }
 
         private void connectToServerToolStripMenuItem_Click(object sender, EventArgs e)
@@ -199,7 +188,7 @@ namespace SpreadsheetGUI
 
         private void ReceivedSpreadsheets(List<string> sheetList)
         {
-            //List<string> test = new List<string>() {"test", "random", "strings" };
+            //opens dialog box for selecting a spreadsheet
             SpreadsheetSelector input = new SpreadsheetSelector(sheetList);
             string chosenSpreadsheet = "";
             MethodInvoker invoker =
@@ -209,6 +198,7 @@ namespace SpreadsheetGUI
                     if (input.ShowDialog(this) == DialogResult.OK)
                     {
                         chosenSpreadsheet = input.Spreadsheet;
+                        spreadsheetPanel.Enabled = true;
                     }
                 }
             );
@@ -216,5 +206,38 @@ namespace SpreadsheetGUI
             controller.SendSpreadsheet(chosenSpreadsheet);
         }
 
+        private void ReceivedUpdate(IList<string> updateList)
+        {
+            //update spreadsheet panel
+            RecalculateCells(updateList);
+        }
+
+        private void SelectedCell(string cellName)
+        {
+            //re-enable input boxes if we are able to edit the cell
+            cellInputTextBox.Enabled = true;
+            setCellButton.Enabled = true;
+
+            //update selected cell text box
+            cellNameTextBox.Text = cellName;
+
+        }
+
+        /// <summary>
+        /// Given a list of cell names, recalculate and set the text of the cells that are in the list
+        /// </summary>
+        /// <param name="list"></param>
+        private void RecalculateCells(IList<string> list)
+        {
+            foreach (string s in list)
+            {
+                spreadsheetPanel.SetValue(controller.GetColumn(s), controller.GetRow(s), controller.GetCellValue(controller.GetColumn(s), controller.GetRow(s)));
+            }
+        }
+
+        private void setCellButton_Click(object sender, EventArgs e)
+        {
+            controller.SendEditRequest(cellNameTextBox.Text, cellInputTextBox.Text);
+        }
     }
 }
