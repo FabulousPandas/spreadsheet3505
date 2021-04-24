@@ -16,6 +16,7 @@ namespace SpreadsheetGUI
 {
     public partial class SpreadsheetForm : Form
     {
+        // Controller object
         private SpreadsheetController controller;
 
         public SpreadsheetForm(SpreadsheetController control)
@@ -64,7 +65,7 @@ namespace SpreadsheetGUI
             switch (e.KeyChar)
             {
                 case (char)Keys.Return:
-                    //UpdateCells();
+                    controller.SendEditRequest(cellNameTextBox.Text, cellInputTextBox.Text);
                     e.Handled = true;
                     break;
             }
@@ -187,6 +188,7 @@ namespace SpreadsheetGUI
 
         private void ReceivedSpreadsheets(List<string> sheetList)
         {
+            //opens dialog box for selecting a spreadsheet
             SpreadsheetSelector input = new SpreadsheetSelector(sheetList);
             string chosenSpreadsheet = "";
             MethodInvoker invoker =
