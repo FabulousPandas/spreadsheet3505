@@ -40,19 +40,7 @@ namespace SpreadsheetGUI
             spreadsheetPanel.GetSelection(out int col, out int row);
             string cellName = controller.GetCellName(col, row);
             controller.SelectCell(cellName);
-            /*
-            // Changes the cell address text box
-            string cellName = controller.GetCellName(col, row);
-            cellNameTextBox.Text = cellName;
-
-
-            // Changes the cell value text box
-            string cellValue = controller.GetCellValue(col, row);
-            cellValueTextBox.Text = cellValue;
-
-            // Changes the cell input box to whatever is selected
-            cellInputText.Text = controller.GetCellContents(col, row);
-            */
+            
         }
 
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
@@ -206,21 +194,46 @@ namespace SpreadsheetGUI
             controller.SendSpreadsheet(chosenSpreadsheet);
         }
 
-        private void ReceivedUpdate(IList<string> updateList)
+        private void ReceivedUpdate(int col, int row, IList<string> updateList)
         {
             //update spreadsheet panel
             RecalculateCells(updateList);
+
+            MethodInvoker invoker =
+            new MethodInvoker(
+                () =>
+                {
+                    // Changes the cell address text box
+                    string cellName = controller.GetCellName(col, row);
+                    cellNameTextBox.Text = cellName;
+
+                    // Changes the cell value text box
+                    string cellValue = controller.GetCellValue(col, row);
+                    cellValueTextBox.Text = cellValue;
+
+                    // Changes the cell input box to whatever is selected
+                    cellInputTextBox.Text = controller.GetCellContents(col, row);
+                }
+            );
+            
+            
         }
 
         private void SelectedCell(string cellName)
         {
-            //re-enable input boxes if we are able to edit the cell
-            cellInputTextBox.Enabled = true;
-            setCellButton.Enabled = true;
+            MethodInvoker invoker =
+            new MethodInvoker(
+                () =>
+                {
+                    //re-enable input boxes if we are able to edit the cell
+                    cellInputTextBox.Enabled = true;
+                    setCellButton.Enabled = true;
 
-            //update selected cell text box
-            cellNameTextBox.Text = cellName;
-
+                    //update selected cell text box
+                    cellNameTextBox.Text = cellName;
+                }
+            );
+            this.Invoke(invoker);
         }
 
         /// <summary>

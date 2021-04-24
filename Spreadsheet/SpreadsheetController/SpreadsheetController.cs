@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using NetworkUtil;
 using SpreadsheetUtilities;
+using Newtonsoft.Json;
 
 namespace SS
 {
@@ -17,7 +18,7 @@ namespace SS
         public delegate void SpreadsheetsReceivedHandler(List<string> list);
         public event SpreadsheetsReceivedHandler SpreadsheetReceived;
 
-        public delegate void UpdateReceivedHandler(IList<string> updateList);
+        public delegate void UpdateReceivedHandler(int col, int row, IList<string> updateList);
         public event UpdateReceivedHandler UpdateReceived;
 
         public delegate void SelectionMadeHandler(string cellName);
@@ -70,7 +71,7 @@ namespace SS
         {
             string totalData = state.GetData();
 
-            if (totalData.Substring(totalData.Length - 2) != "\n\n")  //checking if we have received all the spreadsheets yet
+            if (totalData.Length - 2 > 0 && totalData.Substring(totalData.Length - 2) != "\n\n")  //checking if we have received all the spreadsheets yet
                 return;
 
             string[] parts = Regex.Split(totalData, @"(?<=[\n])");
@@ -125,6 +126,34 @@ namespace SS
                 if (p[p.Length - 1] != '\n')
                     break;
 
+                ServerMessage message = JsonConvert.DeserializeObject<ServerMessage>(p);
+                if (message == null)
+                    continue;
+                if(message.messageType == "cellUpdated")
+                {
+                    Console.WriteLine("Received cell update message");
+                    int col = GetColumn(message.cellName), row = GetRow(message.cellName);
+                    IList<string> updateList = SetCell(col, row, message.contents);
+                    UpdateReceived(col, row, updateList);
+                }
+                else if(message.messageType == "cellSelected")
+                {
+                    if(message.selectorName == username)
+                        SelectionMade(message.cellName);
+                }
+                else if (message.messageType == "disconnected")
+                {
+                    // disconnect event
+                }
+                else if (message.messageType == "requestError")
+                {
+                    Error("Error in cell: " + message.cellName + "\nReason: " + message.message);
+                }
+                else if (message.messageType == "serverError")
+                {
+                    Error(message.message);
+                }
+
                 //TODO: process full requests
                 /*
                  * code outline
@@ -166,19 +195,28 @@ namespace SS
         {
             //TODO: send a select cell request
             Console.WriteLine("Cell selected: " + cellName);
-
+            ClientRequest request = new ClientRequest { requestType = "selectCell", cellName = cellName };
+            string requestString = JsonConvert.SerializeObject(request, Formatting.None, new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore });
+            Console.WriteLine(requestString);
+            Networking.Send(server.TheSocket, requestString + "\n");
         }
 
         public void SendEditRequest(string cellName, string cellContents)
         {
             //TODO: send an edit request
             Console.WriteLine("Edit request of cell: " + cellName + " to contents: " + cellContents);
+            ClientRequest request = new ClientRequest { requestType = "editCell", cellName = cellName, contents = cellContents };
+            string requestString = JsonConvert.SerializeObject(request, Formatting.None, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+            Networking.Send(server.TheSocket, requestString + "\n");
         }
 
         public void SendUndoRequest()
         {
             //TODO: send an undo request
             Console.WriteLine("Undo request sent to server");
+            ClientRequest request = new ClientRequest { requestType = "undo" };
+            string requestString = JsonConvert.SerializeObject(request, Formatting.None, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+            Networking.Send(server.TheSocket, requestString + "\n");
         }
 
         /// <summary>

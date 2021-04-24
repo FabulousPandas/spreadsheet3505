@@ -8,6 +8,7 @@ namespace SS
 {
     public class ClientRequest
     {
+        public string requestType { get; set; }
         public string cellName { get; set; }
         public string contents { get; set; }
     }
