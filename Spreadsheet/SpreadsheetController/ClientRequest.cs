@@ -8,6 +8,7 @@ namespace SpreadsheetController
 {
     public class ClientRequest
     {
-
+        public string cellName { get; set; }
+        public string contents { get; set; }
     }
 }
