@@ -104,7 +104,13 @@ namespace SpreadsheetGUI
 
         private void okButton_Click(object sender, EventArgs e)
         {
-            if(spreadsheetInputBox.Text == "")
+            SaveInput();
+            Close();
+        }
+
+        private void SaveInput()
+        {
+            if (spreadsheetInputBox.Text == "")
             {
                 MessageBox.Show("Please select a spreadsheet or type a name in the blank");
                 DialogResult = DialogResult.None;
@@ -114,7 +120,6 @@ namespace SpreadsheetGUI
             Spreadsheet = spreadsheetInputBox.Text;
 
             DialogResult = DialogResult.OK;
-            Close();
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
@@ -125,6 +130,14 @@ namespace SpreadsheetGUI
         private void spreadsheetList_SelectedValueChanged(object sender, EventArgs e)
         {
             spreadsheetInputBox.Text = spreadsheetList.Text;
+        }
+
+        private void SpreadsheetSelector_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar.Equals(Keys.Enter))
+            {
+                SaveInput();
+            }
         }
     }
 }

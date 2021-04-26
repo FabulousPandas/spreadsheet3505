@@ -35,7 +35,7 @@
             this.cellValueLabel = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.setCellLabel = new System.Windows.Forms.Label();
-            this.cellInputText = new System.Windows.Forms.TextBox();
+            this.cellInputTextBox = new System.Windows.Forms.TextBox();
             this.setCellButton = new System.Windows.Forms.Button();
             this.cellNameTextBox = new System.Windows.Forms.TextBox();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
@@ -118,7 +118,7 @@
             // panel1
             // 
             this.panel1.Controls.Add(this.setCellLabel);
-            this.panel1.Controls.Add(this.cellInputText);
+            this.panel1.Controls.Add(this.cellInputTextBox);
             this.panel1.Controls.Add(this.setCellButton);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel1.Location = new System.Drawing.Point(0, 62);
@@ -135,22 +135,25 @@
             this.setCellLabel.TabIndex = 1;
             this.setCellLabel.Text = "Set Cell: ";
             // 
-            // cellInputText
+            // cellInputTextBox
             // 
-            this.cellInputText.Location = new System.Drawing.Point(85, 1);
-            this.cellInputText.Name = "cellInputText";
-            this.cellInputText.Size = new System.Drawing.Size(608, 20);
-            this.cellInputText.TabIndex = 0;
-            this.cellInputText.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.cellInputText_KeyPress);
+            this.cellInputTextBox.Enabled = false;
+            this.cellInputTextBox.Location = new System.Drawing.Point(85, 1);
+            this.cellInputTextBox.Name = "cellInputTextBox";
+            this.cellInputTextBox.Size = new System.Drawing.Size(608, 20);
+            this.cellInputTextBox.TabIndex = 0;
+            this.cellInputTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.cellInputText_KeyPress);
             // 
             // setCellButton
             // 
+            this.setCellButton.Enabled = false;
             this.setCellButton.Location = new System.Drawing.Point(713, 0);
             this.setCellButton.Name = "setCellButton";
             this.setCellButton.Size = new System.Drawing.Size(75, 21);
             this.setCellButton.TabIndex = 0;
             this.setCellButton.Text = "Set Cell";
             this.setCellButton.UseVisualStyleBackColor = true;
+            this.setCellButton.Click += new System.EventHandler(this.setCellButton_Click);
             // 
             // cellNameTextBox
             // 
@@ -204,6 +207,7 @@
             // spreadsheetPanel
             // 
             this.spreadsheetPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.spreadsheetPanel.Enabled = false;
             this.spreadsheetPanel.Location = new System.Drawing.Point(0, 0);
             this.spreadsheetPanel.Name = "spreadsheetPanel";
             this.spreadsheetPanel.Size = new System.Drawing.Size(800, 363);
@@ -239,7 +243,7 @@
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem closeToolStripMenuItem;
-        private System.Windows.Forms.TextBox cellInputText;
+        private System.Windows.Forms.TextBox cellInputTextBox;
         private System.Windows.Forms.Button setCellButton;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.TextBox cellNameTextBox;
