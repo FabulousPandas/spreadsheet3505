@@ -22,7 +22,7 @@ public:
 
 	bool save_spreadsheet();
 
-	void proccess_message(std::string);
+	std::string proccess_message(std::string);
 
 	void add_client(int id);
 

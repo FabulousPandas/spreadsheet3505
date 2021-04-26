@@ -1,5 +1,8 @@
 #include "cell.h"
-
+	
+	/*
+	* Cell constructor
+	*/
 	cell::cell(std::string name)
 	{
 		cell_name = name;
@@ -22,6 +25,9 @@
 	*/
 	std::string cell::redo_cell()
 	{
+		if (redo_stack.empty())
+			return "empty";
+
 		std::string popped;
 		//save popped edit
 		popped = redo_stack.top();
@@ -36,6 +42,9 @@
 	*/
 	std::string cell::undo_cell()
 	{
+		if (undo_stack.empty())
+			return "empty";
+
 		std::string popped;
 		//save popped edit
 		popped = undo_stack.top();
@@ -47,7 +56,7 @@
 	}
 
 	/*
-	*
+	* returns the contents of the cell
 	*/
 	std::string cell::cell_content()
 	{

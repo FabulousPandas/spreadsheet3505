@@ -8,35 +8,58 @@
 
 #include "spreadsheet.h"
 
+/*
+* Spreadsheet constructor
+*/
 spreadsheet::spreadsheet(std::string name)
 {
 	spreadsheet_name = name;
 }
 
-
+/*
+* adds a message from the client to the mesasge_q
+*/
 void spreadsheet::add_to_q(std::string message)
 {
 	message_q.push(message);
 }
 
-
+/*
+* Saves the spreadsheet
+*/
 bool spreadsheet::save_spreadsheet()
 {
 	return false;
 }
 
-void spreadsheet::proccess_message(std::string)
+/*
+* Implements one message from the message_q
+* return "pass" if it was succesful 
+* otherwise will return a string describing
+* the error
+*/
+std::string spreadsheet::proccess_message(std::string message)
 {
+	if (!is_dependent(message))
+	{
 
+	}
+
+
+	return "pass";
 }
 
+/*
+* Adds a client useing their id to client_list
+*/
 void spreadsheet::add_client(int id)
 {
 	client_list.push_back(id);
 }
 
 /*
-* removes client from list
+* removes client from list, 
+* changes client_list's index to -1 if found
 */
 void spreadsheet::remove_client(int id)
 {
@@ -48,7 +71,34 @@ void spreadsheet::remove_client(int id)
 	}
 }
 
+/*
+* returns the list of clients currently connected
+* to this spreadsheet
+*/
 std::vector<int> spreadsheet::give_client()
 {
-	return client_list;
+	std::vector<int> active_clients;
+	
+
+	for (int i = 0; i < client_list.size(); i++)
+	{
+		if (client_list[i] != -1)
+		{
+			active_clients.push_back(client_list[i]);
+		}
+	}
+
+	return active_clients;
+}
+
+/*
+* returns false if the message would not cause a
+* dependency in the spreadsheet
+*/
+bool spreadsheet::is_dependent(std::string message)
+{
+
+	//TODO
+
+	return false;
 }

@@ -1,5 +1,7 @@
 /*
-
+	This cell class contains the cells contents and edits.
+	Will be used in the spreadsheet class.
+	Written by Malik Qader 4/25/2021
 */
 
 #ifndef CELL_H
