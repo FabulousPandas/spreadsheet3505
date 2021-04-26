@@ -29,9 +29,9 @@ private:
 	//cell name
 	std::string cell_name;
 	//stack of edits
-	std::stack undo_stack;
+	std::stack<std::string> undo_stack;
 	//stack of undo edits
-	std::stack redo_stack;
+	std::stack<std::string> redo_stack;
 
 
 };

@@ -19,6 +19,7 @@ class server
 public:
 
 
+	std::string get_list_of_spreadsheets();
 
 private:
 

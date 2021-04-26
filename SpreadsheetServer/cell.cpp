@@ -1,6 +1,6 @@
 #include "cell.h"
 
-	cell(std::string name)
+	cell::cell(std::string name)
 	{
 		cell_name = name;
 
@@ -8,10 +8,10 @@
 	/*
 	* changes cell contenst to param edit
 	*/
-	void add_edit(std::string edit)
+	void cell::add_edit(std::string edit)
 	{
 		//add edit to stack
-		undo_stack.push_back(edit);
+		undo_stack.push(edit);
 		
 		//clear redo stack
 		for (int i = 0; i < redo_stack.size(); i++)
@@ -20,26 +20,28 @@
 	/*
 	* changes cell to most recent undo
 	*/
-	std::string redo_cell()
+	std::string cell::redo_cell()
 	{
 		std::string popped;
 		//save popped edit
-		popped = redo_stack.pop();
+		popped = redo_stack.top();
+		redo_stack.pop();
 		//push popped edit onto redo stack
-		undo_stack.push_back(popped);
+		undo_stack.push(popped);
 
 		return popped;
 	}
 	/*
 	* changes cell to most recent edit
 	*/
-	std::string undo_cell()
+	std::string cell::undo_cell()
 	{
 		std::string popped;
 		//save popped edit
-		popped = undo_stack.pop();
+		popped = undo_stack.top();
+		undo_stack.pop();
 		//push popped edit onto redo stack
-		redo_stack.push_back(popped);
+		redo_stack.push(popped);
 
 		return popped;
 	}
@@ -47,7 +49,7 @@
 	/*
 	*
 	*/
-	std::string cell_contents()
+	std::string cell::cell_content()
 	{
 		return undo_stack.top();
 	}

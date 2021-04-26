@@ -16,7 +16,7 @@ spreadsheet::spreadsheet(std::string name)
 
 void spreadsheet::add_to_q(std::string message)
 {
-	message_q.push_back(message);
+	message_q.push(message);
 }
 
 
@@ -25,12 +25,12 @@ bool spreadsheet::save_spreadsheet()
 	return false;
 }
 
-void proccess_message(std::string)
+void spreadsheet::proccess_message(std::string)
 {
 
 }
 
-void add_client(int id)
+void spreadsheet::add_client(int id)
 {
 	client_list.push_back(id);
 }
@@ -38,7 +38,7 @@ void add_client(int id)
 /*
 * removes client from list
 */
-void remove_client(int id)
+void spreadsheet::remove_client(int id)
 {
 	for (int i = 0; i < client_list.size(); i++)
 	{
@@ -48,7 +48,7 @@ void remove_client(int id)
 	}
 }
 
-std::vector<int> client_list()
+std::vector<int> spreadsheet::give_client()
 {
-	return give_clients;
+	return client_list;
 }

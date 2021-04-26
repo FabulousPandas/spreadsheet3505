@@ -20,8 +20,9 @@ int main()
     try
     {
 
+	server the_server;
         io_context io_context;
-        listener listen(io_context);
+        listener listen(io_context, the_server);
         io_context.run();
 
     }
@@ -34,7 +35,12 @@ int main()
     return 0;
 }
 
-    void polling()
+std::string server::get_list_of_spreadsheets()
+{
+	return "ss1.txt\nmalik\ndylan.png\n\n"; // TODO: REPLACE WITH ACTUAL FILE READING
+}
+
+    void server::polling()
     {
         bool idle = false;
         bool loop = true;
