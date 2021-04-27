@@ -22,10 +22,9 @@ boost::asio::ip::tcp::socket tester::connectToServer(std::string serverip)
   //create a socket to communicate on
   boost::asio::ip::tcp::socket socket(io_context);
   //connect to server on socket
-        try
-	{
-	  socket.connect( boost::asio::ip::tcp::endpoint( boost::asio::ip::address::from_string(address), std::stoi(port)));
-	} catch
+  boost::system::error_code err;
+  socket.connect( boost::asio::ip::tcp::endpoint( boost::asio::ip::address::from_string(address), std::stoi(port)), err);
+  if(err)
 	{
 	  std::cout << "fail" << std::endl;
 	  exit;
@@ -37,7 +36,9 @@ boost::asio::ip::tcp::socket tester::connectToServer(std::string serverip)
 int tester::testServerConnect()
 {
   //connect with socket to sever and start handshake
-  boost::asio::ip::tcp::socket socket = connectToServer("127.0.0.1");
+  std::string address;
+  address = "127.0.0.1:1100";
+  boost::asio::ip::tcp::socket socket = connectToServer(address);
   //send a string to the server as a username and expect a response
   boost::system::error_code error;
   boost::asio::write( socket, boost::asio::buffer("username"), error);
