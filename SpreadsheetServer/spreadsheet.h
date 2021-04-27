@@ -9,7 +9,7 @@
 #include <string>
 #include <map>
 #include <vector>
-
+#include "cell.h"
 
 
 class spreadsheet 
@@ -18,26 +18,31 @@ public:
 
 	spreadsheet(std::string name);
 
-	std::queue<std::string> message_q;
-
-	std::vector<int> clients;
-
-	void add_to_q();
+	void add_to_q(std::string message);
 
 	bool save_spreadsheet();
 
-	void proccess_message(std::string);
+	std::string proccess_message(std::string);
+
+	void add_client(int id);
+
+	void remove_client(int id);
+
+	std::vector<int> give_client();
 
 
 
 private:
 
-	std::map<std::string cell_name, std::vector<std::string> edits> cells;
+	std::queue<std::string> message_q;
 
+	std::map<std::string, cell> cell_map;
 
-
+	std::string spreadsheet_name;
 
 	bool is_dependent(std::string);
+
+	std::vector<int> client_list;
 
 
 

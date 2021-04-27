@@ -12,6 +12,7 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/bind.hpp>
 #include "handle_connection.h"
+#include "server.h"
 
 
 class listener
@@ -19,7 +20,7 @@ class listener
 public:
 
 
-	listener(boost::asio::io_context& io_context);
+	listener(boost::asio::io_context& io_context, server server);
 
 
 private:
@@ -28,6 +29,8 @@ private:
 	boost::asio::ip::tcp::acceptor acceptor_obj;
 
 	boost::asio::io_context& io_context_obj;
+
+	server the_server;
 
 
 	void start_accept();

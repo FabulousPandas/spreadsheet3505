@@ -14,6 +14,7 @@ handle_connection::handle_connection(boost::asio::io_context& io_context)
 {
 	message_buffer = "";
 	con_state = 0;
+	client_username = "";
 }
 
 /*
@@ -35,8 +36,10 @@ boost::asio::ip::tcp::socket& handle_connection::socket()
 /*
  * The first steps of communication between the server and client
  */
-void handle_connection::start()
+void handle_connection::start(server serv)
 {
+	// Gives this class the server object
+	the_server = serv;
 	// Sets the state of the connection to the part where it receives the username
 	con_state = 1;
 	
@@ -56,8 +59,9 @@ void handle_connection::read_handler(const boost::system::error_code& err, size_
 			case 1:
 				if (complete_handshake_message())
 				{
-					std::cout << "USERNAME IS " << message_buffer << std::endl; //TODO: REMOVE (FOR TESTING ONLY)
-					std::string spreadsheet_list = "sheet1\nmalikkk\nwow\n\n"; //TODO: Make it list the actual saved spreadsheets
+					client_username = message_buffer;
+					std::cout << "USERNAME IS " << client_username << std::endl; //TODO: REMOVE (FOR TESTING ONLY)
+					std::string spreadsheet_list = the_server.get_list_of_spreadsheets(); // Gets a list of spreadsheets from the server
 					send_message(spreadsheet_list);
 				}
 				message_buffer = "";

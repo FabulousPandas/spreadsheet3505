@@ -10,7 +10,7 @@ handle connection class header
 #include <boost/asio.hpp>
 #include <string>
 #include <boost/bind.hpp>
-
+#include "server.h"
 
 
 class handle_connection
@@ -26,7 +26,7 @@ public:
 
 	boost::asio::ip::tcp::socket& socket();
 
-	void start();
+	void start(server serv);
 
 
 
@@ -34,11 +34,14 @@ public:
 private:
 
         boost::asio::ip::tcp::socket socket_;
+
+	server the_server;
   
 	enum { max_length = 512 };
 	char delivered_message[max_length];
 	std::string message_buffer;
 	int con_state;
+	std::string client_username;
 
 
 
