@@ -15,7 +15,7 @@ static int testCircularDependency();
 static int testSimultaniousEdit();
 
 private:
-boost::asio::ip::tcp::socket connectToServer(std::string serverip);
+static boost::asio::ip::tcp::socket connectToServer(std::string serverip);
   
 };
 

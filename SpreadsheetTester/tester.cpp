@@ -16,7 +16,7 @@ boost::asio::ip::tcp::socket tester::connectToServer(std::string serverip)
   //break serverip apart into port and address
   std::string delimiter = ":";
   std::string address = serverip.substr(0, serverip.find(delimiter));
-  std::string port = serverip.substr(serverip.find(delimiter), serverip.length());
+  std::string port = serverip.substr(serverip.find(delimiter) + 1, serverip.length());
   
   boost::asio::io_context io_context;
   //create a socket to communicate on
