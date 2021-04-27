@@ -118,32 +118,35 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="textBoxDescription.Text" xml:space="preserve">
-    <value>Selecting a Cell:
-Click on any cell or use the arrow keys to navigate through the spreadsheet's cells.
-You are also able to type in a valid cell into the "Selected Cell" text box and
-press Enter to navigate to that cell.
+    <value>Opening a Spreadsheet:
+Click on the "File" button in the top left hand corner and click "Connect to 
+Server". Then enter in a Username and IP Address along with a Port number 
+if necessary (the default port is 1100). Once submitted, you will be given the 
+option to select any spreadsheet already created or create a new one by typing 
+in a new spreadsheet name.
+
+Selecting a Cell:
+Click on any cell or use the arrow keys to navigate through the spreadsheet's 
+cells. You are also able to type in a valid cell into the "Selected Cell" text box 
+and press Enter to navigate to that cell.
 
 Setting a Cell:
 The text box labeled "Set Cell" is where you can enter in the contents of a cell.
 You can press the "Set Cell" button next to the box or you can use the Enter key
 to make the change to the cell.
 
-Creating a New Spreadsheet:
-In the File menu in the top left corner, you are able to create a new spreadsheet window by clicking on the New button. This will create an empty spreadsheet in another window.
+Saving Spreadsheets:
+The server will automatically save all edits made to a spreadsheet.
 
-Saving and Opening Files:
-In the File menu, there are also the Save and Open options. The Save button 
-opens up a save window where you can navigate to the directory where 
-you want to save the file. The default extension for a spreadsheet file is .sprd,
-but you can save the file with a different extension if needed.
-The Open button also opens up a dialog where you can choose a file to open.
-As long as the file is in a format that the spreadsheet can open, it can take in
-other types other than .sprd.
+Undo a Change:
+Clicking the "Undo" button will reverse the latest change made to the 
+spreadsheet. Continuously clicking the "Undo" button will continue 
+reversing changes until undos are no longer possible.
 
-Additional Features:
-Undo Button:
-When clicked it undoes the last change to the spreadsheet the user has made.
-After clicking on the button, it turns into a redo button if you want to remake
-the same change.</value>
+Closing the Spreadsheet:
+The user can either click the "File" button and then the "Close" button to exit
+out of the spreadsheet or exit out normally with the "X" button in the top right
+corner.
+</value>
   </data>
 </root>
