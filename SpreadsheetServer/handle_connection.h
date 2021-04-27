@@ -42,7 +42,7 @@ private:
 	std::string message_buffer;
 	int con_state;
 	std::string client_username;
-
+	int ID;
 
 
 

@@ -10,9 +10,6 @@
 
 using namespace boost::asio;
 
-std::vector<std::string> client_list;
-
-std::vector<std::string> connection_list;
 
 int main()
 {
@@ -62,6 +59,13 @@ std::string server::get_list_of_spreadsheets()
 	return sheet_list + '\n'; // Returns the whole list of files with an additional newline appended so the client knows it's the end of the list
 }
 
+int server::get_ID()
+{
+	int clientID = curID;
+	curID++;
+	return clientID;
+}
+
 /*
  * Compares 2 strings in complete alphabetical order (case independent)
  */
@@ -80,7 +84,7 @@ bool server::alphabetical_compare(std::string a, std::string b)
 
         while (loop)
         {
-            for (int i = 0; i< client_list.size(); i++)
+            for (int i = 0; i< clients.size(); i++)
             {
 
             }
