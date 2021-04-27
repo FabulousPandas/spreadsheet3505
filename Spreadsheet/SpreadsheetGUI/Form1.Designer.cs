@@ -157,6 +157,7 @@
             // 
             // cellNameTextBox
             // 
+            this.cellNameTextBox.Enabled = false;
             this.cellNameTextBox.Location = new System.Drawing.Point(108, 32);
             this.cellNameTextBox.Name = "cellNameTextBox";
             this.cellNameTextBox.Size = new System.Drawing.Size(68, 20);

@@ -187,6 +187,7 @@ namespace SpreadsheetGUI
                     {
                         chosenSpreadsheet = input.Spreadsheet;
                         spreadsheetPanel.Enabled = true;
+                        cellNameTextBox.Enabled = true;
                     }
                 }
             );

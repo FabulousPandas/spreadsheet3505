@@ -38,7 +38,6 @@
             // submitButton
             // 
             this.submitButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.submitButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.submitButton.Location = new System.Drawing.Point(346, 248);
             this.submitButton.Name = "submitButton";
             this.submitButton.Size = new System.Drawing.Size(75, 23);

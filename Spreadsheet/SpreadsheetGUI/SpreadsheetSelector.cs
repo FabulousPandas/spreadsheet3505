@@ -105,12 +105,11 @@ namespace SpreadsheetGUI
         private void okButton_Click(object sender, EventArgs e)
         {
             SaveInput();
-            Close();
         }
 
         private void SaveInput()
         {
-            if (spreadsheetInputBox.Text == "")
+            if (string.IsNullOrWhiteSpace(spreadsheetInputBox.Text))
             {
                 MessageBox.Show("Please select a spreadsheet or type a name in the blank");
                 DialogResult = DialogResult.None;

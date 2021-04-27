@@ -29,6 +29,7 @@ namespace SS
         private Spreadsheet sheet;
         private SocketState server;
         private string username;
+        private int userID;
 
         public void Connect(string addr, string name, int port)
         {
@@ -139,11 +140,15 @@ namespace SS
                 else if(message.messageType == "cellSelected")
                 {
                     if(message.selectorName == username)
+                    {
                         SelectionMade(message.cellName);
+                        userID = (int) message.selector;
+                    }
                 }
                 else if (message.messageType == "disconnected")
                 {
-                    // disconnect event
+                    if (message.user == userID)
+                        Error("Disconnected from server");
                 }
                 else if (message.messageType == "requestError")
                 {
@@ -153,31 +158,6 @@ namespace SS
                 {
                     Error(message.message);
                 }
-
-                //TODO: process full requests
-                /*
-                 * code outline
-                 * 
-                 * parse json
-                 * 
-                 * if messageType == cellUpdate
-                 *      edits and shit come up here
-                 *      update spreadsheet with the update
-                 *      IList<string> updateList = setCell(col, row, cellContents);
-                 *      UpdateReceived(updateList);
-                 *      
-                 * else if messageType == cellSelected
-                 *      if selector is us -> tell view we selected a cell
-                 *      SelectionMade()
-                 * else if messageType == disconnected
-                 *      view gets disconnected() event to show a disconnect message or something
-                 * else if messageType == requestError
-                 *      view gets error message
-                 *      Error(errorMessage);
-                 * else if messageType == serverError
-                 *      view gets server shutdown message
-                 *      Error(serverShutdownMessage);
-                 */
 
                 state.RemoveData(0, p.Length);
             }
@@ -193,7 +173,6 @@ namespace SS
 
         public void SelectCell(string cellName)
         {
-            //TODO: send a select cell request
             Console.WriteLine("Cell selected: " + cellName);
             ClientRequest request = new ClientRequest { requestType = "selectCell", cellName = cellName };
             string requestString = JsonConvert.SerializeObject(request, Formatting.None, new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore });
@@ -203,7 +182,6 @@ namespace SS
 
         public void SendEditRequest(string cellName, string cellContents)
         {
-            //TODO: send an edit request
             Console.WriteLine("Edit request of cell: " + cellName + " to contents: " + cellContents);
             ClientRequest request = new ClientRequest { requestType = "editCell", cellName = cellName, contents = cellContents };
             string requestString = JsonConvert.SerializeObject(request, Formatting.None, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -212,7 +190,6 @@ namespace SS
 
         public void SendUndoRequest()
         {
-            //TODO: send an undo request
             Console.WriteLine("Undo request sent to server");
             ClientRequest request = new ClientRequest { requestType = "undo" };
             string requestString = JsonConvert.SerializeObject(request, Formatting.None, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -307,26 +284,6 @@ namespace SS
                 return "=" + cellContents.ToString();
             return cellContents.ToString();
         }
-
-
-        /*
-         * Helper method for updating all the cells within the spreadsheet.
-         */
-        private void UpdateCells()
-        {
-            // Sets the contents of the selected cell when clicked
-            //spreadsheetPanel.GetSelection(out int col, out int row);
-            //IList<string> updateList = SetCell(col, row, cellInputText.Text);
-
-            // Updates cell value text box
-            //string cellValue = GetCellValue(col, row);
-            //cellValueTextBox.Text = cellValue;
-
-            // If you make a new change, button can't redo
-            //undoButton.Text = "Undo";
-
-            // Recalculates cells that depends on the selected cell
-            //RecalculateCells(updateList);
-        }
+        
     }
 }

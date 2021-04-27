@@ -103,19 +103,18 @@ namespace SpreadsheetGUI
         private void okButton_Click(object sender, EventArgs e)
         {
             SaveInput();
-            Close();
         }
 
         private void SaveInput()
         {
-            if (usernameInputBox.Text == "" || ipAddressInputBox.Text == "")
+            if (string.IsNullOrWhiteSpace(usernameInputBox.Text) || string.IsNullOrWhiteSpace(ipAddressInputBox.Text))
             {
                 MessageBox.Show("Please fill in the user name/ip address boxes");
                 DialogResult = DialogResult.None;
                 return;
             }
 
-            if (portInputBox.Text == "")
+            if (string.IsNullOrWhiteSpace(portInputBox.Text))
                 Port = 1100; // if port is left blank, use 1100 as default
             else
             {
