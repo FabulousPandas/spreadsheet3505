@@ -3,7 +3,8 @@
 #include <boost/asio.hpp> 
 
 
-int main()
+
+int main(int testNumber, char** ipAndPort)
 {
   //call all tests here
   tester::testServerConnect();
@@ -13,33 +14,22 @@ int main()
 boost::asio::ip::tcp::socket tester::connectToServer(std::string serverip)
 {
   //break serverip apart into port and address
-  std::string segment;
-  std::vector<std::string> seglist;
-
-  while(std::getline(serverip, segment, ':'))
-    {
-      seglist.pushback(segment);
-    }
+  std::string delimiter = ":";
+  std::string address = serverip.substr(0, serverip.find(delimiter));
+  std::string port = serverip.substr(serverip.find(delimiter), serverip.length());
   
   boost::asio::io_context io_context;
   //create a socket to communicate on
   boost::asio::ip::tcp::socket socket(io_context);
   //connect to server on socket
-  if(seglist.size() == 2)
-    {
-      try
+        try
 	{
-  socket.connect( boost::asio::ip::tcp::endpoint( boost::asio::ip::address::from_string(seglist), 1100));
+	  socket.connect( boost::asio::ip::tcp::endpoint( boost::asio::ip::address::from_string(address), std::stoi(port)));
 	} catch
 	{
 	  std::cout << "fail" << std::endl;
 	  exit;
 	}
-    } else
-    {
-      std::cout << "fail" << std::endl;
-      exit;
-    }
   return socket;
 		  
 }
