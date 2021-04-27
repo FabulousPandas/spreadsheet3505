@@ -12,12 +12,34 @@ int main()
 
 boost::asio::ip::tcp::socket tester::connectToServer(std::string serverip)
 {
+  //break serverip apart into port and address
+  std::string segment;
+  std::vector<std::string> seglist;
+
+  while(std::getline(serverip, segment, ':'))
+    {
+      seglist.pushback(segment);
+    }
+  
   boost::asio::io_context io_context;
   //create a socket to communicate on
   boost::asio::ip::tcp::socket socket(io_context);
   //connect to server on socket
-  socket.connect( boost::asio::ip::tcp::endpoint( boost::asio::ip::address::from_string(serverip), 1100));
-		 
+  if(seglist.size() == 2)
+    {
+      try
+	{
+  socket.connect( boost::asio::ip::tcp::endpoint( boost::asio::ip::address::from_string(seglist), 1100));
+	} catch
+	{
+	  std::cout << "fail" << std::endl;
+	  exit;
+	}
+    } else
+    {
+      std::cout << "fail" << std::endl;
+      exit;
+    }
   return socket;
 		  
 }
