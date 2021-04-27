@@ -4,8 +4,15 @@
 
 
 
-int main(int testNumber, char** ipAndPort)
+int main(int argc, char** args)
 {
+  if(argc == 1)
+    {
+      std::cout << "num of tests" << std::endl;
+    }
+  // use a switch to find and run the correct test based on input
+
+
   //call all tests here
   tester::testServerConnect();
   return 0; //number of tests failed
