@@ -223,7 +223,6 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "SpreadsheetForm";
             this.Text = "Spreadsheet";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SpreadsheetForm_FormClosing);
             this.verticleSplitContainer.Panel1.ResumeLayout(false);
             this.verticleSplitContainer.Panel1.PerformLayout();
             this.verticleSplitContainer.Panel2.ResumeLayout(false);

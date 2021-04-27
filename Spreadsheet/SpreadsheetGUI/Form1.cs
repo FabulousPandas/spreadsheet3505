@@ -40,7 +40,6 @@ namespace SpreadsheetGUI
             spreadsheetPanel.GetSelection(out int col, out int row);
             string cellName = controller.GetCellName(col, row);
             controller.SelectCell(cellName);
-            
         }
 
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
@@ -92,11 +91,6 @@ namespace SpreadsheetGUI
                 return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);
-        }
-
-        private void SpreadsheetForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            //TODO: maybe add some socket closing bullshit? 
         }
 
         private void helpToolStripMenuItem_Click(object sender, EventArgs e)
