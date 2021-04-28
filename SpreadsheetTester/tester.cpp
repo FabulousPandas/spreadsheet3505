@@ -131,8 +131,10 @@ int tester::testCircularDependency(std::string address)
 
 int tester::testSimultaniousEdit(std::string adress)
 {
-  //send an edit of the same cell from two sockets to attempt for exception
-
+  //send an edit of the same cell from two sockets to ensure second edit occurs
+  boost::asio::ip::tcp::socket socket1 = completeHandshake(address, "testSimultaniousEdit");
+  boost::asio::ip::tcp::socket socket2 = completeHandshake(address, "testSimultaniousEdit");
+ 
   
   return 0;
 }
