@@ -11,7 +11,7 @@ handle connection class header
 #include <string>
 #include <boost/bind.hpp>
 #include "server.h"
-
+#include "spreadsheet.h"
 
 class handle_connection
 	:public boost::enable_shared_from_this<handle_connection>
@@ -43,6 +43,7 @@ private:
 	int con_state;
 	std::string client_username;
 	int ID;
+	spreadsheet this_sheet;
 
 
 

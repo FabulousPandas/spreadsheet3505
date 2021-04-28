@@ -71,6 +71,7 @@ void handle_connection::read_handler(const boost::system::error_code& err, size_
 				if (complete_handshake_message())
 				{
 					std::cout << "FILENAME IS " << message_buffer << std::endl; //TODO: REMOVE (FOR TESTING ONLY)
+					this_sheet = the_server.open_sheet(message_buffer);
 					ID = the_server.get_ID();
 					send_message(std::to_string(ID) + '\n'); // TODO: ADD CREATING OR GETTING CELL DATA FROM FILE CHOSEN
 				}

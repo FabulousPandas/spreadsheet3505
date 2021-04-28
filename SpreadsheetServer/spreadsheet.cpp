@@ -8,6 +8,11 @@
 
 #include "spreadsheet.h"
 
+spreadsheet::spreadsheet()
+{
+	spreadsheet_name = "";
+}
+
 /*
 * Spreadsheet constructor
 */
