@@ -151,7 +151,15 @@ namespace SpreadsheetGUI
             //re enable connect to server if connection failed
             MethodInvoker invoker =
             new MethodInvoker(
-                () => { this.connectToServerToolStripMenuItem.Enabled = true; }
+                () => 
+                { 
+                    this.connectToServerToolStripMenuItem.Enabled = true;
+                    this.spreadsheetPanel.Clear();
+                    this.spreadsheetPanel.Enabled = false;
+                    this.cellNameTextBox.Enabled = false;
+                    this.cellInputTextBox.Enabled = false;
+                    this.setCellButton.Enabled = false;
+                }
             );
             this.Invoke(invoker);
         }
@@ -162,7 +170,10 @@ namespace SpreadsheetGUI
             //disable connecting to another server when already connected to one
             MethodInvoker invoker =
             new MethodInvoker(
-                () => {this.connectToServerToolStripMenuItem.Enabled = false; }
+                () => 
+                {
+                    this.connectToServerToolStripMenuItem.Enabled = false; 
+                }
             );
             this.Invoke(invoker);
             
@@ -182,6 +193,7 @@ namespace SpreadsheetGUI
                         chosenSpreadsheet = input.Spreadsheet;
                         spreadsheetPanel.Enabled = true;
                         cellNameTextBox.Enabled = true;
+                        undoButton.Enabled = true;
                     }
                 }
             );
