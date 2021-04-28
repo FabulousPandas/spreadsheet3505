@@ -29,7 +29,7 @@ namespace SS
         private Spreadsheet sheet;
         private SocketState server;
         private string username;
-        private int userID;
+        private int? userID;
 
         public void Connect(string addr, string name, int port)
         {
@@ -127,7 +127,17 @@ namespace SS
                 if (p[p.Length - 1] != '\n')
                     break;
 
-                ServerMessage message = JsonConvert.DeserializeObject<ServerMessage>(p);
+                ServerMessage message = null;
+
+                try
+                {
+                    message = JsonConvert.DeserializeObject<ServerMessage>(p);
+                }
+                catch(JsonSerializationException)
+                {
+                    int.TryParse(p, out int result);
+                    userID = result;
+                }
                 if (message == null)
                     continue;
                 if(message.messageType == "cellUpdated")
@@ -139,10 +149,9 @@ namespace SS
                 }
                 else if(message.messageType == "cellSelected")
                 {
-                    if(message.selectorName == username)
+                    if(message.selectorName == username && message.selector == userID)
                     {
                         SelectionMade(message.cellName);
-                        userID = (int) message.selector;
                     }
                 }
                 else if (message.messageType == "disconnected")
