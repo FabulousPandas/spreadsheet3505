@@ -14,7 +14,7 @@ int main(int argc, char** args)
 
 
   //call all tests here
-  tester::testServerConnect();
+  tester::testServerConnect(args[2]);
   return 0; //number of tests failed
 }
 
@@ -42,12 +42,13 @@ boost::asio::ip::tcp::socket tester::connectToServer(std::string serverip)
 
 boost::asio::ip::tcp::socket tester::completeHandshake(std::string serverip, std::string username)
 {
-    boost::asio::ip::socket socket = connectToSever(serverip);
+  boost::asio::ip::tcp::socket socket = connectToServer(serverip);
     boost::system::error_code err;
     boost::asio::write(socket, boost::asio::buffer(username + "\n"), err); // send username 
     if(!err)
     {
-        boost::asio::streambuf receive;
+      std::vector<char> tempRec = std::vector<char>(100);
+	boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 100); 
         boost::asio::read(socket, receive, boost::asio::transfer_all(), err); // get list of sheets
         if(!err)
         {
@@ -61,7 +62,7 @@ boost::asio::ip::tcp::socket tester::completeHandshake(std::string serverip, std
                 boost::asio::read(socket, receive, boost::asio::transfer_all(), err);
                 if(!err)
                 {
-                    data = boost::asio::buffer_cast<char*>(recive.data());
+                    data = boost::asio::buffer_cast<char*>(receive);
                     temp = std::string(data);
                 }
                 }
@@ -87,7 +88,7 @@ int tester::testServerConnect(std::string address)
   //send a string to the server as a username and expect a response
   boost::system::error_code error;
   boost::asio::write( socket, boost::asio::buffer("username \n"), error);
-  if(!error)
+  if(error)
     {
       std::cout << "fail" << std::endl;
       return 0; // client has succesfully connected and sent a message
@@ -98,10 +99,9 @@ int tester::testServerConnect(std::string address)
 
 int tester::testCircularDependency(std::string address)
 {
-  boost::asio::ip::tcp::socket socket = connectToServer(address);
-  boost::system::error_code err;
   //connect to server and send a circular dependancy
-  socket = completeHandshake(socket, "testCircularDependency"); // send test name as username for unique file
+  boost::asio::ip::tcp::socket socket = completeHandshake(address, "testCircularDependency"); // send test name as username for unique file
+  boost::system::error_code err;
   //send first edit
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A1\"}"));
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A1\", \"contents\":\"3\"}"));
@@ -112,9 +112,8 @@ int tester::testCircularDependency(std::string address)
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A2\"}"));
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A2\", \"contents\":\"=A1 + A2\"}"));
   //check buffer
-  boost::asio::streambuf receive;
   boost::asio::read(socket, receive, boost::asio::transfer_all(), err);
-  const char* data = boost::asio::buffer_cast<const char*>(recive.data());
+  const char* data = boost::asio::buffer_cast<const char*>(receive.data());
   std::string temp(data);
   //ensure the server sends back the correct error response 
   if(temp.find("requestError"))

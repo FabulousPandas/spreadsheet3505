@@ -15,7 +15,7 @@ static int testSimultaniousEdit(std::string address);
 
 private:
 static boost::asio::ip::tcp::socket connectToServer(std::string serverip);
-static boost::asio::ip::tcp::socket tester::completeHandshake(std::string serverip, std::string username)
+static boost::asio::ip::tcp::socket completeHandshake(std::string serverip, std::string username);
 };
 
 #endif
