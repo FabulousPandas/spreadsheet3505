@@ -70,15 +70,18 @@ void handle_connection::read_handler(const boost::system::error_code& err, size_
 			case 2:
 				if (complete_handshake_message())
 				{
+					con_state = 0;
 					std::cout << "FILENAME IS " << message_buffer << std::endl; //TODO: REMOVE (FOR TESTING ONLY)
 					this_sheet = the_server.open_sheet(message_buffer);
 					ID = the_server.get_ID();
 					send_message(std::to_string(ID) + '\n'); // TODO: ADD CREATING OR GETTING CELL DATA FROM FILE CHOSEN
+					con_state = 2;
 				}
 				message_buffer = "";
 				break;
 			// Editing the spreadsheet communication
 			case 3:
+				read_message();
 				break;
 			// Shutting down the connection
 			case 4:
@@ -102,8 +105,11 @@ void handle_connection::write_handler(const boost::system::error_code& err, size
 				read_message();
 				break;
 			case 2:
+				con_state = 3;
+				read_message();
 				break;
 			case 3:
+				read_message();
 				break;
 			case 4:
 				break;
