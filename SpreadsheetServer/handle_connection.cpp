@@ -73,6 +73,7 @@ void handle_connection::read_handler(const boost::system::error_code& err, size_
 					con_state = 0;
 					std::cout << "FILENAME IS " << message_buffer << std::endl; //TODO: REMOVE (FOR TESTING ONLY)
 					this_sheet = the_server.open_sheet(message_buffer);
+					this_sheet.add_client(this);
 					ID = the_server.get_ID();
 					send_message(std::to_string(ID) + '\n'); // TODO: ADD CREATING OR GETTING CELL DATA FROM FILE CHOSEN
 					con_state = 2;
@@ -85,6 +86,11 @@ void handle_connection::read_handler(const boost::system::error_code& err, size_
 				{
 					std::string json_message = message_buffer;
 					std::vector<std::string> message = split_message(json_message);
+					if (message.at(0) == "selectCell")
+					{
+						message.push_back(std::to_string(ID));
+						message.push_back(client_username);
+					}
 					this_sheet.add_to_q(message);
 					std::cout << "Message received: " << message_buffer << std::endl;
 					message_buffer = "";

@@ -9,6 +9,7 @@
 #include "spreadsheet.h"
 #include <boost/filesystem.hpp>
 #include <iostream> //TODO REMOVE
+#include "handle_connection.h"
 
 spreadsheet::spreadsheet()
 {
@@ -62,13 +63,14 @@ void spreadsheet::remake_file_from_history()
 /*
 * Implements one message from the message_q
 * return "pass" if it was succesful 
+* return "empty" if the queue is empty
 * otherwise will return a string describing
 * the error
 */
 std::string spreadsheet::proccess_next_message()
 {
 	if (message_q.size() == 0)
-		return "Tried to read from an empty queue";
+		return "empty";
 
 	std::vector<std::string> message = message_q.front();
 	message_q.pop();
@@ -96,6 +98,10 @@ std::string spreadsheet::proccess_next_message()
 		}
 		else if (message.at(0) == "selectCell")
 		{
+			if(message.size() != 4)
+				return "Invalid number of data values sent in selectCell JSON";
+
+
 		}
 		else if (message.at(0) == "undo")
 		{
@@ -139,22 +145,22 @@ cell spreadsheet::get_cell(std::string cell_name)
 /*
 * Adds a client useing their id to client_list
 */
-void spreadsheet::add_client(int id)
+void spreadsheet::add_client(handle_connection* client)
 {
-	client_list.push_back(id);
+	client_list.push_back(client);
 }
 
 /*
 * removes client from list, 
 * changes client_list's index to -1 if found
 */
-void spreadsheet::remove_client(int id)
+void spreadsheet::remove_client(handle_connection* client)
 {
 	for (int i = 0; i < client_list.size(); i++)
 	{
 		//if id is found then change to -1
-		if (id == client_list[i])
-			client_list[i] = -1;
+		//if (client == client_list[i])
+			//client_list[i] = -1;
 	}
 }
 
@@ -162,17 +168,17 @@ void spreadsheet::remove_client(int id)
 * returns the list of clients currently connected
 * to this spreadsheet
 */
-std::vector<int> spreadsheet::give_client()
+std::vector<handle_connection*> spreadsheet::give_client()
 {
-	std::vector<int> active_clients;
+	std::vector<handle_connection*> active_clients;
 	
 
 	for (int i = 0; i < client_list.size(); i++)
 	{
-		if (client_list[i] != -1)
-		{
+		//if (client_list[i] != -1)
+		//{
 			active_clients.push_back(client_list[i]);
-		}
+		//}
 	}
 
 	return active_clients;

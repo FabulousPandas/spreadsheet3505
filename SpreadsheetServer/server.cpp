@@ -6,6 +6,7 @@
 #include <iterator>
 #include <string>
 #include "listener.h"
+#include<unistd.h>
 
 using namespace boost::asio;
 
@@ -21,7 +22,6 @@ int main()
         io_context io_context;
         listener listen(io_context, the_server);
         io_context.run();
-
     }
     catch (std::exception& e)
     {
@@ -35,6 +35,7 @@ int main()
 server::server()
 {
 	put_spreadsheets_in_map();
+	polling();
 }
 
 std::string server::get_list_of_spreadsheets()
@@ -92,16 +93,20 @@ int server::get_ID()
 
     void server::polling()
     {
-        bool idle = false;
         bool loop = true;
-
 
         while (loop)
         {
-            for (int i = 0; i< clients.size(); i++)
+	    bool idle = true;
+            for (std::map<std::string, spreadsheet>::iterator it; it != spreadsheets.end(); it++)
             {
-
+		    spreadsheet cur_sheet = it->second;
+		    std::string result = cur_sheet.proccess_next_message();
+		    if (result != "empty")
+			    idle = false;
             }
+	    if (idle)
+	    	usleep(1 * 1000000 / 2);
         }
     }
 

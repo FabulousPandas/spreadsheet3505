@@ -11,9 +11,12 @@
 #include <vector>
 #include "cell.h"
 
+class handle_connection;
 
 class spreadsheet 
 {
+
+
 public:
 
 	spreadsheet();
@@ -29,16 +32,15 @@ public:
 
 	std::string proccess_next_message();
 
-	void add_client(int id);
+	void add_client(handle_connection* client);
 
-	void remove_client(int id);
+	void remove_client(handle_connection* client);
 
-	std::vector<int> give_client();
+	std::vector<handle_connection*> give_client();
 
 
 
 private:
-
 	std::queue<std::vector<std::string>> message_q;
 
 	std::map<std::string, cell> cell_map;
@@ -51,7 +53,7 @@ private:
 
 	bool is_dependent(std::vector<std::string> message);
 
-	std::vector<int> client_list;
+	std::vector<handle_connection*> client_list;
 
 
 
