@@ -7,10 +7,12 @@ Server class header
 
 #include <boost/asio.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/thread/thread.hpp>
 #include <vector>
+#include <map>
 #include <string>
 #include "spreadsheet.h"
-
+#include <algorithm>
 
 
 class server
@@ -18,20 +20,37 @@ class server
 
 public:
 
-
+	server();
 	std::string get_list_of_spreadsheets();
+	spreadsheet* open_sheet(std::string filename);
 	int get_ID();
+	void polling();
 
 private:
+	struct Alphabetical {
+		
+		/*
+ 		* Compares 2 strings in complete alphabetical order (case independent)
+ 		*/
+		bool operator() (const std::string& a, const std::string& b) const
+		{
+			std::string str1(a);
+			std::string str2(b);
+			std::transform(str1.begin(), str1.end(), str1.begin(), [](unsigned char c){ return std::tolower(c); }); // Converts a to all lowercase	
+			std::transform(str2.begin(), str2.end(), str2.begin(), [](unsigned char c){ return std::tolower(c); }); // Converts b to all lowercase
+			return a < b;
+		}
+
+	};
+
+
 	std::string directory = "SavedSpreadsheets";
 	std::vector<int> clients;
-	std::vector<spreadsheet> spreadsheets;
+	std::map<std::string, spreadsheet, Alphabetical> spreadsheets;
 	int curID = 0;
-	
-	static bool alphabetical_compare(std::string a, std::string b);
 
+	void put_spreadsheets_in_map();
 
-	void polling();
 
 
 

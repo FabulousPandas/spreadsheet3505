@@ -6,7 +6,6 @@
 	cell::cell(std::string name)
 	{
 		cell_name = name;
-
 	}
 	/*
 	* changes cell contenst to param edit
@@ -16,14 +15,13 @@
 		//add edit to stack
 		undo_stack.push(edit);
 		
-		//clear redo stack
-		for (int i = 0; i < redo_stack.size(); i++)
-			redo_stack.pop();
 	}
 	/*
-	* changes cell to most recent undo
+	* undoes the act of reverting
+	* if the stack was empty then "empty"
+	* is returned
 	*/
-	std::string cell::redo_cell()
+	std::string cell::undo_revert()
 	{
 		if (redo_stack.empty())
 			return "empty";
@@ -37,10 +35,20 @@
 
 		return popped;
 	}
+
 	/*
-	* changes cell to most recent edit
+	* removes last edit from the stack
 	*/
-	std::string cell::undo_cell()
+	void cell::remove_edit()
+	{
+		undo_stack.pop();
+	}
+	/*
+	* reverts cell to last change
+	* or if the stack was empty then "empty"
+	* is returned
+	*/
+	std::string cell::revert()
 	{
 		if (undo_stack.empty())
 			return "empty";

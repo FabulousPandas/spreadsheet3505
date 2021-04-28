@@ -1,4 +1,3 @@
-
 #ifndef TESTER_H
 #define TESTER_H
 
@@ -10,13 +9,13 @@ class tester
 {
 
 public:
-static int testServerConnect();
-static int testCircularDependency();
-static int testSimultaniousEdit();
+static int testServerConnect(std::string address);
+static int testCircularDependency(std::string address);
+static int testSimultaniousEdit(std::string address);
 
 private:
 static boost::asio::ip::tcp::socket connectToServer(std::string serverip);
-  
+static boost::asio::ip::tcp::socket completeHandshake(std::string serverip, std::string username);
 };
 
 #endif

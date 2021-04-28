@@ -4,9 +4,9 @@
 #include "server.h"
 #include <iostream>
 #include <iterator>
-#include <algorithm>
 #include <string>
 #include "listener.h"
+#include<unistd.h>
 
 using namespace boost::asio;
 
@@ -17,12 +17,13 @@ int main()
     try
     {
 
-	server the_server;
+	server* the_server = new server;
 
         io_context io_context;
         listener listen(io_context, the_server);
-        io_context.run();
-
+	boost::thread t(boost::bind(&boost::asio::io_context::run, &io_context));
+	the_server->polling();
+	t.join();
     }
     catch (std::exception& e)
     {
@@ -33,30 +34,54 @@ int main()
     return 0;
 }
 
+server::server()
+{
+	put_spreadsheets_in_map();
+}
+
 std::string server::get_list_of_spreadsheets()
 {
-	boost::filesystem::path sheet_dir(directory); // Creates a path object at the folder specified to hold the spreadsheets
+	if (spreadsheets.size() == 0)
+		return "\n\n";
+
 	std::string sheet_list; // String list of the spreadsheets to be returned for sending to the client
 
+	for (std::map<std::string, spreadsheet>::iterator i = spreadsheets.begin(); i != spreadsheets.end(); i++)
+	{
+		sheet_list += i->first + '\n'; // Appends each spreadsheet file name to the string with an added newline between each filename
+	}
+	return sheet_list + '\n'; // Returns the whole list of files with an additional newline appended so the client knows it's the end of the list
+}
+
+spreadsheet* server::open_sheet(std::string filename)
+{
+	if (spreadsheets.find(filename) == spreadsheets.end()) // if the filename is not in the spreadsheet list
+	{
+		boost::filesystem::path sheet_dir(directory); // Creates a path object at the folder specified to hold the spreadsheets
+		boost::filesystem::ofstream new_file(sheet_dir / filename);
+		new_file.close();
+		spreadsheet new_sheet(filename);
+		spreadsheets.insert(std::pair<std::string, spreadsheet>(filename, new_sheet));
+	}
+
+	return &spreadsheets[filename];
+}
+
+void server::put_spreadsheets_in_map()
+{
+
+	boost::filesystem::path sheet_dir(directory); // Creates a path object at the folder specified to hold the spreadsheets
+
 	boost::filesystem::recursive_directory_iterator end;
-	std::vector<std::string> spreadsheet_list;
 	// Iterates through every file in the directory the spreadsheets are saved to
 	for (boost::filesystem::recursive_directory_iterator i(sheet_dir); i != end; i++)
 	{
 		boost::filesystem::path sheet = (*i); // Sets the sheet path to whichever spreadsheet the iterator is currently pointing at
-		spreadsheet_list.push_back(sheet.string().substr(directory.length() + 1, sheet.string().length() - directory.length() - 1)); // Removes the filepath up until the actual spreadsheet file name and pushes the filename to the vector
+		std::string filename = sheet.string().substr(directory.length() + 1, sheet.string().length() - directory.length() - 1); // Removes the filepath up until the actual spreadsheet file name
+		spreadsheet new_sheet(filename);
+		spreadsheets.insert(std::pair<std::string, spreadsheet>(filename, new_sheet));
 	}
 
-	if (spreadsheet_list.size() == 0)
-		return "\n\n";
-
-	std::sort(spreadsheet_list.begin(), spreadsheet_list.end(), alphabetical_compare); // Sorts the vector storing the spreadsheet filenames into alphabetical order
-
-	for (int i = 0; i < spreadsheet_list.size(); i++)
-	{
-		sheet_list += spreadsheet_list.at(i) + '\n'; // Appends each spreadsheet file name to the string with an added newline between each filename
-	}
-	return sheet_list + '\n'; // Returns the whole list of files with an additional newline appended so the client knows it's the end of the list
 }
 
 int server::get_ID()
@@ -66,28 +91,21 @@ int server::get_ID()
 	return clientID;
 }
 
-/*
- * Compares 2 strings in complete alphabetical order (case independent)
- */
-bool server::alphabetical_compare(std::string a, std::string b)
-{
-	std::transform(a.begin(), a.end(), a.begin(), [](unsigned char c){ return std::tolower(c); }); // Converts a to all lowercase	
-	std::transform(b.begin(), b.end(), b.begin(), [](unsigned char c){ return std::tolower(c); }); // Converts b to all lowercase
-	return a < b;
-}
-
     void server::polling()
     {
-        bool idle = false;
         bool loop = true;
-
-
         while (loop)
         {
-            for (int i = 0; i< clients.size(); i++)
+	    bool idle = true;
+            for (std::map<std::string, spreadsheet>::iterator it = spreadsheets.begin(); it != spreadsheets.end(); it++)
             {
-
+		    spreadsheet cur_sheet = it->second;
+		    std::string result = cur_sheet.proccess_next_message();
+		    if (result != "empty")
+			    idle = false;
             }
+	    if (idle)
+	    	usleep(1 * 1000000 / 2);
         }
     }
 

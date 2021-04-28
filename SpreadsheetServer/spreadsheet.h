@@ -11,38 +11,49 @@
 #include <vector>
 #include "cell.h"
 
+class handle_connection;
 
 class spreadsheet 
 {
+
+
 public:
 
-	spreadsheet(std::string name);
+	spreadsheet();
+	spreadsheet(std::string filepath);
 
-	void add_to_q(std::string message);
+	void add_to_q(std::vector<std::string> message);
 
-	bool save_spreadsheet();
+	void build_from_file();
 
-	std::string proccess_message(std::string);
+	void write_message_to_spreadsheet(std::vector<std::string> message);
 
-	void add_client(int id);
+	void remake_file_from_history();
 
-	void remove_client(int id);
+	std::string proccess_next_message();
 
-	std::vector<int> give_client();
+	void add_client(handle_connection* client);
+
+	void remove_client(handle_connection* client);
+
+	std::vector<handle_connection*> give_client();
 
 
 
 private:
-
-	std::queue<std::string> message_q;
+	std::queue<std::vector<std::string>> message_q;
 
 	std::map<std::string, cell> cell_map;
 
+	std::vector<std::vector<std::string>> change_history;
+
 	std::string spreadsheet_name;
 
-	bool is_dependent(std::string);
+	cell get_cell(std::string cell_name);
 
-	std::vector<int> client_list;
+	bool is_dependent(std::vector<std::string> message);
+
+	std::vector<handle_connection*> client_list;
 
 
 
