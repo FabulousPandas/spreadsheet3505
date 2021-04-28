@@ -7,6 +7,7 @@
 
 
 #include "spreadsheet.h"
+#include <boost/filesystem.hpp>
 
 spreadsheet::spreadsheet()
 {
@@ -16,15 +17,15 @@ spreadsheet::spreadsheet()
 /*
 * Spreadsheet constructor
 */
-spreadsheet::spreadsheet(std::string name)
+spreadsheet::spreadsheet(std::string filepath)
 {
-	spreadsheet_name = name;
+	spreadsheet_name = filepath;
 }
 
 /*
 * adds a message from the client to the mesasge_q
 */
-void spreadsheet::add_to_q(std::string message)
+void spreadsheet::add_to_q(std::vector<std::string> message)
 {
 	message_q.push(message);
 }
@@ -32,9 +33,21 @@ void spreadsheet::add_to_q(std::string message)
 /*
 * Saves the spreadsheet
 */
-bool spreadsheet::save_spreadsheet()
+void spreadsheet::write_message_to_spreadsheet(std::vector<std::string> message)
 {
-	return false;
+	boost::filesystem::path sheet_dir(spreadsheet_name);
+	boost::filesystem::ofstream file(sheet_dir);
+	for (int i = 0; i < message.size(); i++)
+	{
+		file << message.at(i) << '\n';
+	}
+	file << '\n';
+	file.close();
+}
+
+void spreadsheet::remake_file_from_history()
+{
+
 }
 
 /*
@@ -43,15 +56,75 @@ bool spreadsheet::save_spreadsheet()
 * otherwise will return a string describing
 * the error
 */
-std::string spreadsheet::proccess_message(std::string message)
+std::string spreadsheet::proccess_next_message()
 {
+	if (message_q.size() == 0)
+		return "Tried to read from an empty queue";
+
+	std::vector<std::string> message = message_q.front();
+	message_q.pop();
+
 	if (!is_dependent(message))
 	{
+		if (message.at(0) == "editCell")
+		{
+			if (message.size() != 3)
+				return "Invalid number of data values sent in editCell JSON";
+			cell this_cell = get_cell(message.at(1));
+			this_cell.add_edit(message.at(2));
+			change_history.push_back(message);
+			write_message_to_spreadsheet(message);
+		}
+		else if (message.at(0) == "revertCell")
+		{
+			if (message.size() != 2)
+				return "Invalid number of data values sent in revertCell JSON";
 
+			cell this_cell = get_cell(message.at(1));	
+			this_cell.revert();
+			change_history.push_back(message);
+			write_message_to_spreadsheet(message);	
+		}
+		else if (message.at(0) == "selectCell")
+		{
+		}
+		else if (message.at(0) == "undo")
+		{
+			if (message.size() != 1)
+				return "Invalid number of data values sent in undo JSON";
+
+			std::vector<std::string> prev_message = change_history.back();
+			cell prev_cell = get_cell(prev_message.at(1));
+			if (prev_message.at(0) == "editCell")
+			{
+				prev_cell.remove_edit();
+			} 
+			else if (prev_message.at(0) == "revertCell")
+			{
+				prev_cell.undo_revert();
+			}
+			change_history.pop_back();
+			remake_file_from_history();
+		}
+		else
+		{
+			return "Unknown requestType sent to server";
+		}
 	}
 
 
 	return "pass";
+}
+
+cell spreadsheet::get_cell(std::string cell_name)
+{
+
+	std::map<std::string, cell>::iterator it = cell_map.find(cell_name);
+	if (it == cell_map.end()) // If the cell map doesn't contain this cell
+	{
+		it = cell_map.insert(std::pair<std::string, cell>(cell_name, cell(cell_name))).first; // Add a new cell to the map
+	}
+ 	return it->second; // Gets the cell value from the cell name key specified earlier
 }
 
 /*
@@ -100,7 +173,7 @@ std::vector<int> spreadsheet::give_client()
 * returns false if the message would not cause a
 * dependency in the spreadsheet
 */
-bool spreadsheet::is_dependent(std::string message)
+bool spreadsheet::is_dependent(std::vector<std::string> message)
 {
 
 	//TODO

@@ -164,8 +164,10 @@ bool handle_connection::complete_handshake_message()
 std::vector<std::string> split_message(std::string message)
 {
 	rapidjson::Document doc;
-	doc.Parse(message);
+	//doc.Parse(message);
 
+	std::vector<std::string> dummy;
+	return dummy;
 
 }
 

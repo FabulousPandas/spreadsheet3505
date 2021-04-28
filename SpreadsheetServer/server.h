@@ -19,7 +19,6 @@ class server
 
 public:
 
-
 	server();
 	std::string get_list_of_spreadsheets();
 	spreadsheet open_sheet(std::string filename);
@@ -41,6 +40,7 @@ private:
 		}
 
 	};
+
 
 	std::string directory = "SavedSpreadsheets";
 	std::vector<int> clients;

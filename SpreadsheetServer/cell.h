@@ -19,6 +19,8 @@ public:
 
 	void add_edit(std::string edit);
 
+	void remove_edit();
+
 	std::string undo_revert();
 
 	std::string revert();
@@ -35,7 +37,6 @@ private:
 	//stack of undo edits
 	std::stack<std::string> redo_stack;
 
-	void remove_edit();
 };
 
 

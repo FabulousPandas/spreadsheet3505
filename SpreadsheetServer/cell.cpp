@@ -39,7 +39,7 @@
 	/*
 	* removes last edit from the stack
 	*/
-	void remove_edit()
+	void cell::remove_edit()
 	{
 		undo_stack.pop();
 	}

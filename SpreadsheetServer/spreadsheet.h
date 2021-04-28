@@ -17,13 +17,15 @@ class spreadsheet
 public:
 
 	spreadsheet();
-	spreadsheet(std::string name);
+	spreadsheet(std::string filepath);
 
-	void add_to_q(std::string message);
+	void add_to_q(std::vector<std::string> message);
 
-	bool save_spreadsheet();
+	void write_message_to_spreadsheet(std::vector<std::string> message);
 
-	std::string proccess_message(std::string);
+	void remake_file_from_history();
+
+	std::string proccess_next_message();
 
 	void add_client(int id);
 
@@ -35,13 +37,17 @@ public:
 
 private:
 
-	std::queue<std::string> message_q;
+	std::queue<std::vector<std::string>> message_q;
 
 	std::map<std::string, cell> cell_map;
 
+	std::vector<std::vector<std::string>> change_history;
+
 	std::string spreadsheet_name;
 
-	bool is_dependent(std::string);
+	cell get_cell(std::string cell_name);
+
+	bool is_dependent(std::vector<std::string> message);
 
 	std::vector<int> client_list;
 
