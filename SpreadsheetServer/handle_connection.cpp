@@ -148,5 +148,18 @@ bool handle_connection::complete_handshake_message()
 	return false;
 }
 
+/*
+* Takes in the entire message from client, splits message into
+* a vector of strings containing:
+* index 0 = requestType
+* index 1 = cellName/ or empty
+* index 2 = cellContents/ or empty
+*/
+std::vector<std::string> split_message(std::string message)
+{
+	rapidjson::Document doc;
+	doc.Parse(message);
+
+}
 
 

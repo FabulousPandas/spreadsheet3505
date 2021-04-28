@@ -12,6 +12,7 @@ handle connection class header
 #include <boost/bind.hpp>
 #include "server.h"
 #include "spreadsheet.h"
+#include <rapidjson/document.h>
 
 class handle_connection
 	:public boost::enable_shared_from_this<handle_connection>
@@ -57,6 +58,8 @@ private:
 	void send_message(std::string message);
 
 	bool complete_handshake_message();
+
+	std::vector<std::string> split_message(std::string message);
 
 
 };
