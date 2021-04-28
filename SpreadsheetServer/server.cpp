@@ -63,9 +63,7 @@ spreadsheet server::open_sheet(std::string filename)
 		return new_sheet;
 	}
 
-	spreadsheet dummy;
-	return dummy;
-
+	return spreadsheets[filename];
 }
 
 void server::put_spreadsheets_in_map()
