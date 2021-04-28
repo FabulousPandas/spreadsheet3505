@@ -6,7 +6,6 @@
 	cell::cell(std::string name)
 	{
 		cell_name = name;
-
 	}
 	/*
 	* changes cell contenst to param edit
@@ -22,6 +21,9 @@
 	}
 	/*
 	* changes cell to most recent undo
+	* returns the redo string
+	* or if the stack was empty then "empty"
+	* is returned
 	*/
 	std::string cell::redo_cell()
 	{
@@ -39,6 +41,9 @@
 	}
 	/*
 	* changes cell to most recent edit
+	* returns the undo string
+	* or if the stack was empty then "empty"
+	* is returned
 	*/
 	std::string cell::undo_cell()
 	{
