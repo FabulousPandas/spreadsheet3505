@@ -17,11 +17,13 @@ int main()
     try
     {
 
-	server the_server;
+	server* the_server = new server;
 
         io_context io_context;
         listener listen(io_context, the_server);
-        io_context.run();
+	boost::thread t(boost::bind(&boost::asio::io_context::run, &io_context));
+	the_server->polling();
+	t.join();
     }
     catch (std::exception& e)
     {
@@ -35,7 +37,6 @@ int main()
 server::server()
 {
 	put_spreadsheets_in_map();
-	polling();
 }
 
 std::string server::get_list_of_spreadsheets()
@@ -52,7 +53,7 @@ std::string server::get_list_of_spreadsheets()
 	return sheet_list + '\n'; // Returns the whole list of files with an additional newline appended so the client knows it's the end of the list
 }
 
-spreadsheet server::open_sheet(std::string filename)
+spreadsheet* server::open_sheet(std::string filename)
 {
 	if (spreadsheets.find(filename) == spreadsheets.end()) // if the filename is not in the spreadsheet list
 	{
@@ -61,10 +62,9 @@ spreadsheet server::open_sheet(std::string filename)
 		new_file.close();
 		spreadsheet new_sheet(filename);
 		spreadsheets.insert(std::pair<std::string, spreadsheet>(filename, new_sheet));
-		return new_sheet;
 	}
 
-	return spreadsheets[filename];
+	return &spreadsheets[filename];
 }
 
 void server::put_spreadsheets_in_map()
@@ -94,11 +94,10 @@ int server::get_ID()
     void server::polling()
     {
         bool loop = true;
-
         while (loop)
         {
 	    bool idle = true;
-            for (std::map<std::string, spreadsheet>::iterator it; it != spreadsheets.end(); it++)
+            for (std::map<std::string, spreadsheet>::iterator it = spreadsheets.begin(); it != spreadsheets.end(); it++)
             {
 		    spreadsheet cur_sheet = it->second;
 		    std::string result = cur_sheet.proccess_next_message();

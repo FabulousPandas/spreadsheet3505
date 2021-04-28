@@ -4,11 +4,10 @@ Written by Dylan Hansen and Malik Qader
 */
 #include "listener.h"
 
-
 using namespace boost::asio;
 
 
-	listener::listener(io_context& io_context, server serv)
+	listener::listener(io_context& io_context, server* serv)
 		: io_context_obj(io_context), // Clones io_context to another object which is accessible to the entire class
 		acceptor_obj(io_context, ip::tcp::endpoint(ip::tcp::v4(), 1100))
 	{

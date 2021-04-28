@@ -7,6 +7,7 @@ Server class header
 
 #include <boost/asio.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/thread/thread.hpp>
 #include <vector>
 #include <map>
 #include <string>
@@ -21,8 +22,9 @@ public:
 
 	server();
 	std::string get_list_of_spreadsheets();
-	spreadsheet open_sheet(std::string filename);
+	spreadsheet* open_sheet(std::string filename);
 	int get_ID();
+	void polling();
 
 private:
 	struct Alphabetical {
@@ -49,7 +51,6 @@ private:
 
 	void put_spreadsheets_in_map();
 
-	void polling();
 
 
 

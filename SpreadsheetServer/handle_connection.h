@@ -13,6 +13,8 @@ handle connection class header
 #include "spreadsheet.h"
 #include <rapidjson/document.h>
 #include <rapidjson/schema.h>
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
 
 class handle_connection
 	:public boost::enable_shared_from_this<handle_connection>
@@ -27,8 +29,9 @@ public:
 
 	boost::asio::ip::tcp::socket& socket();
 
-	void start(server serv);
+	void start(server* serv);
 
+	void server_response(std::vector<std::string> message);
 
 
 
@@ -36,7 +39,7 @@ private:
 
         boost::asio::ip::tcp::socket socket_;
 
-	server the_server;
+	server* the_server;
   
 	enum { max_length = 512 };
 	char delivered_message[max_length];
@@ -44,7 +47,7 @@ private:
 	int con_state;
 	std::string client_username;
 	int ID;
-	spreadsheet this_sheet;
+	spreadsheet* this_sheet;
 
 
 

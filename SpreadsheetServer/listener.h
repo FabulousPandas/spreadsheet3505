@@ -20,7 +20,7 @@ class listener
 public:
 
 
-	listener(boost::asio::io_context& io_context, server server);
+	listener(boost::asio::io_context& io_context, server* server);
 
 
 private:
@@ -30,7 +30,7 @@ private:
 
 	boost::asio::io_context& io_context_obj;
 
-	server the_server;
+	server* the_server;
 
 
 	void start_accept();

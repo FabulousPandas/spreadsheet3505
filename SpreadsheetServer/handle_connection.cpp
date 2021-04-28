@@ -36,7 +36,7 @@ boost::asio::ip::tcp::socket& handle_connection::socket()
 /*
  * The first steps of communication between the server and client
  */
-void handle_connection::start(server serv)
+void handle_connection::start(server* serv)
 {
 	// Gives this class the server object
 	the_server = serv;
@@ -61,7 +61,7 @@ void handle_connection::read_handler(const boost::system::error_code& err, size_
 				{
 					client_username = message_buffer;
 					std::cout << "USERNAME IS " << client_username << std::endl; //TODO: REMOVE (FOR TESTING ONLY)
-					std::string spreadsheet_list = the_server.get_list_of_spreadsheets(); // Gets a list of spreadsheets from the server
+					std::string spreadsheet_list = the_server->get_list_of_spreadsheets(); // Gets a list of spreadsheets from the server
 					send_message(spreadsheet_list);
 					message_buffer = "";
 				}
@@ -72,9 +72,9 @@ void handle_connection::read_handler(const boost::system::error_code& err, size_
 				{
 					con_state = 0;
 					std::cout << "FILENAME IS " << message_buffer << std::endl; //TODO: REMOVE (FOR TESTING ONLY)
-					this_sheet = the_server.open_sheet(message_buffer);
-					this_sheet.add_client(this);
-					ID = the_server.get_ID();
+					this_sheet = the_server->open_sheet(message_buffer);
+					this_sheet->add_client(this);
+					ID = the_server->get_ID();
 					send_message(std::to_string(ID) + '\n'); // TODO: ADD CREATING OR GETTING CELL DATA FROM FILE CHOSEN
 					con_state = 2;
 					message_buffer = "";
@@ -91,7 +91,7 @@ void handle_connection::read_handler(const boost::system::error_code& err, size_
 						message.push_back(std::to_string(ID));
 						message.push_back(client_username);
 					}
-					this_sheet.add_to_q(message);
+					this_sheet->add_to_q(message);
 					std::cout << "Message received: " << message_buffer << std::endl;
 					message_buffer = "";
 				}
@@ -129,6 +129,54 @@ void handle_connection::write_handler(const boost::system::error_code& err, size
 				break;
 		}
 	}
+}
+	
+void handle_connection::server_response(std::vector<std::string> message)
+{
+	rapidjson::Document d;
+	d.SetObject();
+
+	rapidjson::Document::AllocatorType& allocator = d.GetAllocator();
+
+	rapidjson::Value obj(rapidjson::kObjectType);
+	rapidjson::Value val(rapidjson::kObjectType);
+
+	val.SetString(message.at(0).c_str(), static_cast<rapidjson::SizeType>(message.at(0).length()), allocator);
+	obj.AddMember("messageType", val, allocator);
+	/*if (message.at(0) == "cellUpdated")
+	{
+		d.AddMember("cellName", message.at(1), allocator);
+		d.AddMember("contents", message.at(2), allocator);
+	}
+	else if (message.at(0) == "cellSelected")
+	{
+		d.AddMember("cellName", message.at(1), allocator);
+		d.AddMember("selector", message.at(2), allocator);
+		d.AddMember("selectorName", message.at(3), allocator);
+	}
+	else if (message.at(0) == "disconnected")
+	{
+		d.AddMember("user", message.at(1), allocator);
+	}
+	else if (message.at(0) == "requestError")
+	{
+		d.AddMember("cellName", message.at(1), allocator);
+		d.AddMember("message", message.at(2), allocator);
+	}
+	else if (message.at(0) == "serverError")
+	{
+		d.AddMember("message", message.at(1), allocator);
+	}
+	*/
+
+	rapidjson::StringBuffer str;
+	rapidjson::Writer<rapidjson::StringBuffer> writer(str);
+	d.Accept(writer);
+
+	std::cout << "SENDING TO CLIENT: " << str.GetString() << std::endl;
+
+	send_message(str.GetString());
+	
 }
 
 void handle_connection::read_message()

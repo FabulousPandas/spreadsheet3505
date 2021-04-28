@@ -72,6 +72,7 @@ std::string spreadsheet::proccess_next_message()
 	if (message_q.size() == 0)
 		return "empty";
 
+	std::cout << "Q SIZE: " << message_q.size() << std::endl;
 	std::vector<std::string> message = message_q.front();
 	message_q.pop();
 
@@ -100,7 +101,13 @@ std::string spreadsheet::proccess_next_message()
 		{
 			if(message.size() != 4)
 				return "Invalid number of data values sent in selectCell JSON";
-
+			
+			message.at(0) = "cellSelected";
+			for (int i = 0; i < client_list.size(); i++)
+			{
+				handle_connection* client = client_list.at(i);
+				client->server_response(message);
+			}
 
 		}
 		else if (message.at(0) == "undo")
@@ -177,7 +184,7 @@ std::vector<handle_connection*> spreadsheet::give_client()
 	{
 		//if (client_list[i] != -1)
 		//{
-			active_clients.push_back(client_list[i]);
+			//active_clients.push_back(client_list[i]);
 		//}
 	}
 
