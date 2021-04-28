@@ -163,6 +163,8 @@ bool handle_connection::complete_handshake_message()
 */
 std::vector<std::string> split_message(std::string message)
 {
+	const char* json = message;
+
 	rapidjson::Document doc;
 	//doc.Parse(message);
 
