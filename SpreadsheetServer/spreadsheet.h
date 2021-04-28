@@ -32,6 +32,8 @@ public:
 
 	std::string proccess_next_message();
 
+	bool needs_to_proccess_message();
+
 	void add_client(handle_connection* client);
 
 	void remove_client(handle_connection* client);

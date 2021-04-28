@@ -46,7 +46,7 @@ std::string server::get_list_of_spreadsheets()
 
 	std::string sheet_list; // String list of the spreadsheets to be returned for sending to the client
 
-	for (std::map<std::string, spreadsheet>::iterator i = spreadsheets.begin(); i != spreadsheets.end(); i++)
+	for (std::map<std::string, spreadsheet*>::iterator i = spreadsheets.begin(); i != spreadsheets.end(); i++)
 	{
 		sheet_list += i->first + '\n'; // Appends each spreadsheet file name to the string with an added newline between each filename
 	}
@@ -60,11 +60,11 @@ spreadsheet* server::open_sheet(std::string filename)
 		boost::filesystem::path sheet_dir(directory); // Creates a path object at the folder specified to hold the spreadsheets
 		boost::filesystem::ofstream new_file(sheet_dir / filename);
 		new_file.close();
-		spreadsheet new_sheet(filename);
-		spreadsheets.insert(std::pair<std::string, spreadsheet>(filename, new_sheet));
+		spreadsheet* new_sheet = new spreadsheet(filename);
+		spreadsheets.insert(std::pair<std::string, spreadsheet*>(filename, new_sheet));
 	}
 
-	return &spreadsheets[filename];
+	return spreadsheets[filename];
 }
 
 void server::put_spreadsheets_in_map()
@@ -78,8 +78,8 @@ void server::put_spreadsheets_in_map()
 	{
 		boost::filesystem::path sheet = (*i); // Sets the sheet path to whichever spreadsheet the iterator is currently pointing at
 		std::string filename = sheet.string().substr(directory.length() + 1, sheet.string().length() - directory.length() - 1); // Removes the filepath up until the actual spreadsheet file name
-		spreadsheet new_sheet(filename);
-		spreadsheets.insert(std::pair<std::string, spreadsheet>(filename, new_sheet));
+		spreadsheet* new_sheet = new spreadsheet(filename);
+		spreadsheets.insert(std::pair<std::string, spreadsheet*>(filename, new_sheet));
 	}
 
 }
@@ -97,17 +97,24 @@ int server::get_ID()
         while (loop)
         {
 	    bool idle = true;
-            for (std::map<std::string, spreadsheet>::iterator it = spreadsheets.begin(); it != spreadsheets.end(); it++)
+	    std::map<std::string, spreadsheet*>::iterator it;
+            for (it = spreadsheets.begin(); it != spreadsheets.end(); it++)
             {
-		    spreadsheet cur_sheet = it->second;
-		    std::string result = cur_sheet.proccess_next_message();
-		    if (result != "empty")
-			    idle = false;
+		    spreadsheet* cur_sheet = it->second;
+		    if (cur_sheet->needs_to_proccess_message())
+		    {
+			    process_message(cur_sheet);
+		    }
             }
 	    if (idle)
 	    	usleep(1 * 1000000 / 2);
         }
     }
+
+void server::process_message(spreadsheet* cur_sheet)
+{
+	std::string result = cur_sheet->proccess_next_message();
+}
 
 
 

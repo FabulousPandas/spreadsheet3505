@@ -46,10 +46,12 @@ private:
 
 	std::string directory = "SavedSpreadsheets";
 	std::vector<int> clients;
-	std::map<std::string, spreadsheet, Alphabetical> spreadsheets;
+	std::map<std::string, spreadsheet*, Alphabetical> spreadsheets;
 	int curID = 0;
 
 	void put_spreadsheets_in_map();
+
+	void process_message(spreadsheet* cur_sheet);
 
 
 

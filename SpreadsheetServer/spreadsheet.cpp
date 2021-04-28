@@ -72,7 +72,6 @@ std::string spreadsheet::proccess_next_message()
 	if (message_q.size() == 0)
 		return "empty";
 
-	std::cout << "Q SIZE: " << message_q.size() << std::endl;
 	std::vector<std::string> message = message_q.front();
 	message_q.pop();
 
@@ -136,6 +135,11 @@ std::string spreadsheet::proccess_next_message()
 
 
 	return "pass";
+}
+	
+bool spreadsheet::needs_to_proccess_message()
+{
+	return message_q.size() != 0;
 }
 
 cell spreadsheet::get_cell(std::string cell_name)
