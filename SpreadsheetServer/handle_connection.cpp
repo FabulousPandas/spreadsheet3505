@@ -63,8 +63,8 @@ void handle_connection::read_handler(const boost::system::error_code& err, size_
 					std::cout << "USERNAME IS " << client_username << std::endl; //TODO: REMOVE (FOR TESTING ONLY)
 					std::string spreadsheet_list = the_server.get_list_of_spreadsheets(); // Gets a list of spreadsheets from the server
 					send_message(spreadsheet_list);
+					message_buffer = "";
 				}
-				message_buffer = "";
 				break;
 			// Getting filename part of handshake
 			case 2:
@@ -76,11 +76,19 @@ void handle_connection::read_handler(const boost::system::error_code& err, size_
 					ID = the_server.get_ID();
 					send_message(std::to_string(ID) + '\n'); // TODO: ADD CREATING OR GETTING CELL DATA FROM FILE CHOSEN
 					con_state = 2;
+					message_buffer = "";
 				}
-				message_buffer = "";
 				break;
 			// Editing the spreadsheet communication
 			case 3:
+				if (complete_json_message())
+				{
+					std::string json_message = message_buffer;
+					std::vector<std::string> message = split_message(json_message);
+					this_sheet.add_to_q(message);
+					std::cout << "Message received: " << message_buffer << std::endl;
+					message_buffer = "";
+				}
 				read_message();
 				break;
 			// Shutting down the connection
@@ -138,7 +146,7 @@ void handle_connection::send_message(std::string message)
 }
 
 /*
- * Returns true if the message received by the server is complete by the rules of a handshake method.
+ * Returns true if the message received by the client is complete by the rules of a handshake method.
  * Also puts the message inside of the message buffer regardless of if it is complete or not
  */
 bool handle_connection::complete_handshake_message()
@@ -155,21 +163,57 @@ bool handle_connection::complete_handshake_message()
 }
 
 /*
+ * Returns true if the message received by the client is a complete json message.
+ * Also puts the message inside of the message buffer regardless of if it is complete or not
+ */
+bool handle_connection::complete_json_message()
+{
+	for (int i = 0; i < sizeof(delivered_message)/sizeof(*delivered_message); i++)
+	{
+		message_buffer += delivered_message[i];
+		if (delivered_message[i] == '}')
+		{
+			rapidjson::Document doc;
+			if (!doc.Parse(message_buffer.c_str()).HasParseError())
+				return true;
+		}
+	}
+	return false;
+}
+
+/*
 * Takes in the entire message from client, splits message into
 * a vector of strings containing:
 * index 0 = requestType
 * index 1 = cellName/ or empty
 * index 2 = cellContents/ or empty
 */
-std::vector<std::string> split_message(std::string message)
+std::vector<std::string> handle_connection::split_message(std::string message)
 {
-	const char* json = message;
+	const char* json = message.c_str();
 
 	rapidjson::Document doc;
-	//doc.Parse(message);
+	doc.Parse(json);
 
-	std::vector<std::string> dummy;
-	return dummy;
+	std::vector<std::string> values;
+
+	rapidjson::Value::ConstMemberIterator itr = doc.FindMember("requestType"); // Iterator that points at the member "requestType" in the json
+	//if (itr == doc.MemberEnd())
+		//TODO AAAA ERROR
+	values.push_back(itr->value.GetString()); // Pushes the value of that member to the first slot of the vector
+	if(values.at(0) != "undo") // If it's a requestType that has more members
+	{
+		rapidjson::Value::ConstMemberIterator itr = doc.FindMember("cellName");
+		values.push_back(itr->value.GetString());
+		if(values.at(0) == "editCell") // If it's a request type that has a 3rd member
+		{
+			rapidjson::Value::ConstMemberIterator itr = doc.FindMember("contents");
+			values.push_back(itr->value.GetString());
+		}
+
+	}
+
+	return values;
 
 }
 

@@ -8,6 +8,7 @@
 
 #include "spreadsheet.h"
 #include <boost/filesystem.hpp>
+#include <iostream> //TODO REMOVE
 
 spreadsheet::spreadsheet()
 {
@@ -20,6 +21,7 @@ spreadsheet::spreadsheet()
 spreadsheet::spreadsheet(std::string filepath)
 {
 	spreadsheet_name = filepath;
+	build_from_file();
 }
 
 /*
@@ -28,6 +30,13 @@ spreadsheet::spreadsheet(std::string filepath)
 void spreadsheet::add_to_q(std::vector<std::string> message)
 {
 	message_q.push(message);
+}
+
+void spreadsheet::build_from_file()
+{
+	boost::filesystem::path sheet_dir(spreadsheet_name);
+	boost::filesystem::ifstream file(sheet_dir);
+	file.close();
 }
 
 /*

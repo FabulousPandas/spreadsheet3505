@@ -21,6 +21,8 @@ public:
 
 	void add_to_q(std::vector<std::string> message);
 
+	void build_from_file();
+
 	void write_message_to_spreadsheet(std::vector<std::string> message);
 
 	void remake_file_from_history();
