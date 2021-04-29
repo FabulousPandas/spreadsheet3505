@@ -74,9 +74,6 @@ void handle_connection::read_handler(const boost::system::error_code& err, size_
 					std::cout << "FILENAME IS " << message_buffer << std::endl; //TODO: REMOVE (FOR TESTING ONLY)
 					this_sheet = the_server->open_sheet(message_buffer);
 					this_sheet->add_client(this);
-					ID = the_server->get_ID();
-					send_message(std::to_string(ID) + '\n'); // TODO: ADD CREATING OR GETTING CELL DATA FROM FILE CHOSEN
-					con_state = 2;
 					message_buffer = "";
 				}
 				break;
@@ -119,6 +116,8 @@ void handle_connection::write_handler(const boost::system::error_code& err, size
 				read_message();
 				break;
 			case 2:
+				ID = the_server->get_ID();
+				send_message(std::to_string(ID) + '\n'); // TODO: ADD CREATING OR GETTING CELL DATA FROM FILE CHOSEN
 				con_state = 3;
 				read_message();
 				break;

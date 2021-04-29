@@ -39,15 +39,23 @@ void spreadsheet::build_from_file()
 	boost::filesystem::ifstream file(sheet_dir);
 	std::string str;
 	int history_index = 0;
+	int message_index = 0;
+	std::vector<std::string> message;
+	message.push_back("");
+	message.push_back("");
+	message.push_back("");
 	while (std::getline(file, str))
 	{
 		if(str == "")
 		{
+			change_history.push_back(message);
 			history_index++;
+			message_index = 0;
 		}
 		else
 		{
-			change_history.at(history_index).push_back(str);
+			message.at(message_index) = str;
+			message_index++;
 		}
 	}
 	file.close();
@@ -192,6 +200,15 @@ cell* spreadsheet::get_cell(std::string cell_name)
 void spreadsheet::add_client(handle_connection* client)
 {
 	client_list.push_back(client);
+	for (int i = 0; i < change_history.size(); i++)
+	{
+		if (i == (change_history.size() - 1))
+			client->con_state = 2;
+
+		std::vector<std::string> message = change_history.at(i);
+		message.at(0) = "cellUpdated";
+		client->server_response(message);
+	}
 }
 
 /*
