@@ -8,7 +8,7 @@ int main(int argc, char** args)
 {
   if(argc == 1)
     {
-      std::cout << 6 << std::endl;
+      std::cout << 8 << std::endl;
       return 0;
     }
   // use a switch to find and run the correct test based on input
@@ -34,6 +34,12 @@ int main(int argc, char** args)
       break;
   case 6:
       tester::testClientDisconnectIsInfromed(args[2]);
+      break;
+  case 7:
+      tester::testUndo(args[2]);
+      break;
+  case 8:
+      tester::testEditAndUndoDifferentClient(args[2]);
       break;
   }
   return 0; 
@@ -124,21 +130,27 @@ void tester::testCircularDependency(std::string address)
   boost::system::error_code err;
   //send first edit
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A1\"} \n"));
+  usleep(1* 1000000 /2);
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A1\", \"contents\":\"3\"} \n"));
+  usleep(1* 1000000 /2);
   //clear buffer
-  std::vector<char> tempRec = std::vector<char>(100);
-  boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 100); 
-  boost::asio::read(socket, receive, boost::asio::transfer_all(), err); 
+  std::vector<char> tempRec = std::vector<char>(500);
+  boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 500); 
+  socket.read_some( receive, err); 
   //send second edit
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A2\"} \n"));
+  usleep(1* 1000000 /2);
+  //clear buffer
+  socket.read_some(receive, err);
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A2\", \"contents\":\"=A1 + A2\"} \n"));
+  usleep(3 *1000000);
   //check buffer
-  boost::asio::read(socket, receive, boost::asio::transfer_all(), err);
+  socket.read_some(receive, err);
   const char* data = boost::asio::buffer_cast<const char*>(receive);
   std::string temp(data);
   //ensure the server sends back the correct error response 
-  std::cout << "in the test \n" << temp << std::endl;
-  if(temp.find("requestError") && !err)
+  std::cout << temp << std::endl;
+  if(temp.find("requestError") != std::string::npos && !err)
   {
       std::cout << "pass \n" << std::endl;
   } else 
@@ -158,18 +170,22 @@ void tester::testSimultaniousEdit(std::string address)
   boost::asio::ip::tcp::socket socket2 = completeHandshake(address, "testSimultaniousEdit");
   //prep sockets by selecting a cell
   boost::asio::write(socket1, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A1\"} \n"));
+  usleep(1* 1000000 /2);
   boost::asio::write(socket2, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A1\"} \n"));
+  usleep(1* 1000000 /2);
   //send different message across both sockets 
   boost::asio::write(socket1, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A1\", \"contents\":\"3\"} \n"));
+  usleep(1* 1000000 /2);
   boost::asio::write(socket2, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A1\", \"contents\":\"4\"} \n"));
+  usleep(1* 1000000 /2);
   //check to make sure that the second value is the one selected
   boost::system::error_code err;
-  std::vector<char> tempRec = std::vector<char>(100);
-	boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 100); 
-  boost::asio::read(socket2, receive, boost::asio::transfer_all(), err);
+  std::vector<char> tempRec = std::vector<char>(500);
+  boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 500); 
+  socket2.read_some(receive, err);
   const char* data = boost::asio::buffer_cast<const char*>(receive);
   std::string temp(data);
-  if(temp.find("4") && !err)
+  if(temp.find("4") != std::string::npos && temp.find("cellUpdated") != std::string::npos &&  !err)
   {
     std::cout << "pass \n" << std::endl;
   } else 
@@ -186,16 +202,18 @@ void tester::testIfServerSendsIntBackAsString(std::string address)
   boost::asio::ip::tcp::socket socket = completeHandshake(address, "testIfServerSendsIntBackAsString");
   //select a cell
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A1\"} \n"));
+  usleep(1* 1000000 /2);
   //make a change request
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A1\", \"contents\":\"3\"} \n"));
   //confirm server sends it back
+  usleep(1 * 1000000 /2);
   boost::system::error_code err;
-  std::vector<char> tempRec = std::vector<char>(100);
-	boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 100); 
-  boost::asio::read(socket, receive, boost::asio::transfer_all(), err);
+  std::vector<char> tempRec = std::vector<char>(500);
+  boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 500); 
+  socket.read_some(receive, err);
   const char* data = boost::asio::buffer_cast<const char*>(receive);
   std::string temp(data);
-  if(temp.find("cellUpdated") && temp.find("3") && !err)
+  if(temp.find("cellUpdated") != std::string::npos && temp.find("3") != std::string::npos && !err)
   {
     std::cout << "pass \n" << std::endl;
   } else 
@@ -212,16 +230,18 @@ void tester::testIfServerSendsStringBackAsString(std::string address)
   boost::asio::ip::tcp::socket socket = completeHandshake(address, "testIfServerSendsStringBackAsString");
   //select a cell
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A1\"} \n"));
+  usleep(1* 1000000 /2);
   //make a change request
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A1\", \"contents\":\"test\"} \n"));
+  usleep(1* 1000000 /2);
   //confirm server sends it back
   boost::system::error_code err;
-  std::vector<char> tempRec = std::vector<char>(100);
-	boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 100); 
-  boost::asio::read(socket, receive, boost::asio::transfer_all(), err);
+  std::vector<char> tempRec = std::vector<char>(500);
+  boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 500); 
+  socket.read_some(receive, err);
   const char* data = boost::asio::buffer_cast<const char*>(receive);
   std::string temp(data);
-  if(temp.find("cellUpdated") && temp.find("test") && !err)
+  if(temp.find("cellUpdated") != std::string::npos && temp.find("test") != std::string::npos && !err)
   {
     std::cout << "pass \n" << std::endl;
   } else 
@@ -238,12 +258,12 @@ void tester::testClientDisconnectIsInfromed(std::string address)
   //diconect one client 
   socket1.close();
   boost::system::error_code err;
-  std::vector<char> tempRec = std::vector<char>(100);
-	boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 100); 
-  boost::asio::read(socket2, receive, boost::asio::transfer_all(), err);
+  std::vector<char> tempRec = std::vector<char>(500);
+	boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 500); 
+  socket2.read_some(receive, err);
   const char* data = boost::asio::buffer_cast<const char*>(receive);
   std::string temp(data);
-  if(temp.find("disconnected") && !err)
+  if(temp.find("disconnected") != std::string::npos && !err)
   {
     std::cout << "pass \n" << std::endl;
   } else 
@@ -257,20 +277,24 @@ void tester::testUndo(std::string address)
   boost::asio::ip::tcp::socket socket = completeHandshake(address, "testUndo");
   //select a cell
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A1\"} \n"));
+  usleep(1* 1000000 /2);
   //make a change request
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A1\", \"contents\":\"test\"} \n"));
+  usleep(1* 1000000 /2);
   //change to something else
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A1\", \"contents\":\"something\"} \n"));
+  usleep(1* 1000000 /2);
   //undo 
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"undo\"} \n"));
+  usleep(1* 1000000 /2);
   //check if it undid
   boost::system::error_code err;
-  std::vector<char> tempRec = std::vector<char>(100);
-  boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 100); 
-  boost::asio::read(socket, receive, boost::asio::transfer_all(), err);
+  std::vector<char> tempRec = std::vector<char>(500);
+  boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 500); 
+  socket.read_some(receive, err);
   const char* data = boost::asio::buffer_cast<const char*>(receive);
   std::string temp(data);
-  if(temp.find("test") && !err)
+  if(temp.find("test") != std::string::npos && !err)
   {
     std::cout << "pass \n" << std::endl;
   } else 
@@ -284,21 +308,26 @@ void tester::testEditAndUndoDifferentClient(std::string address)
   boost::asio::ip::tcp::socket socket1 = completeHandshake(address, "testEditAndUndoDifferentClient");
   boost::asio::ip::tcp::socket socket2 = completeHandshake(address, "testEditAndUndoDifferentClient");
   boost::asio::write(socket1, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A1\"} \n"));
+  usleep(1* 1000000 /2);
   //make a change request
   boost::asio::write(socket1, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A1\", \"contents\":\"test\"} \n"));
+  usleep(1* 1000000 /2);
   //change to something else
   boost::asio::write(socket2, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A1\"} \n"));
+  usleep(1* 1000000 /2);
   boost::asio::write(socket2, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A1\", \"contents\":\"something\"} \n"));
+  usleep(1* 1000000 /2);
   //undo 
   boost::asio::write(socket1, boost::asio::buffer("{\"requestType\":\"undo\"} \n"));
+  usleep(1* 1000000 /2);
   //check if it undid
     boost::system::error_code err;
-  std::vector<char> tempRec = std::vector<char>(100);
-	boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 100); 
-  boost::asio::read(socket2, receive, boost::asio::transfer_all(), err);
+  std::vector<char> tempRec = std::vector<char>(500);
+	boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 500); 
+  socket2.read_some(receive, err);
   const char* data = boost::asio::buffer_cast<const char*>(receive);
   std::string temp(data);
-  if(temp.find("test") && !err)
+  if(temp.find("test") != std::string::npos && !err)
   {
     std::cout << "pass \n" << std::endl;
   } else 
