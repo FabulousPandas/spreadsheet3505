@@ -128,21 +128,22 @@ namespace SS
                     break;
 
                 ServerMessage message = null;
-
                 try
                 {
                     message = JsonConvert.DeserializeObject<ServerMessage>(p);
                 }
                 catch(JsonSerializationException)
                 {
-                    int.TryParse(p, out int result);
-                    userID = result;
+                    if(int.TryParse(p, out int result))
+                    {
+                        userID = result;
+                        state.RemoveData(0, p.Length);
+                    }
                 }
                 if (message == null)
                     continue;
                 if(message.messageType == "cellUpdated")
                 {
-                    Console.WriteLine("Received cell update message");
                     int col = GetColumn(message.cellName), row = GetRow(message.cellName);
                     IList<string> updateList = SetCell(col, row, message.contents);
                     UpdateReceived(col, row, updateList);
@@ -182,16 +183,13 @@ namespace SS
 
         public void SelectCell(string cellName)
         {
-            Console.WriteLine("Cell selected: " + cellName);
             ClientRequest request = new ClientRequest { requestType = "selectCell", cellName = cellName };
             string requestString = JsonConvert.SerializeObject(request, Formatting.None, new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore });
-            Console.WriteLine(requestString);
             Networking.Send(server.TheSocket, requestString + "\n");
         }
 
         public void SendEditRequest(string cellName, string cellContents)
         {
-            Console.WriteLine("Edit request of cell: " + cellName + " to contents: " + cellContents);
             ClientRequest request = new ClientRequest { requestType = "editCell", cellName = cellName, contents = cellContents };
             string requestString = JsonConvert.SerializeObject(request, Formatting.None, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
             Networking.Send(server.TheSocket, requestString + "\n");
@@ -199,7 +197,6 @@ namespace SS
 
         public void SendUndoRequest()
         {
-            Console.WriteLine("Undo request sent to server");
             ClientRequest request = new ClientRequest { requestType = "undo" };
             string requestString = JsonConvert.SerializeObject(request, Formatting.None, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
             Networking.Send(server.TheSocket, requestString + "\n");
