@@ -21,6 +21,8 @@ class handle_connection
 {
 public:
 
+	int con_state;
+
 	handle_connection(boost::asio::io_context& io_context);
 
 	typedef boost::shared_ptr<handle_connection> pointer;
@@ -41,10 +43,9 @@ private:
 
 	server* the_server;
   
-	enum { max_length = 512 };
+	enum { max_length = 1024 };
 	char delivered_message[max_length];
 	std::string message_buffer;
-	int con_state;
 	std::string client_username;
 	int ID;
 	spreadsheet* this_sheet;

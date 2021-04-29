@@ -74,9 +74,6 @@ void handle_connection::read_handler(const boost::system::error_code& err, size_
 					std::cout << "FILENAME IS " << message_buffer << std::endl; //TODO: REMOVE (FOR TESTING ONLY)
 					this_sheet = the_server->open_sheet(message_buffer);
 					this_sheet->add_client(this);
-					ID = the_server->get_ID();
-					send_message(std::to_string(ID) + '\n'); // TODO: ADD CREATING OR GETTING CELL DATA FROM FILE CHOSEN
-					con_state = 2;
 					message_buffer = "";
 				}
 				break;
@@ -119,11 +116,13 @@ void handle_connection::write_handler(const boost::system::error_code& err, size
 				read_message();
 				break;
 			case 2:
+				ID = the_server->get_ID();
+				send_message(std::to_string(ID) + '\n'); // TODO: ADD CREATING OR GETTING CELL DATA FROM FILE CHOSEN
 				con_state = 3;
 				read_message();
 				break;
 			case 3:
-				read_message();
+				//read_message();
 				break;
 			case 4:
 				break;
@@ -138,44 +137,52 @@ void handle_connection::server_response(std::vector<std::string> message)
 
 	rapidjson::Document::AllocatorType& allocator = d.GetAllocator();
 
-	rapidjson::Value obj(rapidjson::kObjectType);
-	rapidjson::Value val(rapidjson::kObjectType);
-
-	val.SetString(message.at(0).c_str(), static_cast<rapidjson::SizeType>(message.at(0).length()), allocator);
-	obj.AddMember("messageType", val, allocator);
-	/*if (message.at(0) == "cellUpdated")
+	rapidjson::Value val(message.at(0).c_str(), allocator);
+	d.AddMember("messageType", val, allocator);
+	
+	if (message.at(0) == "cellUpdated")
 	{
-		d.AddMember("cellName", message.at(1), allocator);
-		d.AddMember("contents", message.at(2), allocator);
+		rapidjson::Value val1(message.at(1).c_str(), allocator);
+		d.AddMember("cellName", val1, allocator);
+		rapidjson::Value val2(message.at(2).c_str(), allocator);
+		d.AddMember("contents", val2, allocator);
 	}
 	else if (message.at(0) == "cellSelected")
 	{
-		d.AddMember("cellName", message.at(1), allocator);
-		d.AddMember("selector", message.at(2), allocator);
-		d.AddMember("selectorName", message.at(3), allocator);
+		rapidjson::Value val1(message.at(1).c_str(), allocator);
+		d.AddMember("cellName", val1, allocator);
+		//rapidjson::Value val2(std::stoi(message.at(2)), allocator);
+		d.AddMember("selector", std::stoi(message.at(2)), allocator);
+		rapidjson::Value val3(message.at(3).c_str(), allocator);
+		d.AddMember("selectorName", val3, allocator);
 	}
 	else if (message.at(0) == "disconnected")
 	{
-		d.AddMember("user", message.at(1), allocator);
+		rapidjson::Value val1(message.at(1).c_str(), allocator);
+		d.AddMember("user", val1, allocator);
 	}
 	else if (message.at(0) == "requestError")
 	{
-		d.AddMember("cellName", message.at(1), allocator);
-		d.AddMember("message", message.at(2), allocator);
+		rapidjson::Value val1(message.at(1).c_str(), allocator);
+		d.AddMember("cellName", val1, allocator);
+		rapidjson::Value val2(message.at(2).c_str(), allocator);
+		d.AddMember("message", val2, allocator);
 	}
 	else if (message.at(0) == "serverError")
 	{
-		d.AddMember("message", message.at(1), allocator);
+		rapidjson::Value val1(message.at(1).c_str(), allocator);
+		d.AddMember("message", val1, allocator);
 	}
-	*/
+	
 
 	rapidjson::StringBuffer str;
 	rapidjson::Writer<rapidjson::StringBuffer> writer(str);
 	d.Accept(writer);
+	std::string output = str.GetString();
 
-	std::cout << "SENDING TO CLIENT: " << str.GetString() << std::endl;
+	std::cout << "SENDING TO CLIENT: " << output << std::endl;
 
-	send_message(str.GetString());
+	send_message(output + '\n');
 	
 }
 
@@ -193,10 +200,10 @@ void handle_connection::send_message(std::string message)
 {
 	socket_.async_write_some(
 		boost::asio::buffer(message, max_length), // Sends the provided message to the client
-       	 	boost::bind(&handle_connection::write_handler, // Calls write_handler once the message has successfully been sent
-	                  shared_from_this(),
-           		  boost::asio::placeholders::error,
-	                  boost::asio::placeholders::bytes_transferred));
+       		boost::bind(&handle_connection::write_handler, // Calls write_handler once the message has successfully been sent
+                 	shared_from_this(),
+        	  	boost::asio::placeholders::error,
+	               	boost::asio::placeholders::bytes_transferred));
 }
 
 /*
