@@ -24,12 +24,6 @@ public:
 
 	void add_to_q(std::vector<std::string> message);
 
-	void build_from_file();
-
-	void write_message_to_spreadsheet(std::vector<std::string> message);
-
-	void remake_file_from_history();
-
 	std::string proccess_next_message();
 
 	bool needs_to_proccess_message();
@@ -56,6 +50,11 @@ private:
 	bool is_dependent(std::vector<std::string> message);
 
 	std::vector<handle_connection*> client_list;
+
+	void build_from_file();
+
+	void remake_file_from_history();
+
 
 
 

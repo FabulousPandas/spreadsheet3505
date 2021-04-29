@@ -37,28 +37,39 @@ void spreadsheet::build_from_file()
 {
 	boost::filesystem::path sheet_dir(spreadsheet_name);
 	boost::filesystem::ifstream file(sheet_dir);
+	std::string str;
+	int history_index = 0;
+	while (std::getline(file, str))
+	{
+		if(str == "")
+		{
+			history_index++;
+		}
+		else
+		{
+			change_history.at(history_index).push_back(str);
+		}
+	}
 	file.close();
 }
 
 /*
 * Saves the spreadsheet
 */
-void spreadsheet::write_message_to_spreadsheet(std::vector<std::string> message)
-{
-	std::cout << "NAME: " << spreadsheet_name << std::endl;
-	boost::filesystem::path sheet_dir(spreadsheet_name);
-	boost::filesystem::ofstream file(sheet_dir);
-	for (int i = 0; i < message.size(); i++)
-	{
-		file << message.at(i) << '\n';
-	}
-	file << '\n';
-	file.close();
-}
-
 void spreadsheet::remake_file_from_history()
 {
-
+	boost::filesystem::path sheet_dir(spreadsheet_name);
+	boost::filesystem::ofstream file(sheet_dir);
+	for (int i = 0; i < change_history.size(); i++)
+	{
+		std::vector<std::string> message = change_history.at(i);
+		for (int j = 0; j < message.size(); j++)
+		{
+			file << message.at(j) << '\n';
+		}
+		file << '\n';
+	}
+	file.close();
 }
 
 /*
@@ -85,7 +96,7 @@ std::string spreadsheet::proccess_next_message()
 			cell* this_cell = get_cell(message.at(1));
 			this_cell->add_edit(message.at(2));
 			change_history.push_back(message);
-			write_message_to_spreadsheet(message);
+			remake_file_from_history();
 			
 			message.at(0) = "cellUpdated";
 			for (int i = 0; i < client_list.size(); i++)

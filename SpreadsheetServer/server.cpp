@@ -60,7 +60,7 @@ spreadsheet* server::open_sheet(std::string filename)
 		boost::filesystem::path sheet_dir(directory); // Creates a path object at the folder specified to hold the spreadsheets
 		boost::filesystem::ofstream new_file(sheet_dir / filename);
 		new_file.close();
-		spreadsheet* new_sheet = new spreadsheet(filename);
+		spreadsheet* new_sheet = new spreadsheet(directory + '/' + filename);
 		spreadsheets.insert(std::pair<std::string, spreadsheet*>(filename, new_sheet));
 	}
 
@@ -78,7 +78,7 @@ void server::put_spreadsheets_in_map()
 	{
 		boost::filesystem::path sheet = (*i); // Sets the sheet path to whichever spreadsheet the iterator is currently pointing at
 		std::string filename = sheet.string().substr(directory.length() + 1, sheet.string().length() - directory.length() - 1); // Removes the filepath up until the actual spreadsheet file name
-		spreadsheet* new_sheet = new spreadsheet(filename);
+		spreadsheet* new_sheet = new spreadsheet(directory + '/' + filename);
 		spreadsheets.insert(std::pair<std::string, spreadsheet*>(filename, new_sheet));
 	}
 
