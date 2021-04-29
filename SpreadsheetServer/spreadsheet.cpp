@@ -44,6 +44,7 @@ void spreadsheet::build_from_file()
 	message.push_back("");
 	message.push_back("");
 	message.push_back("");
+	cell* this_cell;
 	while (std::getline(file, str))
 	{
 		if(str == "")
@@ -55,6 +56,14 @@ void spreadsheet::build_from_file()
 		else
 		{
 			message.at(message_index) = str;
+			if (message_index == 1)
+			{
+				this_cell = get_cell(str);
+			}
+			if (message_index == 2)
+			{
+				this_cell->add_edit(str);
+			}
 			message_index++;
 		}
 	}
@@ -82,16 +91,9 @@ void spreadsheet::remake_file_from_history()
 
 /*
 * Implements one message from the message_q
-* return "pass" if it was succesful 
-* return "empty" if the queue is empty
-* otherwise will return a string describing
-* the error
 */
-std::string spreadsheet::proccess_next_message()
+void spreadsheet::proccess_next_message()
 {
-	if (message_q.size() == 0)
-		return "empty";
-
 	std::vector<std::string> message = message_q.front();
 	message_q.pop();
 
@@ -99,10 +101,10 @@ std::string spreadsheet::proccess_next_message()
 	{
 		if (message.at(0) == "editCell")
 		{
-			if (message.size() != 3)
-				return "Invalid number of data values sent in editCell JSON";
 			cell* this_cell = get_cell(message.at(1));
 			this_cell->add_edit(message.at(2));
+			message.pop_back();
+			message.resize(3);
 			change_history.push_back(message);
 			remake_file_from_history();
 			
@@ -125,9 +127,6 @@ std::string spreadsheet::proccess_next_message()
 		}*/
 		else if (message.at(0) == "selectCell")
 		{
-			if(message.size() != 4)
-				return "Invalid number of data values sent in selectCell JSON";
-			
 			message.at(0) = "cellSelected";
 			for (int i = 0; i < client_list.size(); i++)
 			{
@@ -138,21 +137,23 @@ std::string spreadsheet::proccess_next_message()
 		}
 		else if (message.at(0) == "undo")
 		{
-			if (message.size() != 1)
-				return "Invalid number of data values sent in undo JSON";
-
 			if (change_history.size() == 0)
-				return "Tried to undo a spreadsheet with no changes";
+			{
+				send_client_error(message.at(1), "", "Tried to undo a spreadsheet with no changes");
+				return;
+			}
 
 			std::vector<std::string> prev_message = change_history.back();
 			cell* prev_cell = get_cell(prev_message.at(1));
-			std::cout << "TO GO BACK TO " << prev_message.at(0) << ": " << prev_message.at(1) << std::endl;
 			if (prev_message.at(0) == "editCell")
 			{
+				for (int i = 0; i < prev_message.size(); i++)
+				{
+					std::cout << "GO BACK TO THIS: " << prev_message.at(i) << std::endl;
+				}
 				prev_cell->remove_edit();
-				std::cout << "HEY MALIK" << std::endl;
 				message.at(0) = "cellUpdated";
-				message.push_back(prev_message.at(1));
+				message.at(1) = prev_message.at(1);
 				message.push_back(prev_cell->cell_content());
 				for (int i = 0; i < client_list.size(); i++)
 				{
@@ -168,16 +169,19 @@ std::string spreadsheet::proccess_next_message()
 			change_history.pop_back();
 			remake_file_from_history();
 		}
-		else
-		{
-			return "Unknown requestType sent to server";
-		}
 	}
-
-
-	return "pass";
 }
 	
+void spreadsheet::send_client_error(std::string client_id, std::string cell_name, std::string error_message)
+{
+	handle_connection* client = id_to_client[std::stoi(client_id)];
+	std::vector<std::string> message;
+	message.push_back("requestError");
+	message.push_back(cell_name);
+	message.push_back(error_message);
+	client->server_response(message);
+}
+
 bool spreadsheet::needs_to_proccess_message()
 {
 	return message_q.size() != 0;
@@ -195,7 +199,7 @@ cell* spreadsheet::get_cell(std::string cell_name)
 }
 
 /*
-* Adds a client useing their id to client_list
+* Adds a client using their id to client_list
 */
 void spreadsheet::add_client(handle_connection* client)
 {
@@ -220,6 +224,14 @@ void spreadsheet::add_client(handle_connection* client)
 		message.at(0) = "cellUpdated";
 		client->server_response(message);
 	}
+}
+
+/*
+ * Adds an id-client object map pairing to the spreadsheet
+ */ 
+void spreadsheet::add_client_id(int id, handle_connection* client)
+{
+	id_to_client.insert(std::pair<int, handle_connection*>(id, client));
 }
 
 /*

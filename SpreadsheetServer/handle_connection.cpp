@@ -83,9 +83,9 @@ void handle_connection::read_handler(const boost::system::error_code& err, size_
 				{
 					std::string json_message = message_buffer;
 					std::vector<std::string> message = split_message(json_message);
+					message.push_back(std::to_string(ID));
 					if (message.at(0) == "selectCell")
 					{
-						message.push_back(std::to_string(ID));
 						message.push_back(client_username);
 					}
 					this_sheet->add_to_q(message);
@@ -117,6 +117,7 @@ void handle_connection::write_handler(const boost::system::error_code& err, size
 				break;
 			case 2:
 				ID = the_server->get_ID();
+				this_sheet->add_client_id(ID, this);
 				send_message(std::to_string(ID) + '\n'); // TODO: ADD CREATING OR GETTING CELL DATA FROM FILE CHOSEN
 				con_state = 3;
 				read_message();

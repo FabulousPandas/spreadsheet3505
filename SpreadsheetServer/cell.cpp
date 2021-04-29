@@ -1,5 +1,4 @@
 #include "cell.h"
-#include <iostream> //TODO REMOVE
 	
 	/*
 	* Cell constructor
@@ -43,7 +42,6 @@
 	*/
 	void cell::remove_edit()
 	{
-		std::cout << cell_name << " EDIT SIZE " << undo_stack.size() << std::endl;
 		undo_stack.pop();
 	}
 	/*

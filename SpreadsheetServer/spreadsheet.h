@@ -24,11 +24,13 @@ public:
 
 	void add_to_q(std::vector<std::string> message);
 
-	std::string proccess_next_message();
+	void proccess_next_message();
 
 	bool needs_to_proccess_message();
 
 	void add_client(handle_connection* client);
+
+	void add_client_id(int id, handle_connection* client);
 
 	void remove_client(handle_connection* client);
 
@@ -47,15 +49,17 @@ private:
 
 	cell* get_cell(std::string cell_name);
 
-	bool is_dependent(std::vector<std::string> message);
-
 	std::vector<handle_connection*> client_list;
+
+	std::map<int, handle_connection*> id_to_client;
+
+	bool is_dependent(std::vector<std::string> message);
 
 	void build_from_file();
 
 	void remake_file_from_history();
 
-
+	void send_client_error(std::string client_id, std::string cell_name, std::string error_message);
 
 
 
