@@ -268,6 +268,20 @@ std::vector<handle_connection*> spreadsheet::give_client()
 	return active_clients;
 }
 
+void spreadsheet::disconnect_client(int id, handle_connection* client)
+{
+	id_to_client.erase(id);
+	client_list.erase(std::find(client_list.begin(), client_list.end(), client));
+	std::vector<std::string> message;
+	message.push_back("disconnected");
+	message.push_back(std::to_string(id));
+	for(int i = 0; i < client_list.size(); i++)
+	{
+		handle_connection* client = client_list.at(i);
+		client->server_response(message);
+	}
+}
+
 /*
 * returns false if the message would not cause a
 * dependency in the spreadsheet

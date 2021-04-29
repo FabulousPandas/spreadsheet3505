@@ -15,6 +15,7 @@ handle_connection::handle_connection(boost::asio::io_context& io_context)
 	message_buffer = "";
 	con_state = 0;
 	client_username = "";
+	ID = -1;
 }
 
 /*
@@ -51,6 +52,12 @@ void handle_connection::start(server* serv)
  */
 void handle_connection::read_handler(const boost::system::error_code& err, size_t bytes_transferred)
 {
+	if ((boost::asio::error::eof == err) || (boost::asio::error::connection_reset == err))
+    	{
+		if (this_sheet != NULL)
+			this_sheet->disconnect_client(ID, this);
+		return;
+    	}
 	if (!err)
 	{
 		switch(con_state)

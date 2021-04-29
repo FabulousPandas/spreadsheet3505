@@ -53,6 +53,8 @@ private:
 
 	void process_message(spreadsheet* cur_sheet);
 
+	//void signal_handler(int signum);
+
 
 
 

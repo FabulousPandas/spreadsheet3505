@@ -6,10 +6,16 @@
 #include <iterator>
 #include <string>
 #include "listener.h"
-#include<unistd.h>
+#include <unistd.h>
+#include <csignal>
 
 using namespace boost::asio;
 
+void signal_handler(int signum)
+{
+	//std::cout << "SERVER SHUTDOWN" << std::endl;
+	//TODO: NOTIFY ALL SPREADSHEETS SO THEY CAN SEND ALL OF THEIR CLIENTS THE SHUTDOWN MESSAGE
+}
 
 int main()
 {
@@ -18,7 +24,7 @@ int main()
     {
 
 	server* the_server = new server;
-
+    	//std::signal(SIGINT, signal_handler);
         io_context io_context;
         listener listen(io_context, the_server);
 	boost::thread t(boost::bind(&boost::asio::io_context::run, &io_context));
@@ -29,7 +35,6 @@ int main()
     {
         std::cerr << e.what() << std::endl;
     }
-
 
     return 0;
 }
@@ -116,7 +121,6 @@ void server::process_message(spreadsheet* cur_sheet)
 {
 	cur_sheet->proccess_next_message();
 }
-
 
 
 

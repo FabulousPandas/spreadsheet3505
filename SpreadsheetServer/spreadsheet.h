@@ -36,6 +36,8 @@ public:
 
 	std::vector<handle_connection*> give_client();
 
+	void disconnect_client(int id, handle_connection* client);
+
 
 
 private:
