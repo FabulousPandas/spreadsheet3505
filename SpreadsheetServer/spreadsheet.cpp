@@ -38,7 +38,7 @@ void spreadsheet::build_from_file()
 	boost::filesystem::path sheet_dir(spreadsheet_name);
 	boost::filesystem::ifstream file(sheet_dir);
 	std::string str;
-	int history_index = 0;
+	int history_index = 1;
 	int message_index = 0;
 	std::vector<std::string> message;
 	message.push_back("");
@@ -200,6 +200,17 @@ cell* spreadsheet::get_cell(std::string cell_name)
 void spreadsheet::add_client(handle_connection* client)
 {
 	client_list.push_back(client);
+	
+	if(change_history.size() == 0)
+	{
+		client->con_state = 2;
+		std::vector<std::string> message;
+		message.push_back("cellUpdated");
+		message.push_back("A1");
+		message.push_back("");
+		client->server_response(message);
+	}
+
 	for (int i = 0; i < change_history.size(); i++)
 	{
 		if (i == (change_history.size() - 1))
