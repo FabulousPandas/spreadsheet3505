@@ -45,6 +45,7 @@ void spreadsheet::build_from_file()
 */
 void spreadsheet::write_message_to_spreadsheet(std::vector<std::string> message)
 {
+	std::cout << "NAME: " << spreadsheet_name << std::endl;
 	boost::filesystem::path sheet_dir(spreadsheet_name);
 	boost::filesystem::ofstream file(sheet_dir);
 	for (int i = 0; i < message.size(); i++)
@@ -81,12 +82,19 @@ std::string spreadsheet::proccess_next_message()
 		{
 			if (message.size() != 3)
 				return "Invalid number of data values sent in editCell JSON";
-			cell this_cell = get_cell(message.at(1));
-			this_cell.add_edit(message.at(2));
+			cell* this_cell = get_cell(message.at(1));
+			this_cell->add_edit(message.at(2));
 			change_history.push_back(message);
 			write_message_to_spreadsheet(message);
+			
+			message.at(0) = "cellUpdated";
+			for (int i = 0; i < client_list.size(); i++)
+			{
+				handle_connection* client = client_list.at(i);
+				client->server_response(message);
+			}
 		}
-		else if (message.at(0) == "revertCell")
+		/*else if (message.at(0) == "revertCell")
 		{
 			if (message.size() != 2)
 				return "Invalid number of data values sent in revertCell JSON";
@@ -95,7 +103,7 @@ std::string spreadsheet::proccess_next_message()
 			this_cell.revert();
 			change_history.push_back(message);
 			write_message_to_spreadsheet(message);	
-		}
+		}*/
 		else if (message.at(0) == "selectCell")
 		{
 			if(message.size() != 4)
@@ -114,16 +122,30 @@ std::string spreadsheet::proccess_next_message()
 			if (message.size() != 1)
 				return "Invalid number of data values sent in undo JSON";
 
+			if (change_history.size() == 0)
+				return "Tried to undo a spreadsheet with no changes";
+
 			std::vector<std::string> prev_message = change_history.back();
-			cell prev_cell = get_cell(prev_message.at(1));
+			cell* prev_cell = get_cell(prev_message.at(1));
+			std::cout << "TO GO BACK TO " << prev_message.at(0) << ": " << prev_message.at(1) << std::endl;
 			if (prev_message.at(0) == "editCell")
 			{
-				prev_cell.remove_edit();
+				prev_cell->remove_edit();
+				std::cout << "HEY MALIK" << std::endl;
+				message.at(0) = "cellUpdated";
+				message.push_back(prev_message.at(1));
+				message.push_back(prev_cell->cell_content());
+				for (int i = 0; i < client_list.size(); i++)
+				{
+					handle_connection* client = client_list.at(i);
+					client->server_response(message);
+				}
+
 			} 
-			else if (prev_message.at(0) == "revertCell")
+			/*else if (prev_message.at(0) == "revertCell")
 			{
 				prev_cell.undo_revert();
-			}
+			}*/
 			change_history.pop_back();
 			remake_file_from_history();
 		}
@@ -142,13 +164,13 @@ bool spreadsheet::needs_to_proccess_message()
 	return message_q.size() != 0;
 }
 
-cell spreadsheet::get_cell(std::string cell_name)
+cell* spreadsheet::get_cell(std::string cell_name)
 {
 
-	std::map<std::string, cell>::iterator it = cell_map.find(cell_name);
+	std::map<std::string, cell*>::iterator it = cell_map.find(cell_name);
 	if (it == cell_map.end()) // If the cell map doesn't contain this cell
 	{
-		it = cell_map.insert(std::pair<std::string, cell>(cell_name, cell(cell_name))).first; // Add a new cell to the map
+		it = cell_map.insert(std::pair<std::string, cell*>(cell_name, new cell(cell_name))).first; // Add a new cell to the map
 	}
  	return it->second; // Gets the cell value from the cell name key specified earlier
 }

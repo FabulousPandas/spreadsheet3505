@@ -1,4 +1,5 @@
 #include "cell.h"
+#include <iostream> //TODO REMOVE
 	
 	/*
 	* Cell constructor
@@ -6,6 +7,7 @@
 	cell::cell(std::string name)
 	{
 		cell_name = name;
+		undo_stack.push("");
 	}
 	/*
 	* changes cell contenst to param edit
@@ -41,6 +43,7 @@
 	*/
 	void cell::remove_edit()
 	{
+		std::cout << cell_name << " EDIT SIZE " << undo_stack.size() << std::endl;
 		undo_stack.pop();
 	}
 	/*

@@ -41,7 +41,7 @@ private:
 
 	server* the_server;
   
-	enum { max_length = 512 };
+	enum { max_length = 1024 };
 	char delivered_message[max_length];
 	std::string message_buffer;
 	int con_state;

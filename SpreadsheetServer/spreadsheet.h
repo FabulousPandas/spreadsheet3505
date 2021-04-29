@@ -45,13 +45,13 @@ public:
 private:
 	std::queue<std::vector<std::string>> message_q;
 
-	std::map<std::string, cell> cell_map;
+	std::map<std::string, cell*> cell_map;
 
 	std::vector<std::vector<std::string>> change_history;
 
 	std::string spreadsheet_name;
 
-	cell get_cell(std::string cell_name);
+	cell* get_cell(std::string cell_name);
 
 	bool is_dependent(std::vector<std::string> message);
 
