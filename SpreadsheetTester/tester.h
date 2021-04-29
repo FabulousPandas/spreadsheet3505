@@ -15,6 +15,8 @@ static void testSimultaniousEdit(std::string address);
 static void testIfServerSendsIntBackAsString(std::string address);
 static void testIfServerSendsStringBackAsString(std::string address);
 static void testClientDisconnectIsInfromed(std::string address);
+static void testUndo(std::string address);
+static void testEditAndUndoDifferentClient(std::string address);
 
 private:
 static boost::asio::ip::tcp::socket connectToServer(std::string serverip);
