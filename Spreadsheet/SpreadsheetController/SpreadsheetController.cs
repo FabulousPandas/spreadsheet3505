@@ -12,6 +12,9 @@ namespace SS
         public delegate void ErrorHandler(string err);
         public event ErrorHandler Error;
 
+        public delegate void ErrorNoDisconnect(string err);
+        public event ErrorNoDisconnect ErrorND;
+
         public delegate void ConnectedHandler();
         public event ConnectedHandler Connected;
 
@@ -162,7 +165,7 @@ namespace SS
                 }
                 else if (message.messageType == "requestError")
                 {
-                    Error("Error in cell: " + message.cellName + "\nReason: " + message.message);
+                    ErrorND("Error in cell: " + message.cellName + "\nReason: " + message.message);
                 }
                 else if (message.messageType == "serverError")
                 {

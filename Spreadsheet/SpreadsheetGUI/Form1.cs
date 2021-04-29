@@ -23,7 +23,8 @@ namespace SpreadsheetGUI
         {
             InitializeComponent();
             this.controller = control;
-            controller.Error += ShowError;
+            controller.Error += DisconnectError;
+            controller.ErrorND += RegularError;
             controller.Connected += OnConnect;
             controller.SpreadsheetReceived += ReceivedSpreadsheets;
             controller.UpdateReceived += ReceivedUpdate;
@@ -145,23 +146,29 @@ namespace SpreadsheetGUI
             
         }
 
-        private void ShowError(string errorMessage)
+        private void DisconnectError(string errorMessage)
         {
             MessageBox.Show(errorMessage);
             //re enable connect to server if connection failed
             MethodInvoker invoker =
             new MethodInvoker(
                 () => 
-                { 
+                { //if you get disconnected, everything should be cleared
                     this.connectToServerToolStripMenuItem.Enabled = true;
                     this.spreadsheetPanel.Clear();
                     this.spreadsheetPanel.Enabled = false;
                     this.cellNameTextBox.Enabled = false;
                     this.cellInputTextBox.Enabled = false;
                     this.setCellButton.Enabled = false;
+                    this.undoButton.Enabled = false;
                 }
             );
             this.Invoke(invoker);
+        }
+
+        private void RegularError(string errorMessage)
+        {
+            MessageBox.Show(errorMessage);
         }
 
         private void OnConnect()
@@ -172,7 +179,7 @@ namespace SpreadsheetGUI
             new MethodInvoker(
                 () => 
                 {
-                    this.connectToServerToolStripMenuItem.Enabled = false; 
+                    this.connectToServerToolStripMenuItem.Enabled = false;
                 }
             );
             this.Invoke(invoker);
@@ -259,5 +266,6 @@ namespace SpreadsheetGUI
         {
             controller.SendEditRequest(cellNameTextBox.Text, cellInputTextBox.Text);
         }
+
     }
 }
