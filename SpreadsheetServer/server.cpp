@@ -104,6 +104,7 @@ int server::get_ID()
 		    if (cur_sheet->needs_to_proccess_message())
 		    {
 			    process_message(cur_sheet);
+			    idle = false;
 		    }
             }
 	    if (idle)
@@ -113,7 +114,7 @@ int server::get_ID()
 
 void server::process_message(spreadsheet* cur_sheet)
 {
-	std::string result = cur_sheet->proccess_next_message();
+	cur_sheet->proccess_next_message();
 }
 
 
