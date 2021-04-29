@@ -44,6 +44,7 @@
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.spreadsheetPanel = new SS.SpreadsheetPanel();
+            this.disconnectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.verticleSplitContainer)).BeginInit();
             this.verticleSplitContainer.Panel1.SuspendLayout();
             this.verticleSplitContainer.Panel2.SuspendLayout();
@@ -179,6 +180,7 @@
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.connectToServerToolStripMenuItem,
+            this.disconnectToolStripMenuItem,
             this.closeToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
@@ -213,6 +215,14 @@
             this.spreadsheetPanel.Name = "spreadsheetPanel";
             this.spreadsheetPanel.Size = new System.Drawing.Size(800, 363);
             this.spreadsheetPanel.TabIndex = 0;
+            // 
+            // disconnectToolStripMenuItem
+            // 
+            this.disconnectToolStripMenuItem.Enabled = false;
+            this.disconnectToolStripMenuItem.Name = "disconnectToolStripMenuItem";
+            this.disconnectToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.disconnectToolStripMenuItem.Text = "Disconnect";
+            this.disconnectToolStripMenuItem.Click += new System.EventHandler(this.disconnectToolStripMenuItem_Click);
             // 
             // SpreadsheetForm
             // 
@@ -254,6 +264,7 @@
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.Button undoButton;
         private System.Windows.Forms.ToolStripMenuItem connectToServerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem disconnectToolStripMenuItem;
     }
 }
 

@@ -24,7 +24,7 @@ namespace SS
         public delegate void UpdateReceivedHandler(int col, int row, IList<string> updateList);
         public event UpdateReceivedHandler UpdateReceived;
 
-        public delegate void SelectionMadeHandler(string cellName);
+        public delegate void SelectionMadeHandler(string cellName, string cellContents);
         public event SelectionMadeHandler SelectionMade;
 
         private List<string> spreadsheetList;
@@ -38,6 +38,11 @@ namespace SS
         {
             username = name;
             Networking.ConnectToServer(OnConnect, addr, port);
+        }
+
+        public void Disconnect()
+        {
+            Networking.SendAndClose(server.TheSocket, "");
         }
 
         private void OnConnect(SocketState state)
@@ -155,7 +160,7 @@ namespace SS
                 {
                     if(message.selectorName == username && message.selector == userID)
                     {
-                        SelectionMade(message.cellName);
+                        SelectionMade(message.cellName, GetCellContents(GetColumn(message.cellName), GetRow(message.cellName)));
                     }
                 }
                 else if (message.messageType == "disconnected")

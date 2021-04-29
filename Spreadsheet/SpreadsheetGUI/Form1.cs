@@ -153,8 +153,10 @@ namespace SpreadsheetGUI
             MethodInvoker invoker =
             new MethodInvoker(
                 () => 
-                { //if you get disconnected, everything should be cleared
+                { 
+                    //if you get disconnected, everything should be cleared and buttons should be disabled besides the connect option
                     this.connectToServerToolStripMenuItem.Enabled = true;
+                    this.disconnectToolStripMenuItem.Enabled = false;
                     this.spreadsheetPanel.Clear();
                     this.spreadsheetPanel.Enabled = false;
                     this.cellNameTextBox.Enabled = false;
@@ -180,6 +182,7 @@ namespace SpreadsheetGUI
                 () => 
                 {
                     this.connectToServerToolStripMenuItem.Enabled = false;
+                    this.disconnectToolStripMenuItem.Enabled = true;
                 }
             );
             this.Invoke(invoker);
@@ -233,7 +236,7 @@ namespace SpreadsheetGUI
             
         }
 
-        private void SelectedCell(string cellName)
+        private void SelectedCell(string cellName, string cellContents)
         {
             MethodInvoker invoker =
             new MethodInvoker(
@@ -245,6 +248,7 @@ namespace SpreadsheetGUI
 
                     //update selected cell text box
                     cellNameTextBox.Text = cellName;
+                    cellInputTextBox.Text = cellContents;
                 }
             );
             this.Invoke(invoker);
@@ -267,5 +271,9 @@ namespace SpreadsheetGUI
             controller.SendEditRequest(cellNameTextBox.Text, cellInputTextBox.Text);
         }
 
+        private void disconnectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            controller.Disconnect();
+        }
     }
 }
