@@ -47,7 +47,6 @@ boost::asio::ip::tcp::socket tester::connectToServer(std::string serverip)
   std::string delimiter = ":";
   std::string address = serverip.substr(0, serverip.find(delimiter));
   std::string port = serverip.substr(serverip.find(delimiter) + 1, serverip.length());
-  
   boost::asio::io_context io_context;
   //create a socket to communicate on
   boost::asio::ip::tcp::socket socket(io_context);
@@ -67,30 +66,21 @@ boost::asio::ip::tcp::socket tester::connectToServer(std::string serverip)
  **/
 boost::asio::ip::tcp::socket tester::completeHandshake(std::string serverip, std::string username)
 {
-  boost::asio::ip::tcp::socket socket = connectToServer(serverip);
+    boost::asio::ip::tcp::socket socket = connectToServer(serverip);
     boost::system::error_code err;
     boost::asio::write(socket, boost::asio::buffer(username + "\n"), err); // send username 
     if(!err)
     {
       std::vector<char> tempRec = std::vector<char>(100);
-      boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 100); 
-      boost::asio::read(socket, receive, boost::asio::transfer_all(), err); // get list of sheets
-        if(!err)
+      boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 100);
+      std::cout << "waiting to recieve" << std::endl;
+      socket.read_some(receive, err); // get list of sheets
+      if(!err)
         {
             boost::asio::write(socket, boost::asio::buffer(username + "\n"), err); // make new sheet
             if(!err)
             {
-                char* data;
-                std::string temp(data);
-                while(temp.find("\n") != std::string::npos) // loop until all updates for the sever are processed
-                {
-                boost::asio::read(socket, receive, boost::asio::transfer_all(), err);
-                if(!err)
-                {
-                    data = boost::asio::buffer_cast<char*>(receive);
-                    temp = std::string(data);
-                }
-                }
+	      usleep(3 * 1000000);   
             }
         } else 
         {
@@ -147,6 +137,7 @@ void tester::testCircularDependency(std::string address)
   const char* data = boost::asio::buffer_cast<const char*>(receive);
   std::string temp(data);
   //ensure the server sends back the correct error response 
+  std::cout << "in the test \n" << temp << std::endl;
   if(temp.find("requestError") && !err)
   {
       std::cout << "pass \n" << std::endl;
