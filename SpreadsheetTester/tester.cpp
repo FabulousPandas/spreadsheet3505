@@ -134,8 +134,8 @@ void tester::testCircularDependency(std::string address)
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A1\", \"contents\":\"3\"} \n"));
   usleep(1* 1000000 /2);
   //clear buffer
-  std::vector<char> tempRec = std::vector<char>(1000);
-  boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 1000); 
+  std::vector<char> tempRec = std::vector<char>(500);
+  boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 500); 
   socket.read_some( receive, err); 
   //send second edit
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A2\"} \n"));
@@ -180,12 +180,12 @@ void tester::testSimultaniousEdit(std::string address)
   usleep(1* 1000000 /2);
   //check to make sure that the second value is the one selected
   boost::system::error_code err;
-  std::vector<char> tempRec = std::vector<char>(1000);
-  boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 1000); 
+  std::vector<char> tempRec = std::vector<char>(500);
+  boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 500); 
   socket2.read_some(receive, err);
   const char* data = boost::asio::buffer_cast<const char*>(receive);
   std::string temp(data);
-  if(temp.find("4") != std::string::npos && !err)
+  if(temp.find("4") != std::string::npos && temp.find("cellUpdated") != std::string::npos &&  !err)
   {
     std::cout << "pass \n" << std::endl;
   } else 
@@ -208,8 +208,8 @@ void tester::testIfServerSendsIntBackAsString(std::string address)
   //confirm server sends it back
   usleep(1 * 1000000 /2);
   boost::system::error_code err;
-  std::vector<char> tempRec = std::vector<char>(1000);
-  boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 1000); 
+  std::vector<char> tempRec = std::vector<char>(500);
+  boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 500); 
   socket.read_some(receive, err);
   const char* data = boost::asio::buffer_cast<const char*>(receive);
   std::string temp(data);
@@ -236,12 +236,12 @@ void tester::testIfServerSendsStringBackAsString(std::string address)
   usleep(1* 1000000 /2);
   //confirm server sends it back
   boost::system::error_code err;
-  std::vector<char> tempRec = std::vector<char>(1000);
-  boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 1000); 
+  std::vector<char> tempRec = std::vector<char>(500);
+  boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 500); 
   socket.read_some(receive, err);
   const char* data = boost::asio::buffer_cast<const char*>(receive);
   std::string temp(data);
-  if(temp.find("cellUpdated") != std::string::npos && temp.find("test") && !err)
+  if(temp.find("cellUpdated") != std::string::npos && temp.find("test") != std::string::npos && !err)
   {
     std::cout << "pass \n" << std::endl;
   } else 
@@ -258,8 +258,8 @@ void tester::testClientDisconnectIsInfromed(std::string address)
   //diconect one client 
   socket1.close();
   boost::system::error_code err;
-  std::vector<char> tempRec = std::vector<char>(1000);
-	boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 1000); 
+  std::vector<char> tempRec = std::vector<char>(500);
+	boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 500); 
   socket2.read_some(receive, err);
   const char* data = boost::asio::buffer_cast<const char*>(receive);
   std::string temp(data);
@@ -289,8 +289,8 @@ void tester::testUndo(std::string address)
   usleep(1* 1000000 /2);
   //check if it undid
   boost::system::error_code err;
-  std::vector<char> tempRec = std::vector<char>(1000);
-  boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 1000); 
+  std::vector<char> tempRec = std::vector<char>(500);
+  boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 500); 
   socket.read_some(receive, err);
   const char* data = boost::asio::buffer_cast<const char*>(receive);
   std::string temp(data);
@@ -322,8 +322,8 @@ void tester::testEditAndUndoDifferentClient(std::string address)
   usleep(1* 1000000 /2);
   //check if it undid
     boost::system::error_code err;
-  std::vector<char> tempRec = std::vector<char>(1000);
-	boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 1000); 
+  std::vector<char> tempRec = std::vector<char>(500);
+	boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 500); 
   socket2.read_some(receive, err);
   const char* data = boost::asio::buffer_cast<const char*>(receive);
   std::string temp(data);
