@@ -275,8 +275,8 @@ void tester::testUndo(std::string address)
   //check if it undid
   boost::system::error_code err;
   std::vector<char> tempRec = std::vector<char>(100);
-	boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 100); 
-  boost::asio::read(socket2, receive, boost::asio::transfer_all(), err);
+  boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 100); 
+  boost::asio::read(socket, receive, boost::asio::transfer_all(), err);
   const char* data = boost::asio::buffer_cast<const char*>(receive);
   std::string temp(data);
   if(temp.find("test") && !err)
@@ -292,10 +292,11 @@ void tester::testEditAndUndoDifferentClient(std::string address)
 {
   boost::asio::ip::tcp::socket socket1 = completeHandshake(address, "testEditAndUndoDifferentClient");
   boost::asio::ip::tcp::socket socket2 = completeHandshake(address, "testEditAndUndoDifferentClient");
-  boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A1\"} \n"));
+  boost::asio::write(socket1, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A1\"} \n"));
   //make a change request
   boost::asio::write(socket1, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A1\", \"contents\":\"test\"} \n"));
   //change to something else
+  boost::asio::write(socket2, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A1\"} \n"));
   boost::asio::write(socket2, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A1\", \"contents\":\"something\"} \n"));
   //undo 
   boost::asio::write(socket1, boost::asio::buffer("{\"requestType\":\"undo\"} \n"));
