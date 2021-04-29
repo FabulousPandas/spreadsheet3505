@@ -257,6 +257,7 @@ void tester::testClientDisconnectIsInfromed(std::string address)
   boost::asio::ip::tcp::socket socket2 = completeHandshake(address, "testClientDisconnectIsInfromed");
   //diconect one client 
   socket1.close();
+  usleep(1*1000000);
   boost::system::error_code err;
   std::vector<char> tempRec = std::vector<char>(500);
 	boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 500); 
