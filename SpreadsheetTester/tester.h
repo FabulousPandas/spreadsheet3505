@@ -9,13 +9,18 @@ class tester
 {
 
 public:
-static int testServerConnect(std::string address);
-static int testCircularDependency(std::string address);
-static int testSimultaniousEdit(std::string address);
+static void testServerConnect(std::string address);
+static void testCircularDependency(std::string address);
+static void testSimultaniousEdit(std::string address);
+static void testIfServerSendsIntBackAsString(std::string address);
+static void testIfServerSendsStringBackAsString(std::string address);
+static void testClientDisconnectIsInfromed(std::string address);
+static void testUndo(std::string address);
+static void testEditAndUndoDifferentClient(std::string address);
 
 private:
 static boost::asio::ip::tcp::socket connectToServer(std::string serverip);
-static boost::asio::ip::tcp::socket tester::completeHandshake(std::string serverip, std::string username)
+static boost::asio::ip::tcp::socket completeHandshake(std::string serverip, std::string username);
 };
 
 #endif
