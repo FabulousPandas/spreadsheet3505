@@ -165,8 +165,8 @@ namespace SS
                 }
                 else if (message.messageType == "disconnected")
                 {
-                    if (message.user == userID)
-                        Error("Disconnected from server");
+                    //if (message.user == userID)
+                        ErrorND("User #" + userID + " has disconnected from the server");
                 }
                 else if (message.messageType == "requestError")
                 {
