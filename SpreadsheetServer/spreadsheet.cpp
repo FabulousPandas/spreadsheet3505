@@ -97,12 +97,18 @@ void spreadsheet::proccess_next_message()
 	std::vector<std::string> message = message_q.front();
 	message_q.pop();
 
-	if (!is_dependent(message))
+	if (!is_cyclic_dependency())
 	{
 		if (message.at(0) == "editCell")
 		{
 			cell* this_cell = get_cell(message.at(1));
 			this_cell->add_edit(message.at(2));
+			if(is_cyclic_dependency())
+			{
+				send_client_error(message.at(3), message.at(1), "Edit would cause cyclic dependency");
+				this_cell->remove_edit();
+				return;
+			}
 			message.pop_back();
 			message.resize(3);
 			change_history.push_back(message);
@@ -298,13 +304,19 @@ void spreadsheet::server_shutdown(std::string shutdown_msg)
 }
 
 /*
-* returns false if the message would not cause a
-* dependency in the spreadsheet
+* returns false if there is not a
+* cyclic dependency in the spreadsheet
 */
-bool spreadsheet::is_dependent(std::vector<std::string> message)
+bool spreadsheet::is_cyclic_dependency()
 {
-
-	//TODO
-
+	/*std::vector<std::string> visited;
+	for (std::map<std::string, cell*>::iterator it; it != cell_map.end(); it++)
+	{
+		std::string cur_cellname = it->first;
+		cell* cur_cell = it->second;
+		if(visited.find(visited.begin(), visited.end(), cur_cellname) != visited.end()) // if the 
+		{
+		}
+	}*/
 	return false;
 }

@@ -6,6 +6,14 @@ historyStart
 A1
 
 
+historyStart
+A1
+
+
+historyStart
+A1
+
+
 editCell
 C7
 ffff
@@ -13,4 +21,40 @@ ffff
 editCell
 F5
 gggg
+
+editCell
+B4
+ppppppp
+
+editCell
+D8
+ppppppp
+
+editCell
+E15
+ppppppp
+
+editCell
+B12
+ppppppp
+
+editCell
+E13
+ppppppp
+
+editCell
+E5
+ppppppp
+
+editCell
+G13
+ppppppp
+
+editCell
+B21
+ppppppp
+
+editCell
+B15
+ppppppp
 

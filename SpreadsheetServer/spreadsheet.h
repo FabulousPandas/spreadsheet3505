@@ -57,7 +57,7 @@ private:
 
 	std::map<int, handle_connection*> id_to_client;
 
-	bool is_dependent(std::vector<std::string> message);
+	bool is_cyclic_dependency();
 
 	void build_from_file();
 
