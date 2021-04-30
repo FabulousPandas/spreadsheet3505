@@ -102,10 +102,10 @@ boost::asio::ip::tcp::socket tester::completeHandshake(std::string serverip, std
       socket.read_some(receive, err); // get list of sheets
       if(!err)
         {
-            boost::asio::write(socket, boost::asio::buffer(username + "\n"), err); // make new sheet
+	  boost::asio::write(socket, boost::asio::buffer(username + "\n"), err); // make new sheet
             if(!err)
             {
-	      usleep(2 * 1000000);   
+	      usleep(3 * 1000000);   
             }
         } else 
         {
@@ -366,12 +366,14 @@ void tester::testSpamEdits(std::string address)
   std::string editEnd = "\", \"contents\":\"test\"} \n";
   try
     {
-      for(int i = 0; i < 1000; i ++)
+      for(int i = 1; i < 101; i ++)
 	{
 	  std::string temp1 = selectFront + std::to_string(i) + selectEnd;
 	  std::string temp2 = editFront + std::to_string(i) + editEnd;
 	  boost::asio::write(socket, boost::asio::buffer(temp1));
+	  usleep(1 * 1000000 / 2);
 	  boost::asio::write(socket, boost::asio::buffer(temp2));
+	  usleep(1 * 1000000 / 2);
 	}
     } catch (std::exception& e)
     {
