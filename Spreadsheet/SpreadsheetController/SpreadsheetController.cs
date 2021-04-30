@@ -28,7 +28,7 @@ namespace SS
         public event SelectionMadeHandler SelectionMade;
 
         private List<string> spreadsheetList;
-
+        
         private Spreadsheet sheet;
         private SocketState server;
         private string username;
@@ -154,7 +154,8 @@ namespace SS
                 {
                     int col = GetColumn(message.cellName), row = GetRow(message.cellName);
                     IList<string> updateList = SetCell(col, row, message.contents);
-                    UpdateReceived(col, row, updateList);
+                    UpdateReceived(col, row, updateList);  
+                    
                 }
                 else if(message.messageType == "cellSelected")
                 {
@@ -165,8 +166,7 @@ namespace SS
                 }
                 else if (message.messageType == "disconnected")
                 {
-                    //if (message.user == userID)
-                        ErrorND("User #" + userID + " has disconnected from the server");
+                    ErrorND("User #" + userID + " has disconnected from the server");
                 }
                 else if (message.messageType == "requestError")
                 {
@@ -174,7 +174,7 @@ namespace SS
                 }
                 else if (message.messageType == "serverError")
                 {
-                    Error(message.message);
+                    Error("Server is shutting down");
                 }
 
                 state.RemoveData(0, p.Length);
