@@ -17,30 +17,50 @@ int main(int argc, char** args)
   {
     //call all tests here
   case 1:
-    //print info before 
-      tester::testServerConnect(args[2]);
-      break;
+    //print info before
+    std::cout << "3" << std::endl;
+    std::cout << "TestServerConnect" << std::endl;
+    tester::testServerConnect(args[2]);
+    break;
   case 2:
-      tester::testCircularDependency(args[2]);
-      break;
+    std::cout << "10" << std::endl;
+    std::cout << "TestCircularDependency" << std::endl;
+    tester::testCircularDependency(args[2]);
+    break;
   case 3:
-      tester::testSimultaniousEdit(args[2]);
-      break;
+    std::cout << "8" << std::endl;
+    std::cout << "TestSimultaniousEdit" << std::endl;
+    tester::testSimultaniousEdit(args[2]);
+    break;
   case 4:
-      tester::testIfServerSendsIntBackAsString(args[2]);
-      break;
+    std::cout << "8" << std::endl;
+    std::cout << "TestIfServerSendsIntBackAsString" << std::endl;
+    tester::testIfServerSendsIntBackAsString(args[2]);
+    break;
   case 5:
-      tester::testIfServerSendsStringBackAsString(args[2]);
-      break;
+    std::cout << "8" << std::endl;
+    std::cout << "TestOfServerSemdsStromgBackAsString" << std::endl;
+    tester::testIfServerSendsStringBackAsString(args[2]);
+    break;
   case 6:
-      tester::testClientDisconnectIsInfromed(args[2]);
-      break;
+    std::cout << "8" << std::endl;
+    std::cout << "TestClientDisconnectIsInformed" << std::endl;
+    tester::testClientDisconnectIsInformed(args[2]);
+    break;
   case 7:
-      tester::testUndo(args[2]);
-      break;
+    std::cout << "8" << std::endl;
+    std::cout << "TestUndo" << std::endl;
+    tester::testUndo(args[2]);
+    break;
   case 8:
-      tester::testEditAndUndoDifferentClient(args[2]);
-      break;
+    std::cout << "8" << std::endl;
+    std::cout << "TestEditAndUndoDifferentClient" << std::endl;
+    tester::testEditAndUndoDifferentClient(args[2]);
+    break;
+  case 9:
+    std::cout << "15" << std::endl;
+    std::cout << "TestSpamEdits" << std::endl;
+    tester::testSpamEdits(args[2]);
   }
   return 0; 
 }
@@ -77,16 +97,15 @@ boost::asio::ip::tcp::socket tester::completeHandshake(std::string serverip, std
     boost::asio::write(socket, boost::asio::buffer(username + "\n"), err); // send username 
     if(!err)
     {
-      std::vector<char> tempRec = std::vector<char>(100);
-      boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 100);
-      std::cout << "waiting to recieve" << std::endl;
+      std::vector<char> tempRec = std::vector<char>(1000);
+      boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 1000);
       socket.read_some(receive, err); // get list of sheets
       if(!err)
         {
             boost::asio::write(socket, boost::asio::buffer(username + "\n"), err); // make new sheet
             if(!err)
             {
-	      usleep(3 * 1000000);   
+	      usleep(2 * 1000000);   
             }
         } else 
         {
@@ -250,7 +269,7 @@ void tester::testIfServerSendsStringBackAsString(std::string address)
   }
 }
 
-void tester::testClientDisconnectIsInfromed(std::string address)
+void tester::testClientDisconnectIsInformed(std::string address)
 {
   //connect two clients and disconnect one
   boost::asio::ip::tcp::socket socket1 = completeHandshake(address, "testClientDisconnectIsInfromed");
@@ -335,4 +354,29 @@ void tester::testEditAndUndoDifferentClient(std::string address)
   {
     std::cout << "fail \n" << std::endl;
   }
+}
+
+
+void tester::testSpamEdits(std::string address)
+{
+  boost::asio::ip::tcp::socket socket = completeHandshake(address, "testSpamEdits");
+  std::string selectFront = "{\"requestType\":\"selectCell\",\"cellName\":\"A";
+  std::string selectEnd = "\"} \n";
+  std::string editFront = "{\"requestType\":\"editCell\",\"cellName\":\"A";
+  std::string editEnd = "\", \"contents\":\"test\"} \n";
+  try
+    {
+      for(int i = 0; i < 1000; i ++)
+	{
+	  std::string temp1 = selectFront + std::to_string(i) + selectEnd;
+	  std::string temp2 = editFront + std::to_string(i) + editEnd;
+	  boost::asio::write(socket, boost::asio::buffer(temp1));
+	  boost::asio::write(socket, boost::asio::buffer(temp2));
+	}
+    } catch (std::exception& e)
+    {
+      std::cout << "fail \n" << std::endl;
+    }
+
+  std::cout << "pass \n" << std::endl;
 }
