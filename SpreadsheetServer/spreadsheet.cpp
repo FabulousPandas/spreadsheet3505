@@ -322,8 +322,13 @@ bool spreadsheet::is_cyclic_dependency()
 
 void spreadsheet::visit(std::string start, std::string cur_cellname, std::vector<std::string>& visited, bool& cyclic_dependency)
 {
-	std::cout << cur_cellname << std::endl;
 	visited.push_back(cur_cellname);
+	std::cout << "VISITED LIST" << std::endl;
+	for (int i = 0; i < visited.size(); i++)
+	{
+		std::cout << visited[i] << std::endl;
+	}
+	std::cout << "LIST END" << std::endl;
 	cell* cur_cell = cell_map[cur_cellname];
 	std::vector<std::string> dependent_list = cur_cell->get_dependent_list();
 	for (int i = 0; i < dependent_list.size(); i++)

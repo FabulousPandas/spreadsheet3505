@@ -89,16 +89,14 @@
 			cell_contents = cell_contents.substr(1);
 			std::cout << "REAL IN GET DEPENDENT LIST: " << cell_contents << std::endl;
 
-			const std::regex r("^[a-zA-Z_][a-zA-Z_0-9]*$");
+			const std::regex r("[a-zA-Z_][a-zA-Z_0-9]*");
 			std::smatch sm;
 
-    			if (std::regex_search(cell_contents, sm, r)) 
+    			while (std::regex_search(cell_contents, sm, r)) 
 			{
-        			for (int i = 0; i < sm.size(); i++) 
-				{
-					std::cout << sm[i] << std::endl;
-					dependents.push_back(sm[i]);
-        			}
+				std::cout << sm[0] << std::endl;
+				dependents.push_back(sm[0]);
+				cell_contents = sm.suffix();
     			}
 		}
 
