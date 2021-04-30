@@ -11,10 +11,20 @@
 
 using namespace boost::asio;
 
+server* the_server;
+
+/*
+ * Called when the server shuts down due to
+ * the proccess being terminated on the command line (ctrl + c)
+ */
 void signal_handler(int signum)
 {
-	//std::cout << "SERVER SHUTDOWN" << std::endl;
-	//TODO: NOTIFY ALL SPREADSHEETS SO THEY CAN SEND ALL OF THEIR CLIENTS THE SHUTDOWN MESSAGE
+	for (std::map<std::string, spreadsheet*>::iterator it = the_server->spreadsheets.begin(); it != the_server->spreadsheets.end(); it++)
+	{
+		spreadsheet* sheet = it->second;
+		sheet->server_shutdown("Shutdown manually by the server maintainer");
+	}
+	exit(signum);
 }
 
 int main()
@@ -23,8 +33,8 @@ int main()
     try
     {
 
-	server* the_server = new server;
-    	//std::signal(SIGINT, signal_handler);
+	the_server = new server;
+    	std::signal(SIGINT, signal_handler);
         io_context io_context;
         listener listen(io_context, the_server);
 	boost::thread t(boost::bind(&boost::asio::io_context::run, &io_context));

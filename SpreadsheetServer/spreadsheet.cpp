@@ -283,6 +283,21 @@ void spreadsheet::disconnect_client(int id, handle_connection* client)
 }
 
 /*
+ * Called when the server shuts down
+ */
+void spreadsheet::server_shutdown(std::string shutdown_msg)
+{
+	std::vector<std::string> message;
+	message.push_back("serverError");
+	message.push_back(shutdown_msg);
+	for(int i = 0; i < client_list.size(); i++)
+	{
+		handle_connection* client = client_list.at(i);
+		client->server_response(message);
+	}
+}
+
+/*
 * returns false if the message would not cause a
 * dependency in the spreadsheet
 */
