@@ -64,6 +64,9 @@ private:
 	void remake_file_from_history();
 
 	void send_client_error(std::string client_id, std::string cell_name, std::string error_message);
+	
+	void visit(std::string start, std::string cur_cellname, std::vector<std::string>& visited, bool& cyclic_dependency);
+
 
 
 

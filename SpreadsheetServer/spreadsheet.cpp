@@ -97,85 +97,83 @@ void spreadsheet::proccess_next_message()
 	std::vector<std::string> message = message_q.front();
 	message_q.pop();
 
-	if (!is_cyclic_dependency())
+	if (message.at(0) == "editCell")
 	{
-		if (message.at(0) == "editCell")
+		cell* this_cell = get_cell(message.at(1));	
+		this_cell->add_edit(message.at(2));
+		if(is_cyclic_dependency())
 		{
-			cell* this_cell = get_cell(message.at(1));
-			this_cell->add_edit(message.at(2));
-			if(is_cyclic_dependency())
-			{
-				send_client_error(message.at(3), message.at(1), "Edit would cause cyclic dependency");
-				this_cell->remove_edit();
-				return;
-			}
-			message.pop_back();
-			message.resize(3);
-			change_history.push_back(message);
-			remake_file_from_history();
+			send_client_error(message.at(3), message.at(1), "Edit would cause cyclic dependency");
+			this_cell->remove_edit();
+			return;
+		}
+		message.pop_back();
+		message.resize(3);
+		change_history.push_back(message);
+		remake_file_from_history();
 			
-			message.at(0) = "cellUpdated";
-			for (int i = 0; i < client_list.size(); i++)
-			{
-				handle_connection* client = client_list.at(i);
-				client->server_response(message);
-			}
-		}
-		/*else if (message.at(0) == "revertCell")
+		message.at(0) = "cellUpdated";
+		for (int i = 0; i < client_list.size(); i++)
 		{
-			if (message.size() != 2)
-				return "Invalid number of data values sent in revertCell JSON";
-
-			cell this_cell = get_cell(message.at(1));	
-			this_cell.revert();
-			change_history.push_back(message);
-			write_message_to_spreadsheet(message);	
-		}*/
-		else if (message.at(0) == "selectCell")
-		{
-			message.at(0) = "cellSelected";
-			for (int i = 0; i < client_list.size(); i++)
-			{
-				handle_connection* client = client_list.at(i);
-				client->server_response(message);
-			}
-
-		}
-		else if (message.at(0) == "undo")
-		{
-			if (change_history.size() == 0)
-			{
-				send_client_error(message.at(1), "", "Tried to undo a spreadsheet with no changes");
-				return;
-			}
-
-			std::vector<std::string> prev_message = change_history.back();
-			cell* prev_cell = get_cell(prev_message.at(1));
-			if (prev_message.at(0) == "editCell")
-			{
-				for (int i = 0; i < prev_message.size(); i++)
-				{
-					std::cout << "GO BACK TO THIS: " << prev_message.at(i) << std::endl;
-				}
-				prev_cell->remove_edit();
-				message.at(0) = "cellUpdated";
-				message.at(1) = prev_message.at(1);
-				message.push_back(prev_cell->cell_content());
-				for (int i = 0; i < client_list.size(); i++)
-				{
-					handle_connection* client = client_list.at(i);
-					client->server_response(message);
-				}
-
-			} 
-			/*else if (prev_message.at(0) == "revertCell")
-			{
-				prev_cell.undo_revert();
-			}*/
-			change_history.pop_back();
-			remake_file_from_history();
+			handle_connection* client = client_list.at(i);
+			client->server_response(message);
 		}
 	}
+	/*else if (message.at(0) == "revertCell")
+	{
+		if (message.size() != 2)
+			return "Invalid number of data values sent in revertCell JSON";
+
+		cell this_cell = get_cell(message.at(1));	
+		this_cell.revert();
+		change_history.push_back(message);
+		write_message_to_spreadsheet(message);	
+	}*/
+	else if (message.at(0) == "selectCell")
+	{
+		message.at(0) = "cellSelected";
+		for (int i = 0; i < client_list.size(); i++)
+		{
+			handle_connection* client = client_list.at(i);
+			client->server_response(message);
+		}
+
+	}
+	else if (message.at(0) == "undo")
+	{
+		if (change_history.size() == 0)
+		{
+			send_client_error(message.at(1), "", "Tried to undo a spreadsheet with no changes");
+			return;
+		}
+
+		std::vector<std::string> prev_message = change_history.back();
+		cell* prev_cell = get_cell(prev_message.at(1));
+		if (prev_message.at(0) == "editCell")
+		{
+			for (int i = 0; i < prev_message.size(); i++)
+			{
+				std::cout << "GO BACK TO THIS: " << prev_message.at(i) << std::endl;
+			}
+			prev_cell->remove_edit();
+			message.at(0) = "cellUpdated";
+			message.at(1) = prev_message.at(1);
+			message.push_back(prev_cell->cell_content());
+			for (int i = 0; i < client_list.size(); i++)
+			{
+				handle_connection* client = client_list.at(i);
+				client->server_response(message);
+			}
+
+		} 
+		/*else if (prev_message.at(0) == "revertCell")
+		{
+			prev_cell.undo_revert();
+		}*/
+		change_history.pop_back();
+		remake_file_from_history();
+	}
+
 }
 	
 void spreadsheet::send_client_error(std::string client_id, std::string cell_name, std::string error_message)
@@ -309,14 +307,31 @@ void spreadsheet::server_shutdown(std::string shutdown_msg)
 */
 bool spreadsheet::is_cyclic_dependency()
 {
-	/*std::vector<std::string> visited;
-	for (std::map<std::string, cell*>::iterator it; it != cell_map.end(); it++)
+	bool cyclic_dependency = false;
+	std::vector<std::string> visited;
+	for (std::map<std::string, cell*>::iterator it = cell_map.begin(); it != cell_map.end(); it++)
 	{
 		std::string cur_cellname = it->first;
-		cell* cur_cell = it->second;
-		if(visited.find(visited.begin(), visited.end(), cur_cellname) != visited.end()) // if the 
+		if(std::find(visited.begin(), visited.end(), cur_cellname) == visited.end()) // if the current cell has not been visited yet
 		{
+			visit(cur_cellname, cur_cellname, visited, cyclic_dependency); 
 		}
-	}*/
-	return false;
+	}
+	return cyclic_dependency;
+}
+
+void spreadsheet::visit(std::string start, std::string cur_cellname, std::vector<std::string>& visited, bool& cyclic_dependency)
+{
+	std::cout << cur_cellname << std::endl;
+	visited.push_back(cur_cellname);
+	cell* cur_cell = cell_map[cur_cellname];
+	std::vector<std::string> dependent_list = cur_cell->get_dependent_list();
+	for (int i = 0; i < dependent_list.size(); i++)
+	{
+		std::string dependent = dependent_list.at(i);
+		if(dependent == start)
+			cyclic_dependency = true;
+		else if (std::find(visited.begin(), visited.end(), dependent) != visited.end())
+			visit(start, dependent, visited, cyclic_dependency);
+	}
 }

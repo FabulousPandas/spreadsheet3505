@@ -9,6 +9,7 @@
 
 #include <string>
 #include <stack>
+#include <vector>
 
 
 class cell
@@ -26,6 +27,8 @@ public:
 	std::string revert();
 
 	std::string cell_content();
+
+	std::vector<std::string> get_dependent_list();
 
 
 private:

@@ -1,4 +1,6 @@
 #include "cell.h"
+#include <regex>
+#include <iostream> //TODO REMOVE
 	
 	/*
 	* Cell constructor
@@ -71,3 +73,35 @@
 	{
 		return undo_stack.top();
 	}
+
+	/*
+	 * returns a list of the cells that this cell uses
+	 */
+	std::vector<std::string> cell::get_dependent_list()
+	{
+		std::string cell_contents = cell_content();
+		std::vector<std::string> dependents;
+
+		std::cout << "IN GET DEPENDENT LIST" << std::endl;
+
+		if(cell_contents[0] == '=')
+		{
+			cell_contents = cell_contents.substr(1);
+			std::cout << "REAL IN GET DEPENDENT LIST: " << cell_contents << std::endl;
+
+			const std::regex r("^[a-zA-Z_][a-zA-Z_0-9]*$");
+			std::smatch sm;
+
+    			if (std::regex_search(cell_contents, sm, r)) 
+			{
+        			for (int i = 0; i < sm.size(); i++) 
+				{
+					std::cout << sm[i] << std::endl;
+					dependents.push_back(sm[i]);
+        			}
+    			}
+		}
+
+		return dependents;
+	}
+
