@@ -266,7 +266,7 @@ namespace SS
             }
             catch (FormulaFormatException)
             {
-                Error("Invalid formula given");
+                ErrorND("Invalid formula given");
             }
             return new List<string>();
         }
