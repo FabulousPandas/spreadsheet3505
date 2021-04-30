@@ -29,7 +29,7 @@ int main(int argc, char** args)
     break;
   case 3:
     std::cout << "15" << std::endl;
-    std::cout << "TestSimultaniousEdit" << std::endl;
+    std::cout << "TestSimultaneousEdit" << std::endl;
     tester::testSimultaniousEdit(args[2]);
     break;
   case 4:
@@ -39,7 +39,7 @@ int main(int argc, char** args)
     break;
   case 5:
     std::cout << "15" << std::endl;
-    std::cout << "TestOfServerSemdsStromgBackAsString" << std::endl;
+    std::cout << "TestOfServerSendsStringBackAsString" << std::endl;
     tester::testIfServerSendsStringBackAsString(args[2]);
     break;
   case 6:
@@ -58,7 +58,7 @@ int main(int argc, char** args)
     tester::testEditAndUndoDifferentClient(args[2]);
     break;
   case 9:
-    std::cout << "30" << std::endl;
+    std::cout << "60" << std::endl;
     std::cout << "TestSpamEdits" << std::endl;
     tester::testSpamEdits(args[2]);
   }
@@ -189,14 +189,14 @@ void tester::testSimultaniousEdit(std::string address)
   boost::asio::ip::tcp::socket socket2 = completeHandshake(address, "testSimultaniousEdit");
   //prep sockets by selecting a cell
   boost::asio::write(socket1, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A1\"} \n"));
-  usleep(1* 1000000 /4);
+  usleep(1* 1000000 /2);
   boost::asio::write(socket2, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A1\"} \n"));
-  usleep(1* 1000000 /4);
+  usleep(1* 1000000 /2);
   //send different message across both sockets 
   boost::asio::write(socket1, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A1\", \"contents\":\"3\"} \n"));
-  usleep(1* 1000000 /4);
+  usleep(1* 1000000 /2);
   boost::asio::write(socket2, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A1\", \"contents\":\"4\"} \n"));
-  usleep(1* 1000000 /4);
+  usleep(1* 1000000 /2);
   //check to make sure that the second value is the one selected
   boost::system::error_code err;
   std::vector<char> tempRec = std::vector<char>(500);
