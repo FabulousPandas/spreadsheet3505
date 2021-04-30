@@ -37,7 +37,6 @@ namespace SpreadsheetGUI
         }
         private void selectionChanged(SpreadsheetPanel ssp)
         {
-            //UpdateCells(); TODO: make it so when you select a different box, changes are reflected on the spreadsheet
             spreadsheetPanel.GetSelection(out int col, out int row);
             string cellName = controller.GetCellName(col, row);
             controller.SelectCell(cellName);
@@ -65,28 +64,24 @@ namespace SpreadsheetGUI
 
             if (keyData == (Keys.Up))
             {
-                //UpdateCells();
                 spreadsheetPanel.SetSelection(col, row - 1);
                 selectionChanged(spreadsheetPanel);
                 return true;
             }
             if (keyData == (Keys.Down))
             {
-                //UpdateCells();
                 spreadsheetPanel.SetSelection(col, row + 1);
                 selectionChanged(spreadsheetPanel);
                 return true;
             }
             if (keyData == (Keys.Left))
             {
-                //UpdateCells();
                 spreadsheetPanel.SetSelection(col - 1, row);
                 selectionChanged(spreadsheetPanel);
                 return true;
             }
             if (keyData == (Keys.Right))
             {
-                //UpdateCells();
                 spreadsheetPanel.SetSelection(col + 1, row);
                 selectionChanged(spreadsheetPanel);
                 return true;
@@ -211,10 +206,10 @@ namespace SpreadsheetGUI
             controller.SendSpreadsheet(chosenSpreadsheet);
         }
 
-        private void ReceivedUpdate(int col, int row, IList<string> updateList)
+        private void ReceivedUpdate(int col, int row, IList<string> list)
         {
             //update spreadsheet panel
-            RecalculateCells(updateList);
+            RecalculateCells(list);
 
             MethodInvoker invoker =
             new MethodInvoker(
@@ -249,6 +244,7 @@ namespace SpreadsheetGUI
                     //update selected cell text box
                     cellNameTextBox.Text = cellName;
                     cellInputTextBox.Text = cellContents;
+                    cellValueTextBox.Text = controller.GetCellValue(controller.GetColumn(cellName), controller.GetRow(cellName));
                 }
             );
             this.Invoke(invoker);
@@ -260,9 +256,12 @@ namespace SpreadsheetGUI
         /// <param name="list"></param>
         private void RecalculateCells(IList<string> list)
         {
-            foreach (string s in list)
+            lock(spreadsheetPanel)
             {
-                spreadsheetPanel.SetValue(controller.GetColumn(s), controller.GetRow(s), controller.GetCellValue(controller.GetColumn(s), controller.GetRow(s)));
+                foreach (string s in list)
+                {
+                    spreadsheetPanel.SetValue(controller.GetColumn(s), controller.GetRow(s), controller.GetCellValue(controller.GetColumn(s), controller.GetRow(s)));
+                }
             }
         }
 

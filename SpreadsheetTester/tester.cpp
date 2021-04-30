@@ -8,7 +8,7 @@ int main(int argc, char** args)
 {
   if(argc == 1)
     {
-      std::cout << 8 << std::endl;
+      std::cout << 9 << std::endl;
       return 0;
     }
   // use a switch to find and run the correct test based on input
@@ -23,42 +23,42 @@ int main(int argc, char** args)
     tester::testServerConnect(args[2]);
     break;
   case 2:
-    std::cout << "10" << std::endl;
+    std::cout << "20" << std::endl;
     std::cout << "TestCircularDependency" << std::endl;
     tester::testCircularDependency(args[2]);
     break;
   case 3:
-    std::cout << "8" << std::endl;
-    std::cout << "TestSimultaniousEdit" << std::endl;
+    std::cout << "15" << std::endl;
+    std::cout << "TestSimultaneousEdit" << std::endl;
     tester::testSimultaniousEdit(args[2]);
     break;
   case 4:
-    std::cout << "8" << std::endl;
+    std::cout << "15" << std::endl;
     std::cout << "TestIfServerSendsIntBackAsString" << std::endl;
     tester::testIfServerSendsIntBackAsString(args[2]);
     break;
   case 5:
-    std::cout << "8" << std::endl;
-    std::cout << "TestOfServerSemdsStromgBackAsString" << std::endl;
+    std::cout << "15" << std::endl;
+    std::cout << "TestOfServerSendsStringBackAsString" << std::endl;
     tester::testIfServerSendsStringBackAsString(args[2]);
     break;
   case 6:
-    std::cout << "8" << std::endl;
+    std::cout << "15" << std::endl;
     std::cout << "TestClientDisconnectIsInformed" << std::endl;
     tester::testClientDisconnectIsInformed(args[2]);
     break;
   case 7:
-    std::cout << "8" << std::endl;
+    std::cout << "15" << std::endl;
     std::cout << "TestUndo" << std::endl;
     tester::testUndo(args[2]);
     break;
   case 8:
-    std::cout << "8" << std::endl;
+    std::cout << "15" << std::endl;
     std::cout << "TestEditAndUndoDifferentClient" << std::endl;
     tester::testEditAndUndoDifferentClient(args[2]);
     break;
   case 9:
-    std::cout << "15" << std::endl;
+    std::cout << "60" << std::endl;
     std::cout << "TestSpamEdits" << std::endl;
     tester::testSpamEdits(args[2]);
   }
@@ -82,7 +82,7 @@ boost::asio::ip::tcp::socket tester::connectToServer(std::string serverip)
   if(err)
 	{
 	  std::cout << "fail \n" << std::endl;
-	  exit;
+	  exit(EXIT_FAILURE);
 	}
   return socket;
 		  
@@ -102,21 +102,21 @@ boost::asio::ip::tcp::socket tester::completeHandshake(std::string serverip, std
       socket.read_some(receive, err); // get list of sheets
       if(!err)
         {
-            boost::asio::write(socket, boost::asio::buffer(username + "\n"), err); // make new sheet
+	  boost::asio::write(socket, boost::asio::buffer(username + "\n"), err); // make new sheet
             if(!err)
             {
-	      usleep(2 * 1000000);   
+	      usleep(3 * 1000000);   
             }
         } else 
         {
              std::cout << "fail \n" << std::endl;
-             exit;
+             exit(EXIT_FAILURE);
         }
         
     } else 
     {
         std::cout << "fail \n" << std::endl;
-        exit;
+        exit(EXIT_FAILURE);
     }
     return socket;
 }
@@ -149,16 +149,16 @@ void tester::testCircularDependency(std::string address)
   boost::system::error_code err;
   //send first edit
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A1\"} \n"));
-  usleep(1* 1000000 /2);
+  usleep(1* 1000000 /4);
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A1\", \"contents\":\"3\"} \n"));
-  usleep(1* 1000000 /2);
+  usleep(1* 1000000 /4);
   //clear buffer
   std::vector<char> tempRec = std::vector<char>(500);
   boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 500); 
   socket.read_some( receive, err); 
   //send second edit
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A2\"} \n"));
-  usleep(1* 1000000 /2);
+  usleep(1* 1000000 /4);
   //clear buffer
   socket.read_some(receive, err);
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A2\", \"contents\":\"=A1 + A2\"} \n"));
@@ -221,11 +221,11 @@ void tester::testIfServerSendsIntBackAsString(std::string address)
   boost::asio::ip::tcp::socket socket = completeHandshake(address, "testIfServerSendsIntBackAsString");
   //select a cell
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A1\"} \n"));
-  usleep(1* 1000000 /2);
+  usleep(1* 1000000 /4);
   //make a change request
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A1\", \"contents\":\"3\"} \n"));
   //confirm server sends it back
-  usleep(1 * 1000000 /2);
+  usleep(1 * 1000000 /4);
   boost::system::error_code err;
   std::vector<char> tempRec = std::vector<char>(500);
   boost::asio::mutable_buffers_1 receive = boost::asio::buffer(tempRec, 500); 
@@ -249,10 +249,10 @@ void tester::testIfServerSendsStringBackAsString(std::string address)
   boost::asio::ip::tcp::socket socket = completeHandshake(address, "testIfServerSendsStringBackAsString");
   //select a cell
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A1\"} \n"));
-  usleep(1* 1000000 /2);
+  usleep(1* 1000000 /4);
   //make a change request
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A1\", \"contents\":\"test\"} \n"));
-  usleep(1* 1000000 /2);
+  usleep(1* 1000000 /4);
   //confirm server sends it back
   boost::system::error_code err;
   std::vector<char> tempRec = std::vector<char>(500);
@@ -297,16 +297,16 @@ void tester::testUndo(std::string address)
   boost::asio::ip::tcp::socket socket = completeHandshake(address, "testUndo");
   //select a cell
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A1\"} \n"));
-  usleep(1* 1000000 /2);
+  usleep(1* 1000000 /4);
   //make a change request
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A1\", \"contents\":\"test\"} \n"));
-  usleep(1* 1000000 /2);
+  usleep(1* 1000000 /4);
   //change to something else
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A1\", \"contents\":\"something\"} \n"));
-  usleep(1* 1000000 /2);
+  usleep(1* 1000000 /4);
   //undo 
   boost::asio::write(socket, boost::asio::buffer("{\"requestType\":\"undo\"} \n"));
-  usleep(1* 1000000 /2);
+  usleep(1* 1000000 /4);
   //check if it undid
   boost::system::error_code err;
   std::vector<char> tempRec = std::vector<char>(500);
@@ -328,18 +328,18 @@ void tester::testEditAndUndoDifferentClient(std::string address)
   boost::asio::ip::tcp::socket socket1 = completeHandshake(address, "testEditAndUndoDifferentClient");
   boost::asio::ip::tcp::socket socket2 = completeHandshake(address, "testEditAndUndoDifferentClient");
   boost::asio::write(socket1, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A1\"} \n"));
-  usleep(1* 1000000 /2);
+  usleep(1* 1000000 /4);
   //make a change request
   boost::asio::write(socket1, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A1\", \"contents\":\"test\"} \n"));
-  usleep(1* 1000000 /2);
+  usleep(1* 1000000 /4);
   //change to something else
   boost::asio::write(socket2, boost::asio::buffer("{\"requestType\":\"selectCell\",\"cellName\":\"A1\"} \n"));
-  usleep(1* 1000000 /2);
+  usleep(1* 1000000 /4);
   boost::asio::write(socket2, boost::asio::buffer("{\"requestType\":\"editCell\",\"cellName\":\"A1\", \"contents\":\"something\"} \n"));
-  usleep(1* 1000000 /2);
+  usleep(1* 1000000 /4);
   //undo 
   boost::asio::write(socket1, boost::asio::buffer("{\"requestType\":\"undo\"} \n"));
-  usleep(1* 1000000 /2);
+  usleep(1* 1000000 /4);
   //check if it undid
     boost::system::error_code err;
   std::vector<char> tempRec = std::vector<char>(500);
@@ -366,12 +366,14 @@ void tester::testSpamEdits(std::string address)
   std::string editEnd = "\", \"contents\":\"test\"} \n";
   try
     {
-      for(int i = 0; i < 1000; i ++)
+      for(int i = 1; i < 100; i ++)
 	{
 	  std::string temp1 = selectFront + std::to_string(i) + selectEnd;
 	  std::string temp2 = editFront + std::to_string(i) + editEnd;
 	  boost::asio::write(socket, boost::asio::buffer(temp1));
+	  usleep(1 * 1000000 / 4);
 	  boost::asio::write(socket, boost::asio::buffer(temp2));
+	  usleep(1 * 1000000 / 4);
 	}
     } catch (std::exception& e)
     {

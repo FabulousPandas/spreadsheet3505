@@ -444,29 +444,33 @@ namespace SS
                 }
 
                 // Draw the text
-                foreach (KeyValuePair<Address, String> address in _values)
+                lock(_ssp)
                 {
-                    String text = address.Value;
-                    int x = address.Key.Col - _firstColumn;
-                    int y = address.Key.Row - _firstRow;
-                    float height = e.Graphics.MeasureString(text, regularFont).Height;
-                    float width = e.Graphics.MeasureString(text, regularFont).Width;
-                    if (x >= 0 && y >= 0)
+                    foreach (KeyValuePair<Address, String> address in _values)
                     {
-                        Region cellClip = new Region(new Rectangle(LABEL_COL_WIDTH + x * DATA_COL_WIDTH + PADDING,
-                                                                   LABEL_ROW_HEIGHT + y * DATA_ROW_HEIGHT,
-                                                                   DATA_COL_WIDTH - 2 * PADDING,
-                                                                   DATA_ROW_HEIGHT));
-                        cellClip.Intersect(clip);
-                        e.Graphics.Clip = cellClip;
-                        e.Graphics.DrawString(
-                            text,
-                            regularFont,
-                            brush,
-                            LABEL_COL_WIDTH + x * DATA_COL_WIDTH + PADDING,
-                            LABEL_ROW_HEIGHT + y * DATA_ROW_HEIGHT + (DATA_ROW_HEIGHT - height) / 2);
+                        String text = address.Value;
+                        int x = address.Key.Col - _firstColumn;
+                        int y = address.Key.Row - _firstRow;
+                        float height = e.Graphics.MeasureString(text, regularFont).Height;
+                        float width = e.Graphics.MeasureString(text, regularFont).Width;
+                        if (x >= 0 && y >= 0)
+                        {
+                            Region cellClip = new Region(new Rectangle(LABEL_COL_WIDTH + x * DATA_COL_WIDTH + PADDING,
+                                                                       LABEL_ROW_HEIGHT + y * DATA_ROW_HEIGHT,
+                                                                       DATA_COL_WIDTH - 2 * PADDING,
+                                                                       DATA_ROW_HEIGHT));
+                            cellClip.Intersect(clip);
+                            e.Graphics.Clip = cellClip;
+                            e.Graphics.DrawString(
+                                text,
+                                regularFont,
+                                brush,
+                                LABEL_COL_WIDTH + x * DATA_COL_WIDTH + PADDING,
+                                LABEL_ROW_HEIGHT + y * DATA_ROW_HEIGHT + (DATA_ROW_HEIGHT - height) / 2);
+                        }
                     }
                 }
+                    
 
 
             }
