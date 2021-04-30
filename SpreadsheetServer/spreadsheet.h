@@ -1,5 +1,6 @@
 /*
-
+Class that represents a spreadsheet
+Written by Dylan Hansen and Malik Qader
 */
 
 #ifndef SPREADSHEET_H
@@ -31,10 +32,6 @@ public:
 	void add_client(handle_connection* client);
 
 	void add_client_id(int id, handle_connection* client);
-
-	void remove_client(handle_connection* client);
-
-	std::vector<handle_connection*> give_client();
 
 	void disconnect_client(int id, handle_connection* client);
 

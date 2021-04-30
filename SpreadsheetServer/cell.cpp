@@ -1,6 +1,11 @@
+/*
+ * Repesentation of a cell in a spreadsheet
+ * Written by Malik Quader and Dylan Hansen
+ */
+
+
 #include "cell.h"
 #include <regex>
-#include <iostream> //TODO REMOVE
 	
 	/*
 	* Cell constructor
@@ -17,7 +22,6 @@
 	{
 		//add edit to stack
 		undo_stack.push(edit);
-		
 	}
 	/*
 	* undoes the act of reverting
@@ -82,19 +86,19 @@
 		std::string cell_contents = cell_content();
 		std::vector<std::string> dependents;
 
-		std::cout << "IN GET DEPENDENT LIST" << std::endl;
-
+		//if what's stored in the cell is a formula
 		if(cell_contents[0] == '=')
 		{
+			//remove the = sign
 			cell_contents = cell_contents.substr(1);
-			std::cout << "REAL IN GET DEPENDENT LIST: " << cell_contents << std::endl;
 
+			// regex for valid cell name
 			const std::regex r("[a-zA-Z_][a-zA-Z_0-9]*");
 			std::smatch sm;
 
+			//gets all of the valid cell names in the formula and puts it in the dependents vector
     			while (std::regex_search(cell_contents, sm, r)) 
 			{
-				std::cout << sm[0] << std::endl;
 				dependents.push_back(sm[0]);
 				cell_contents = sm.suffix();
     			}

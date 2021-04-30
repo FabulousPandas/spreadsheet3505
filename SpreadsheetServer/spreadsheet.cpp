@@ -1,14 +1,13 @@
 /*
  Spreadsheet class. This spreadsheet object can holds the cells 
  of the spreadsheet and the connects (clients)
- Written by Malik Qader 4/25/2021
+ Written by Malik Qader and Dylan Hansen 4/30/2021
 
 */
 
 
 #include "spreadsheet.h"
 #include <boost/filesystem.hpp>
-#include <iostream> //TODO REMOVE
 #include "handle_connection.h"
 
 spreadsheet::spreadsheet()
@@ -33,6 +32,9 @@ void spreadsheet::add_to_q(std::vector<std::string> message)
 	message_q.push(message);
 }
 
+/*
+ * Builds a history of changes from the spreadsheet file.
+ */
 void spreadsheet::build_from_file()
 {
 	boost::filesystem::path sheet_dir(spreadsheet_name);
@@ -45,8 +47,10 @@ void spreadsheet::build_from_file()
 	message.push_back("");
 	message.push_back("");
 	cell* this_cell;
+	// For every line in the file
 	while (std::getline(file, str))
 	{
+		// If we have reached a complete message to add to the log
 		if(str == "")
 		{
 			change_history.push_back(message);
@@ -55,7 +59,9 @@ void spreadsheet::build_from_file()
 		}
 		else
 		{
+			// Adds the line to the message
 			message.at(message_index) = str;
+			// Adds this to a cell if needed
 			if (message_index == 1)
 			{
 				this_cell = get_cell(str);
@@ -67,18 +73,23 @@ void spreadsheet::build_from_file()
 			message_index++;
 		}
 	}
+
 	file.close();
 }
 
 /*
-* Saves the spreadsheet
+* Saves the spreadsheet in this format:
+* Every line is a seperate element of a message
+* Once a complete message has been written, write an additional new line
 */
 void spreadsheet::remake_file_from_history()
 {
 	boost::filesystem::path sheet_dir(spreadsheet_name);
 	boost::filesystem::ofstream file(sheet_dir);
+	// for every message in the histoy log
 	for (int i = 0; i < change_history.size(); i++)
 	{
+		//write that message to the file in the formate listed above
 		std::vector<std::string> message = change_history.at(i);
 		for (int j = 0; j < message.size(); j++)
 		{
@@ -99,6 +110,7 @@ void spreadsheet::proccess_next_message()
 
 	if (message.at(0) == "editCell")
 	{
+		// gets cell object of the cell needed to edit
 		cell* this_cell = get_cell(message.at(1));	
 		this_cell->add_edit(message.at(2));
 		if(is_cyclic_dependency())
@@ -107,11 +119,14 @@ void spreadsheet::proccess_next_message()
 			this_cell->remove_edit();
 			return;
 		}
+		//Remove appended ID from the message
 		message.pop_back();
 		message.resize(3);
+		//add message to history
 		change_history.push_back(message);
 		remake_file_from_history();
 			
+		//sends the message back to the client as a "cellUpdated" message
 		message.at(0) = "cellUpdated";
 		for (int i = 0; i < client_list.size(); i++)
 		{
@@ -119,18 +134,9 @@ void spreadsheet::proccess_next_message()
 			client->server_response(message);
 		}
 	}
-	/*else if (message.at(0) == "revertCell")
-	{
-		if (message.size() != 2)
-			return "Invalid number of data values sent in revertCell JSON";
-
-		cell this_cell = get_cell(message.at(1));	
-		this_cell.revert();
-		change_history.push_back(message);
-		write_message_to_spreadsheet(message);	
-	}*/
 	else if (message.at(0) == "selectCell")
 	{
+		// Sends back the select cell message as a "cellSelected" message
 		message.at(0) = "cellSelected";
 		for (int i = 0; i < client_list.size(); i++)
 		{
@@ -147,14 +153,12 @@ void spreadsheet::proccess_next_message()
 			return;
 		}
 
+		// Gets the previous message in the history
 		std::vector<std::string> prev_message = change_history.back();
 		cell* prev_cell = get_cell(prev_message.at(1));
+		//If it was an edit request we send the client a request to change the cell's value to the previous value it held
 		if (prev_message.at(0) == "editCell")
 		{
-			for (int i = 0; i < prev_message.size(); i++)
-			{
-				std::cout << "GO BACK TO THIS: " << prev_message.at(i) << std::endl;
-			}
 			prev_cell->remove_edit();
 			message.at(0) = "cellUpdated";
 			message.at(1) = prev_message.at(1);
@@ -166,16 +170,16 @@ void spreadsheet::proccess_next_message()
 			}
 
 		} 
-		/*else if (prev_message.at(0) == "revertCell")
-		{
-			prev_cell.undo_revert();
-		}*/
+		// Removes the most recent edit from the change history
 		change_history.pop_back();
 		remake_file_from_history();
 	}
 
 }
 	
+/*
+ * Sends the client with the specified ID an error message
+ */
 void spreadsheet::send_client_error(std::string client_id, std::string cell_name, std::string error_message)
 {
 	handle_connection* client = id_to_client[std::stoi(client_id)];
@@ -238,40 +242,6 @@ void spreadsheet::add_client_id(int id, handle_connection* client)
 	id_to_client.insert(std::pair<int, handle_connection*>(id, client));
 }
 
-/*
-* removes client from list, 
-* changes client_list's index to -1 if found
-*/
-void spreadsheet::remove_client(handle_connection* client)
-{
-	for (int i = 0; i < client_list.size(); i++)
-	{
-		//if id is found then change to -1
-		//if (client == client_list[i])
-			//client_list[i] = -1;
-	}
-}
-
-/*
-* returns the list of clients currently connected
-* to this spreadsheet
-*/
-std::vector<handle_connection*> spreadsheet::give_client()
-{
-	std::vector<handle_connection*> active_clients;
-	
-
-	for (int i = 0; i < client_list.size(); i++)
-	{
-		//if (client_list[i] != -1)
-		//{
-			//active_clients.push_back(client_list[i]);
-		//}
-	}
-
-	return active_clients;
-}
-
 void spreadsheet::disconnect_client(int id, handle_connection* client)
 {
 	id_to_client.erase(id);
@@ -279,6 +249,7 @@ void spreadsheet::disconnect_client(int id, handle_connection* client)
 	std::vector<std::string> message;
 	message.push_back("disconnected");
 	message.push_back(std::to_string(id));
+	// Sends each client a disconnected message
 	for(int i = 0; i < client_list.size(); i++)
 	{
 		handle_connection* client = client_list.at(i);
@@ -294,6 +265,7 @@ void spreadsheet::server_shutdown(std::string shutdown_msg)
 	std::vector<std::string> message;
 	message.push_back("serverError");
 	message.push_back(shutdown_msg);
+	// Sends each client a server shutdown message
 	for(int i = 0; i < client_list.size(); i++)
 	{
 		handle_connection* client = client_list.at(i);
@@ -309,6 +281,7 @@ bool spreadsheet::is_cyclic_dependency()
 {
 	bool cyclic_dependency = false;
 	std::vector<std::string> visited;
+	// Visits every cell and follows the cells that it uses for its value
 	for (std::map<std::string, cell*>::iterator it = cell_map.begin(); it != cell_map.end(); it++)
 	{
 		std::string cur_cellname = it->first;
@@ -320,20 +293,18 @@ bool spreadsheet::is_cyclic_dependency()
 	return cyclic_dependency;
 }
 
+/*
+ * Visits a cell as part of checking for cyclic dependencies
+ */
 void spreadsheet::visit(std::string start, std::string cur_cellname, std::vector<std::string>& visited, bool& cyclic_dependency)
 {
 	visited.push_back(cur_cellname);
-	std::cout << "VISITED LIST" << std::endl;
-	for (int i = 0; i < visited.size(); i++)
-	{
-		std::cout << visited[i] << std::endl;
-	}
-	std::cout << "LIST END" << std::endl;
 	cell* cur_cell = cell_map[cur_cellname];
 	std::vector<std::string> dependent_list = cur_cell->get_dependent_list();
 	for (int i = 0; i < dependent_list.size(); i++)
 	{
 		std::string dependent = dependent_list.at(i);
+		// If a cell goes in a circle following this path then a cyclic dependency has occured
 		if(dependent == start)
 			cyclic_dependency = true;
 		else if (std::find(visited.begin(), visited.end(), dependent) != visited.end())

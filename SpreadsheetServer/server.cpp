@@ -19,12 +19,13 @@ server* the_server;
  */
 void signal_handler(int signum)
 {
+	// For every spreadsheet
 	for (std::map<std::string, spreadsheet*>::iterator it = the_server->spreadsheets.begin(); it != the_server->spreadsheets.end(); it++)
 	{
 		spreadsheet* sheet = it->second;
 		sheet->server_shutdown("Shutdown manually by the server maintainer");
 	}
-	exit(signum);
+	exit(signum); // shuts down program
 }
 
 int main()
@@ -34,11 +35,11 @@ int main()
     {
 
 	the_server = new server;
-    	std::signal(SIGINT, signal_handler);
+    	std::signal(SIGINT, signal_handler); // Look for a server termination
         io_context io_context;
         listener listen(io_context, the_server);
-	boost::thread t(boost::bind(&boost::asio::io_context::run, &io_context));
-	the_server->polling();
+	boost::thread t(boost::bind(&boost::asio::io_context::run, &io_context)); // listens for connections on a seperate thread
+	the_server->polling(); // start checking the spreadsheets for requests it needs to handle
 	t.join();
     }
     catch (std::exception& e)
@@ -68,6 +69,9 @@ std::string server::get_list_of_spreadsheets()
 	return sheet_list + '\n'; // Returns the whole list of files with an additional newline appended so the client knows it's the end of the list
 }
 
+/*
+ * Gets a spreadsheet object mapped to the specified filename
+ */
 spreadsheet* server::open_sheet(std::string filename)
 {
 	if (spreadsheets.find(filename) == spreadsheets.end()) // if the filename is not in the spreadsheet list
@@ -82,6 +86,9 @@ spreadsheet* server::open_sheet(std::string filename)
 	return spreadsheets[filename];
 }
 
+/*
+ * Add all of the saved spreadsheets into a (filename -> spreadsheet object) map
+ */
 void server::put_spreadsheets_in_map()
 {
 
@@ -99,6 +106,9 @@ void server::put_spreadsheets_in_map()
 
 }
 
+/*
+ * Gets the next client ID
+ */
 int server::get_ID()
 {
 	int clientID = curID;
@@ -106,6 +116,9 @@ int server::get_ID()
 	return clientID;
 }
 
+    /*
+     * Has each spreadsheet handle the next request in its queue
+     */
     void server::polling()
     {
         bool loop = true;

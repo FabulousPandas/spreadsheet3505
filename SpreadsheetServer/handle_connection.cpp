@@ -4,7 +4,6 @@ Written by Malik Qader and Dylan Hansen
 */
 
 #include "handle_connection.h"
-#include <iostream> //TODO: REMOVE (FOR TESTING ONLY)
 
 // Set an alias for the shared pointer to be "pointer"
 typedef boost::shared_ptr<handle_connection> pointer;
@@ -52,8 +51,10 @@ void handle_connection::start(server* serv)
  */
 void handle_connection::read_handler(const boost::system::error_code& err, size_t bytes_transferred)
 {
+	// if the client disconnects
 	if ((boost::asio::error::eof == err) || (boost::asio::error::connection_reset == err))
     	{
+		// if the client isn't connected to a spreadsheet
 		if (this_sheet != NULL)
 			this_sheet->disconnect_client(ID, this);
 		return;
@@ -67,7 +68,6 @@ void handle_connection::read_handler(const boost::system::error_code& err, size_
 				if (complete_handshake_message())
 				{
 					client_username = message_buffer;
-					std::cout << "USERNAME IS " << client_username << std::endl; //TODO: REMOVE (FOR TESTING ONLY)
 					std::string spreadsheet_list = the_server->get_list_of_spreadsheets(); // Gets a list of spreadsheets from the server
 					send_message(spreadsheet_list);
 					message_buffer = "";
@@ -78,8 +78,7 @@ void handle_connection::read_handler(const boost::system::error_code& err, size_
 				if (complete_handshake_message())
 				{
 					con_state = 0;
-					std::cout << "FILENAME IS " << message_buffer << std::endl; //TODO: REMOVE (FOR TESTING ONLY)
-					this_sheet = the_server->open_sheet(message_buffer);
+					this_sheet = the_server->open_sheet(message_buffer); // gets the spreadsheet object associated with this filename
 					this_sheet->add_client(this);
 					message_buffer = "";
 				}
@@ -89,20 +88,16 @@ void handle_connection::read_handler(const boost::system::error_code& err, size_
 				if (complete_json_message())
 				{
 					std::string json_message = message_buffer;
-					std::vector<std::string> message = split_message(json_message);
-					message.push_back(std::to_string(ID));
+					std::vector<std::string> message = split_message(json_message); // splits the elements of the json into the message vector
+					message.push_back(std::to_string(ID)); // append the client's id to the message
 					if (message.at(0) == "selectCell")
 					{
-						message.push_back(client_username);
+						message.push_back(client_username); // if we're selecting the cell we also append the client's username
 					}
-					this_sheet->add_to_q(message);
-					std::cout << "Message received: " << message_buffer << std::endl;
+					this_sheet->add_to_q(message); // send this message request to the sheet's message queue
 					message_buffer = "";
 				}
-				read_message();
-				break;
-			// Shutting down the connection
-			case 4:
+				read_message(); // read message loop
 				break;
 		}
 	}
@@ -122,32 +117,37 @@ void handle_connection::write_handler(const boost::system::error_code& err, size
 				con_state = 2;
 				read_message();
 				break;
+			// Happens once the spreadsheet is done sending all of the cell data to the client
 			case 2:
+				// The server assigns an ID to the client
 				ID = the_server->get_ID();
 				this_sheet->add_client_id(ID, this);
-				send_message(std::to_string(ID) + '\n'); // TODO: ADD CREATING OR GETTING CELL DATA FROM FILE CHOSEN
+				send_message(std::to_string(ID) + '\n'); // send ID to client
 				con_state = 3;
 				read_message();
-				break;
-			case 3:
-				//read_message();
-				break;
-			case 4:
 				break;
 		}
 	}
 }
 	
+/*
+ * Converts a string list of JSON elements into a JSON string.
+ * Then it sends that JSON string to the client
+ */
 void handle_connection::server_response(std::vector<std::string> message)
 {
 	rapidjson::Document d;
 	d.SetObject();
 
+	// Allocates space for the JSON parsing functions
 	rapidjson::Document::AllocatorType& allocator = d.GetAllocator();
 
+	// The first member is always messageType so set that member
 	rapidjson::Value val(message.at(0).c_str(), allocator);
 	d.AddMember("messageType", val, allocator);
 	
+	// if statements below look to see which JSON message type it is and then fills the document with the proper arguments passed
+
 	if (message.at(0) == "cellUpdated")
 	{
 		rapidjson::Value val1(message.at(1).c_str(), allocator);
@@ -159,7 +159,6 @@ void handle_connection::server_response(std::vector<std::string> message)
 	{
 		rapidjson::Value val1(message.at(1).c_str(), allocator);
 		d.AddMember("cellName", val1, allocator);
-		//rapidjson::Value val2(std::stoi(message.at(2)), allocator);
 		d.AddMember("selector", std::stoi(message.at(2)), allocator);
 		rapidjson::Value val3(message.at(3).c_str(), allocator);
 		d.AddMember("selectorName", val3, allocator);
@@ -185,15 +184,15 @@ void handle_connection::server_response(std::vector<std::string> message)
 
 	rapidjson::StringBuffer str;
 	rapidjson::Writer<rapidjson::StringBuffer> writer(str);
-	d.Accept(writer);
+	d.Accept(writer); // writes the document contents to a JSON string
 	std::string output = str.GetString();
 
-	std::cout << "SENDING TO CLIENT: " << output << std::endl;
-
 	send_message(output + '\n');
-	
 }
 
+/*
+ * Wrapper for reading an incoming message
+ */
 void handle_connection::read_message()
 {
 	socket_.async_read_some(
@@ -204,6 +203,9 @@ void handle_connection::read_message()
 			boost::asio::placeholders::bytes_transferred));
 }
 
+/*
+ * Wrapper for sending a message over the socket
+ */
 void handle_connection::send_message(std::string message)
 {
 	socket_.async_write_some(
