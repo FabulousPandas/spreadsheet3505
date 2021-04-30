@@ -18,15 +18,6 @@ Server class header
 class server
 {
 
-public:
-
-	server();
-	std::string get_list_of_spreadsheets();
-	spreadsheet* open_sheet(std::string filename);
-	int get_ID();
-	void polling();
-
-private:
 	struct Alphabetical {
 		
 		/*
@@ -43,17 +34,27 @@ private:
 
 	};
 
+public:
+
+	server();
+	std::string get_list_of_spreadsheets();
+	std::map<std::string, spreadsheet*, Alphabetical> spreadsheets;
+	spreadsheet* open_sheet(std::string filename);
+	int get_ID();
+	void polling();
+
+private:
+
 
 	std::string directory = "SavedSpreadsheets";
 	std::vector<int> clients;
-	std::map<std::string, spreadsheet*, Alphabetical> spreadsheets;
 	int curID = 0;
 
 	void put_spreadsheets_in_map();
 
 	void process_message(spreadsheet* cur_sheet);
 
-	//void signal_handler(int signum);
+	//static void signal_handler(int signum);
 
 
 

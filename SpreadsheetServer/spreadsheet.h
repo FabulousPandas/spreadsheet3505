@@ -38,6 +38,8 @@ public:
 
 	void disconnect_client(int id, handle_connection* client);
 
+	void server_shutdown(std::string message);
+
 
 
 private:
