@@ -5,18 +5,9 @@ VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormulaEvaluator", "FormulaEvaluator\FormulaEvaluator.csproj", "{391877C6-29E5-4667-9E1C-629594FAE734}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormulaEvaluatorTests", "FormulaEvaluatorTests\FormulaEvaluatorTests.csproj", "{E910E654-5FDB-487F-B511-F84F31E12046}"
-	ProjectSection(ProjectDependencies) = postProject
-		{391877C6-29E5-4667-9E1C-629594FAE734} = {391877C6-29E5-4667-9E1C-629594FAE734}
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DependencyGraph", "DependencyGraph\DependencyGraph.csproj", "{2CB7296A-5ADC-467A-8D7F-14BDBF53CFFB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DependencyGraphTests", "DependencyGraphTests\DependencyGraphTests.csproj", "{9D206523-9769-4F02-AC3B-72292397BEEA}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Formula", "Formula\Formula.csproj", "{AFB9B79C-9621-48E1-86DF-25DF4B1308F7}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormulaTests", "FormulaTests\FormulaTests.csproj", "{3EB33E37-9F21-4FA2-9F43-F0E780AA4E70}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spreadsheet", "Spreadsheet\Spreadsheet.csproj", "{F0B7694C-73AC-441F-BC5F-56C3BE69AD26}"
 EndProject
@@ -36,26 +27,14 @@ Global
 		{391877C6-29E5-4667-9E1C-629594FAE734}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{391877C6-29E5-4667-9E1C-629594FAE734}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{391877C6-29E5-4667-9E1C-629594FAE734}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E910E654-5FDB-487F-B511-F84F31E12046}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E910E654-5FDB-487F-B511-F84F31E12046}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E910E654-5FDB-487F-B511-F84F31E12046}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E910E654-5FDB-487F-B511-F84F31E12046}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2CB7296A-5ADC-467A-8D7F-14BDBF53CFFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2CB7296A-5ADC-467A-8D7F-14BDBF53CFFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2CB7296A-5ADC-467A-8D7F-14BDBF53CFFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2CB7296A-5ADC-467A-8D7F-14BDBF53CFFB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9D206523-9769-4F02-AC3B-72292397BEEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9D206523-9769-4F02-AC3B-72292397BEEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9D206523-9769-4F02-AC3B-72292397BEEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9D206523-9769-4F02-AC3B-72292397BEEA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AFB9B79C-9621-48E1-86DF-25DF4B1308F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AFB9B79C-9621-48E1-86DF-25DF4B1308F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFB9B79C-9621-48E1-86DF-25DF4B1308F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFB9B79C-9621-48E1-86DF-25DF4B1308F7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3EB33E37-9F21-4FA2-9F43-F0E780AA4E70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3EB33E37-9F21-4FA2-9F43-F0E780AA4E70}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3EB33E37-9F21-4FA2-9F43-F0E780AA4E70}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3EB33E37-9F21-4FA2-9F43-F0E780AA4E70}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F0B7694C-73AC-441F-BC5F-56C3BE69AD26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F0B7694C-73AC-441F-BC5F-56C3BE69AD26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0B7694C-73AC-441F-BC5F-56C3BE69AD26}.Release|Any CPU.ActiveCfg = Release|Any CPU
