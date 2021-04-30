@@ -244,6 +244,7 @@ namespace SpreadsheetGUI
                     //update selected cell text box
                     cellNameTextBox.Text = cellName;
                     cellInputTextBox.Text = cellContents;
+                    cellValueTextBox.Text = controller.GetCellValue(controller.GetColumn(cellName), controller.GetRow(cellName));
                 }
             );
             this.Invoke(invoker);
